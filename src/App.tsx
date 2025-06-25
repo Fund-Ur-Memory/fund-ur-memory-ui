@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import HomePage from "./components/HomePage"
 import ErrorPage from "./components/ErrorPage"
+import { Dashboard } from './components/dashboard/Dashboard';
 
 import "@rainbow-me/rainbowkit/styles.css";
 import GlobalAOSProvider from "./GlobalAOSProvider/GlobalAOSProvider";
@@ -63,6 +64,10 @@ function App() {
     switch (currentPath) {
       case '/':
         return <HomePage />;
+      case '/dashboard':
+        return <Dashboard userAddress={''} onDisconnect={function (): void {
+          throw new Error('Function not implemented.');
+        } } />;
       default:
         return <ErrorPage />;
     }
