@@ -1,13 +1,8 @@
 import { type DashboardData } from '../../types/dashboard'
 
 export class MockAPIService {
-  private static delay(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms))
-  }
 
   static async getDashboardData(address: string): Promise<DashboardData> {
-    await this.delay(1500)
-
     return {
       profile: {
         address,

@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
+// src/components/dashboard/tabs/VaultsTab.tsx - Final fixed version
+import React from 'react'
 import { motion } from 'framer-motion'
-import { Plus } from 'lucide-react'
+import { Plus, Shield, DollarSign, Brain } from 'lucide-react'
 import { VaultCard } from '../cards/VaultCard'
 import { MetricCard } from '../cards/MetricCard'
-// import { VaultDetailModal } from '../modals/VaultDetailModal'
 import { Button } from '../../ui/Button'
-import { type DashboardData, type Vault } from '../../../types/dashboard'
+import { type DashboardData } from '../../../types/dashboard'
 
 interface VaultsTabProps {
   data: DashboardData
@@ -17,11 +17,22 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
   data,
   isPrivacyMode,
 }) => {
-  const [selectedVault, setSelectedVault] = useState<Vault | null>(null)
   const { vaults } = data
 
   const totalLockedValue = vaults.reduce((sum, vault) => sum + vault.value, 0)
-  const avgAIScore = Math.round(vaults.reduce((sum, vault) => sum + vault.aiScore, 0) / vaults.length)
+  const avgAIScore = vaults.length > 0 
+    ? Math.round(vaults.reduce((sum, vault) => sum + vault.aiScore, 0) / vaults.length) 
+    : 0
+
+  const handleVaultClick = (vaultId: number) => {
+    console.log('View vault details:', vaultId)
+    // Handle vault detail view
+  }
+
+  const handleCreateVault = () => {
+    console.log('Create new vault')
+    // Handle vault creation
+  }
 
   return (
     <div className="space-y-8">
@@ -29,7 +40,7 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
         <h2 className="text-2xl font-bold text-white">Your Commitment Vaults</h2>
         <Button
           icon={<Plus className="w-5 h-5" />}
-          onClick={() => console.log('Create new vault')}
+          onClick={handleCreateVault}
         >
           Create New Vault
         </Button>
@@ -41,7 +52,7 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
           title="Active Vaults"
           value={vaults.length}
           subtitle="All performing well"
-          icon={Plus}
+          icon={Shield}
           iconColor="text-purple-400"
         />
         
@@ -49,7 +60,7 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
           title="Total Locked Value"
           value={totalLockedValue}
           subtitle="Across 3 chains"
-          icon={Plus}
+          icon={DollarSign}
           iconColor="text-blue-400"
           isPrivate={isPrivacyMode}
         />
@@ -58,7 +69,7 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
           title="Avg AI Score"
           value={avgAIScore}
           subtitle="High confidence"
-          icon={Plus}
+          icon={Brain}
           iconColor="text-green-400"
         />
       </div>
@@ -70,7 +81,7 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
             key={vault.id}
             vault={vault}
             isPrivate={isPrivacyMode}
-            onClick={() => setSelectedVault(vault)}
+            onClick={() => handleVaultClick(vault.id)}
             delay={index * 0.1}
           />
         ))}
@@ -87,22 +98,12 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
           <p className="text-gray-400 mb-8">Create your first commitment vault to get started</p>
           <Button
             icon={<Plus className="w-5 h-5" />}
-            onClick={() => console.log('Create first vault')}
+            onClick={handleCreateVault}
           >
             Create Your First Vault
           </Button>
         </motion.div>
       )}
-
-      {/* Vault Detail Modal */}
-      {/* {selectedVault && (
-        <VaultDetailModal
-          vault={selectedVault}
-          isOpen={!!selectedVault}
-          onClose={() => setSelectedVault(null)}
-          isPrivate={isPrivacyMode}
-        />
-      )} */}
     </div>
   )
 }

@@ -1,6 +1,7 @@
+// src/components/dashboard/cards/MetricCard.tsx - Fixed version
 import React from 'react'
 import { motion } from 'framer-motion'
-import { type  LucideIcon } from 'lucide-react'
+import { type LucideIcon } from 'lucide-react'
 import { Card } from '../../ui/Card'
 import { formatCurrency, formatPercentage } from '../../../utils/formatters'
 
@@ -31,6 +32,17 @@ export const MetricCard: React.FC<MetricCardProps> = ({
     ? formatCurrency(value, isPrivate) 
     : value
 
+  const getIconBgColor = (iconColor: string) => {
+    const colorMap: Record<string, string> = {
+      'text-purple-400': 'bg-purple-500/20',
+      'text-green-400': 'bg-green-500/20',
+      'text-blue-400': 'bg-blue-500/20',
+      'text-red-400': 'bg-red-500/20',
+      'text-yellow-400': 'bg-yellow-500/20',
+    }
+    return colorMap[iconColor] || 'bg-purple-500/20'
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -46,7 +58,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
               <p className="text-gray-500 text-xs mt-1">{subtitle}</p>
             )}
           </div>
-          <div className={`bg-${iconColor.split('-')[1]}-500/20 p-3 rounded-xl`}>
+          <div className={`${getIconBgColor(iconColor)} p-3 rounded-xl`}>
             <Icon className={`w-6 h-6 ${iconColor}`} />
           </div>
         </div>
