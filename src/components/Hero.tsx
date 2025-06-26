@@ -30,7 +30,7 @@ const Hero = () => {
           <li>
             <button 
               className="ico_creative_btn" 
-              onClick={() => handleNavigation("/token")}
+              onClick={() => handleNavigation("/dashboard")}
             >
               <span className="btn_wrapper">
                 <span className="btn_icon_left">
@@ -58,7 +58,7 @@ const Hero = () => {
           <li>
             <button 
               className="ico_creative_btn" 
-              onClick={() => handleNavigation("/about")}
+              onClick={() => handleNavigation("/dashboard")}
             >
               <span className="btn_wrapper">
                 <span className="btn_icon_left">

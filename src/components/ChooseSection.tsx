@@ -1,10 +1,6 @@
 import icon1 from "../icons/icon_dollar_2.svg"
 import icon2 from "../icons/icon_bank_building.svg"
 import icon3 from "../icons/icon_scan.svg"
-import icon4 from "/public/images/services/icon_pinpoint.png"
-import shape1 from "/public/images/shapes/shape_section_divider_1.svg"
-import sImg from "/public/images/services/ico_service_image.webp"
-import shape2 from "/public/images/shapes/shape_poligon.svg"
 
 const services = [
   {
@@ -26,7 +22,7 @@ const services = [
     delay: 400,
   },
   {
-    icon: icon4,
+    icon: "/images/services/icon_pinpoint.png",
     title: "Privacy Layer",
     description: "ZK-proof implementation for transaction privacy and stealth addresses",
     delay: 500,
@@ -40,7 +36,7 @@ const ChooseSection = () => {
       className="ico_service_section section_space pb-0 section_decoration section_shadow_top"
     >
       <div className="decoration_item shape_divider_1">
-        <img src={shape1 || "/placeholder.svg"} alt="Shape Divider" />
+        <img src="/images/shapes/shape_section_divider_1.svg" alt="Shape Divider" />
       </div>
 
       <div className="container">
@@ -51,7 +47,7 @@ const ChooseSection = () => {
         <div className="row m-lg-0 justify-content-center">
           <div className="col-lg-4 p-lg-0" data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
             <div className="ico_service_image">
-              <img src={sImg || "/placeholder.svg"} alt="ICO Service Icon" />
+              <img src="/images/services/ico_service_image.webp" alt="ICO Service Icon" />
             </div>
           </div>
           {services.map((service, index) => (
@@ -76,10 +72,10 @@ const ChooseSection = () => {
         </div>
       </div>
       <div className="decoration_item shape_shadow_1">
-        <img src={shape2 || "/placeholder.svg"} alt="Shape Color Shadow" />
+        <img src="/images/shapes/shape_poligon.svg" alt="Shape Color Shadow" />
       </div>
       <div className="decoration_item shape_shadow_2">
-        <img src={shape2 || "/placeholder.svg"} alt="Shape Color Shadow" />
+        <img src="/images/shapes/shape_poligon.svg" alt="Shape Color Shadow" />
       </div>
     </section>
   )
