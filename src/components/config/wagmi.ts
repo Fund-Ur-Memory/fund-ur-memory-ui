@@ -31,7 +31,7 @@ const monadTestnet: Chain = {
 
 export const config = getDefaultConfig({
   appName: "Fund Ur Memory",
-  projectId: "YOUR_WALLETCONNECT_PROJECT_ID",
+  projectId: "c320a9d45d2597dbc7e795fb97d965f1",
   chains: [avalancheFuji, monadTestnet],
   ssr: true,
 })

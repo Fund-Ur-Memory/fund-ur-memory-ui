@@ -5,6 +5,8 @@ import { Shield, DollarSign, CheckCircle, Clock } from 'lucide-react'
 import { VaultCard } from '../cards/VaultCard'
 import { MetricCard } from '../cards/MetricCard'
 import { CreateVaultModal } from '../modals/CreateVaultModal'
+import { LoadingSpinner } from '../common/LoadingSpinner'
+import { VaultCardSkeleton } from '../common/SkeletonLoader'
 import { useCreateVault } from '../../../hooks/dashboard/useCreateVault'
 import { useGetVaults } from '../../../hooks/contracts/useGetVaults'
 import { useAccount } from 'wagmi'
@@ -193,19 +195,34 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
                   </div>
                 </motion.div>
               ) : isLoadingVaults ? (
-                /* Loading State */
+                /* Enhanced Loading State with Skeleton Cards */
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="text-center py-5"
+                  className="row g-2"
                 >
-                  <div className="ico_iconbox_block p-5">
-                    <div style={{ fontSize: '4rem', marginBottom: '2rem' }}>⏳</div>
-                    <h3 className="heading_text text-white mb-4">Loading Your Vaults</h3>
-                    <p className="text-secondary mb-4">
-                      Fetching your commitment vaults from the blockchain...
-                    </p>
+                  {/* Loading header */}
+                  <div className="col-12 text-center mb-4">
+                    <LoadingSpinner
+                      variant="vault"
+                      size="lg"
+                      text="Loading your commitment vaults..."
+                      color="purple"
+                    />
                   </div>
+
+                  {/* Skeleton vault cards */}
+                  {Array.from({ length: 4 }, (_, index) => (
+                    <motion.div
+                      key={index}
+                      className="col-lg-6 col-md-6"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      <VaultCardSkeleton />
+                    </motion.div>
+                  ))}
                 </motion.div>
               ) : userVaults.length > 0 ? (
                 /* User Has Vaults */

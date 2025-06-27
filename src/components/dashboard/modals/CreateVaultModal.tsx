@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronDown, ArrowRight, Clock, Target, Zap } from 'lucide-react'
+import { LoadingSpinner } from '../common/LoadingSpinner'
 import type { VaultFormData } from '../../../types/contracts'
 import '../../../styles/create-vault-modal.css'
+import '../../../styles/enhanced-loading.css'
 
 interface CreateVaultModalProps {
   isOpen: boolean
@@ -439,7 +441,13 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
                   </span>
                   <span className="btn_icon_right">
                     {isLoading ? (
-                      <div className="loading-spinner" />
+                      <LoadingSpinner
+                        size="xs"
+                        variant="dots"
+                        color="white"
+                        text=""
+                        className="inline-flex"
+                      />
                     ) : (
                       <ArrowRight className="w-5 h-5" />
                     )}

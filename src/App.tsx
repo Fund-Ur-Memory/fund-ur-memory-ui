@@ -5,8 +5,10 @@ import { injected } from 'wagmi/connectors'
 import HomePage from "./components/HomePage"
 import ErrorPage from "./components/ErrorPage"
 import { Dashboard } from './components/dashboard/Dashboard'
+import { WalletConnectionAnimation } from './components/dashboard/common/WalletConnectionAnimation'
 
 import "@rainbow-me/rainbowkit/styles.css"
+import "./styles/enhanced-loading.css"
 import GlobalAOSProvider from "./GlobalAOSProvider/GlobalAOSProvider"
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit"
 import { WagmiProvider } from "wagmi"
@@ -27,7 +29,7 @@ const ProfilePage = () => {
   const { address, isConnected } = useAccount()
   const { disconnect } = useDisconnect()
   const { data: ensName } = useEnsName({ address })
-  
+
   const handleDisconnect = () => {
     disconnect()
     toast.success('Wallet disconnected successfully')
@@ -47,7 +49,7 @@ const ProfilePage = () => {
       <Header />
       <main className="page_content">
         {/* Hero Section */}
-        <section className="ico_hero_section section_decoration text-center" style={{ 
+        <section className="ico_hero_section section_decoration text-center" style={{
           backgroundImage: `url(${"/images/shapes/shape_net_ico_hero_section_bg.svg"})`,
           minHeight: "auto",
           paddingTop: "2rem",
@@ -107,7 +109,7 @@ const ProfilePage = () => {
                       </button>
                     </div>
                   </div>
-                  
+
                   {/* Settings */}
                   <div className="col-lg-8">
                     <div className="ico_iconbox_block p-4">
@@ -126,7 +128,7 @@ const ProfilePage = () => {
                             </span>
                           </div>
                         </div>
-                        
+
                         {ensName && (
                           <div className="mb-3">
                             <label className="text-secondary mb-2 d-block">ENS Name</label>
@@ -140,7 +142,7 @@ const ProfilePage = () => {
                             </div>
                           </div>
                         )}
-                        
+
                         <div className="mb-3">
                           <label className="text-secondary mb-2 d-block">Network</label>
                           <div style={{
@@ -152,7 +154,7 @@ const ProfilePage = () => {
                             <span className="text-white">Monad Testnet</span>
                           </div>
                         </div>
-                        
+
                         <div className="mb-3">
                           <label className="text-secondary mb-2 d-block">Risk Profile</label>
                           <select className="form-control" style={{
@@ -186,9 +188,9 @@ const ProfilePage = () => {
                         }}>
                           <span className="text-white">{setting.label}</span>
                           <div className="form-check form-switch">
-                            <input 
-                              className="form-check-input" 
-                              type="checkbox" 
+                            <input
+                              className="form-check-input"
+                              type="checkbox"
                               defaultChecked={setting.enabled}
                             />
                           </div>
@@ -238,57 +240,76 @@ const ProfilePage = () => {
   )
 }
 
-// Connection Guard Component with real Web3 integration
+// Connection Guard Component with enhanced wallet connection animation
 const ConnectionGuard = ({ children }: { children?: React.ReactNode }) => {
   const { isConnected, isConnecting } = useAccount()
-  const { connect, isPending } = useConnect()
+  const { connect, isPending, connectors } = useConnect()
+  const [showAnimation, setShowAnimation] = useState(false)
+  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'success' | 'error'>('connecting')
 
   const handleConnect = () => {
+    setShowAnimation(true)
+    setConnectionStatus('connecting')
     connect({ connector: injected() })
   }
+
+  // Handle connection state changes
+  useEffect(() => {
+    if (isConnected) {
+      setConnectionStatus('success')
+      setTimeout(() => {
+        setShowAnimation(false)
+      }, 2000) // Show success for 2 seconds
+    } else if (!isConnecting && !isPending && showAnimation) {
+      setConnectionStatus('error')
+      setTimeout(() => {
+        setShowAnimation(false)
+      }, 3000) // Show error for 3 seconds
+    }
+  }, [isConnected, isConnecting, isPending, showAnimation])
 
   if (isConnected && children) {
     return <>{children}</>
   }
 
   return (
-    <div className="index_ico page_wrapper">
-      <Header />
-      <main className="page_content">
-        <section className="ico_hero_section section_decoration text-center" style={{ 
-          backgroundImage: `url(${"/images/shapes/shape_net_ico_hero_section_bg.svg"})`,
-          minHeight: "80vh",
-          display: "flex",
-          alignItems: "center"
-        }}>
-          <div className="container">
-            <div className="row justify-content-center">
-              <div className="col-lg-8">
-                <div className="text-center">
-                  <div className="mb-4" style={{ fontSize: "4rem" }}>
-                    {isConnecting || isPending ? '⏳' : '🔒'}
-                  </div>
-                  <h2 className="heading_text text-white mb-4">
-                    {isConnecting || isPending ? 'Connecting Wallet...' : 'Connect Your Wallet'}
-                  </h2>
-                  <p className="text-secondary mb-4">
-                    {isConnecting || isPending 
-                      ? 'Please approve the connection in your wallet'
-                      : 'Please connect your wallet to access the dashboard and manage your commitment vaults.'
-                    }
-                  </p>
-                  
-                  {!isConnecting && !isPending && (
+    <>
+      <div className="index_ico page_wrapper">
+        <Header />
+        <main className="page_content">
+          <section className="ico_hero_section section_decoration text-center" style={{
+            backgroundImage: `url(${"/images/shapes/shape_net_ico_hero_section_bg.svg"})`,
+            minHeight: "80vh",
+            display: "flex",
+            alignItems: "center"
+          }}>
+            <div className="container">
+              <div className="row justify-content-center">
+                <div className="col-lg-8">
+                  <div className="text-center">
+                    <div className="mb-4" style={{ fontSize: "4rem" }}>
+                      🔒
+                    </div>
+                    <h2 className="heading_text text-white mb-4">
+                      Connect Your Wallet
+                    </h2>
+                    <p className="text-secondary mb-4">
+                      Please connect your wallet to access the dashboard and manage your commitment vaults.
+                    </p>
+
                     <div className="d-flex justify-content-center gap-3 flex-wrap">
                       <button
                         onClick={handleConnect}
                         className="ico_creative_btn"
+                        disabled={isConnecting || isPending}
                       >
                         <span className="btn_wrapper">
-                          <span className="btn_label">Connect Wallet</span>
+                          <span className="btn_label">
+                            {isConnecting || isPending ? 'Connecting...' : 'Connect Wallet'}
+                          </span>
                         </span>
                       </button>
-                      
+
                       <button
                         onClick={() => window.location.href = '/'}
                         className="ico_creative_btn"
@@ -301,33 +322,23 @@ const ConnectionGuard = ({ children }: { children?: React.ReactNode }) => {
                         </span>
                       </button>
                     </div>
-                  )}
-                  
-                  {(isConnecting || isPending) && (
-                    <div className="ico_progress mt-4">
-                      <div className="progress">
-                        <div
-                          className="progress-bar progress-bar-striped progress-bar-animated"
-                          role="progressbar"
-                          style={{ 
-                            width: "75%",
-                            background: "linear-gradient(135deg, #6f42c1, #9d5be8)"
-                          }}
-                          aria-valuenow={75}
-                          aria-valuemin={0}
-                          aria-valuemax={100}
-                        ></div>
-                      </div>
-                    </div>
-                  )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-      </main>
-      <Footer />
-    </div>
+          </section>
+        </main>
+        <Footer />
+      </div>
+
+      {/* Enhanced Wallet Connection Animation */}
+      <WalletConnectionAnimation
+        isVisible={showAnimation || isConnecting || isPending}
+        status={connectionStatus}
+        walletName={connectors[0]?.name || 'MetaMask'}
+        onComplete={() => setShowAnimation(false)}
+      />
+    </>
   )
 }
 
@@ -336,7 +347,7 @@ const LoadingScreen = ({ message = "Loading..." }: { message?: string }) => (
   <div className="index_ico page_wrapper">
     <Header />
     <main className="page_content">
-      <section className="ico_hero_section section_decoration text-center" style={{ 
+      <section className="ico_hero_section section_decoration text-center" style={{
         backgroundImage: `url(${"/images/shapes/shape_net_ico_hero_section_bg.svg"})`,
         minHeight: "80vh",
         display: "flex",
@@ -349,7 +360,7 @@ const LoadingScreen = ({ message = "Loading..." }: { message?: string }) => (
                 <div
                   className="progress-bar progress-bar-striped progress-bar-animated"
                   role="progressbar"
-                  style={{ 
+                  style={{
                     width: "75%",
                     background: "linear-gradient(135deg, #6f42c1, #9d5be8)"
                   }}
@@ -373,7 +384,7 @@ const LoadingScreen = ({ message = "Loading..." }: { message?: string }) => (
 function AppContent() {
   const [currentPath, setCurrentPath] = useState(window.location.pathname)
   const [isLoading, setIsLoading] = useState(false)
-  
+
   // Real Web3 hooks
   const { address, isConnected, isConnecting } = useAccount()
   const { disconnect } = useDisconnect()
@@ -396,7 +407,7 @@ function AppContent() {
     }
 
     setIsLoading(true)
-    
+
     // Simulate navigation delay for better UX
     setTimeout(() => {
       window.history.pushState({}, '', path)
@@ -420,14 +431,23 @@ function AppContent() {
     }
   }, [isConnected, address])
 
-  // Loading screen during navigation
+  // Enhanced loading states with wallet connection animation
   if (isLoading) {
     return <LoadingScreen message="Navigating..." />
   }
 
-  // Loading screen during wallet connection
+  // Use enhanced wallet connection animation for connecting state
   if (isConnecting) {
-    return <LoadingScreen message="Connecting Wallet..." />
+    return (
+      <>
+        <LoadingScreen message="Connecting Wallet..." />
+        <WalletConnectionAnimation
+          isVisible={true}
+          status="connecting"
+          walletName="MetaMask"
+        />
+      </>
+    )
   }
 
   // Enhanced routing logic with real Web3 state
@@ -436,21 +456,21 @@ function AppContent() {
       switch (currentPath) {
         case '/':
           return <HomePage />
-        
+
         case '/dashboard':
           if (!isConnected || !address) {
             return <ConnectionGuard />
           }
           return (
-            <Dashboard 
-              userAddress={address} 
+            <Dashboard
+              userAddress={address}
               onDisconnect={handleDisconnect}
             />
           )
-        
+
         case '/profile':
           return <ProfilePage />
-        
+
         default:
           return <ErrorPage />
       }
@@ -484,7 +504,7 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <RainbowKitProvider>
             <AppContent />
-            <Toaster 
+            <Toaster
               position="top-center"
               toastOptions={{
                 duration: 4000,

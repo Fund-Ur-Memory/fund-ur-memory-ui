@@ -4,6 +4,8 @@ import { motion } from 'framer-motion'
 import { Archive, CheckCircle, AlertTriangle, Clock } from 'lucide-react'
 import { VaultCard } from '../cards/VaultCard'
 import { MetricCard } from '../cards/MetricCard'
+import { LoadingSpinner } from '../common/LoadingSpinner'
+import { VaultCardSkeleton } from '../common/SkeletonLoader'
 import { useGetVaults } from '../../../hooks/contracts/useGetVaults'
 import { useAccount } from 'wagmi'
 import '../../../styles/header-compact.css'
@@ -155,19 +157,34 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
                   </div>
                 </motion.div>
               ) : isLoadingVaults ? (
-                /* Loading State */
+                /* Enhanced Loading State for History */
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="text-center py-5"
+                  className="row g-2"
                 >
-                  <div className="ico_iconbox_block p-5">
-                    <div style={{ fontSize: '4rem', marginBottom: '2rem' }}>⏳</div>
-                    <h3 className="heading_text text-white mb-4">Loading History</h3>
-                    <p className="text-secondary mb-4">
-                      Fetching your vault history from the blockchain...
-                    </p>
+                  {/* Loading header */}
+                  <div className="col-12 text-center mb-4">
+                    <LoadingSpinner
+                      variant="blockchain"
+                      size="lg"
+                      text="Loading your vault history..."
+                      color="blue"
+                    />
                   </div>
+
+                  {/* Skeleton vault cards for history */}
+                  {Array.from({ length: 3 }, (_, index) => (
+                    <motion.div
+                      key={index}
+                      className="col-lg-6 col-md-6"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.15 }}
+                    >
+                      <VaultCardSkeleton />
+                    </motion.div>
+                  ))}
                 </motion.div>
               ) : historyVaults.length > 0 ? (
                 /* User Has History Vaults */
