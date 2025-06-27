@@ -1,5 +1,5 @@
 // src/hooks/contracts/useWithdrawVault.ts
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { FUM_VAULT_CONFIG } from '../../contracts/FUMVault'
 import type { Address } from 'viem'
@@ -24,6 +24,13 @@ export const useWithdrawVault = (): UseWithdrawVaultReturn => {
     hash: hash as Address,
   })
 
+  // Update txHash when hash changes
+  useEffect(() => {
+    if (hash) {
+      setTxHash(hash)
+    }
+  }, [hash])
+
   const withdrawVault = async (vaultId: number) => {
     try {
       setIsLoading(true)
@@ -32,15 +39,15 @@ export const useWithdrawVault = (): UseWithdrawVaultReturn => {
 
       console.log(`🔓 Withdrawing vault ${vaultId}...`)
 
-      const result = await writeContract({
+      writeContract({
         address: FUM_VAULT_CONFIG.address,
         abi: FUM_VAULT_CONFIG.abi,
         functionName: 'withdrawVault',
         args: [BigInt(vaultId)],
       })
 
-      setTxHash(result)
-      console.log(`✅ Withdraw transaction submitted:`, result)
+      // The transaction hash will be available in the `hash` data from useWriteContract
+      console.log(`✅ Withdraw transaction initiated`)
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to withdraw vault'
@@ -59,15 +66,15 @@ export const useWithdrawVault = (): UseWithdrawVaultReturn => {
 
       console.log(`🚨 Emergency withdrawing vault ${vaultId}...`)
 
-      const result = await writeContract({
+      writeContract({
         address: FUM_VAULT_CONFIG.address,
         abi: FUM_VAULT_CONFIG.abi,
         functionName: 'executeEmergencyWithdrawal',
         args: [BigInt(vaultId)],
       })
 
-      setTxHash(result)
-      console.log(`✅ Emergency withdraw transaction submitted:`, result)
+      // The transaction hash will be available in the `hash` data from useWriteContract
+      console.log(`✅ Emergency withdraw transaction initiated`)
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to emergency withdraw vault'
