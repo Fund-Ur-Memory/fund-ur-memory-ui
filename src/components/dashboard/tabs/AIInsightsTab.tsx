@@ -55,7 +55,7 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
   return (
     <div>
       {/* Header Section */}
-      <section className="section_space pb-0">
+      <section style={{ paddingTop: '2rem', paddingBottom: '0' }}>
         <div className="container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -76,7 +76,7 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
       </section>
 
       {/* AI Health Score Section */}
-      <section className="section_space pb-0">
+      <section style={{ paddingTop: '1rem', paddingBottom: '0' }}>
         <div className="container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -90,10 +90,10 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
                 border: '1px solid rgba(111, 66, 193, 0.4)'
               }}>
                 <h3 className="heading_text text-white mb-4">Your AI Risk Score</h3>
-                
+
                 {/* Circular Progress */}
                 <div className="position-relative mx-auto mb-4" style={{ width: '150px', height: '150px' }}>
-                  <svg 
+                  <svg
                     className="position-absolute"
                     style={{ transform: 'rotate(-90deg)', width: '150px', height: '150px' }}
                     viewBox="0 0 36 36"
@@ -133,7 +133,7 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
                     </motion.div>
                   </div>
                 </div>
-                
+
                 <h5 className="text-white mb-2">Low Risk Profile</h5>
                 <p className="text-secondary mb-0">
                   {aiInsights.confidence}% confidence based on your trading history
@@ -145,7 +145,7 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
       </section>
 
       {/* Insight Categories Navigation */}
-      <section className="section_space pb-0">
+      <section style={{ paddingTop: '1rem', paddingBottom: '0' }}>
         <div className="container">
           <div className="row justify-content-center">
             <div className="col-lg-10">
@@ -157,9 +157,9 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
                       type="button"
                       role="tab"
                       onClick={() => setSelectedInsight(key)}
-                      style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
                         gap: '0.5rem',
                         minWidth: '160px',
                         justifyContent: 'center'
@@ -177,7 +177,7 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
       </section>
 
       {/* Insight Content */}
-      <section className="section_space pb-0">
+      <section style={{ paddingTop: '1rem', paddingBottom: '0' }}>
         <div className="container">
           <motion.div
             key={selectedInsight}
@@ -194,7 +194,7 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
                       <span style={{ fontSize: '2rem', marginRight: '1rem' }}>📊</span>
                       <h3 className="iconbox_title text-white mb-0">Market Conditions</h3>
                     </div>
-                    
+
                     <div className="row mb-4">
                       <div className="col-md-6 mb-3">
                         <div className="p-3" style={{
@@ -221,7 +221,7 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="p-3" style={{
                       background: 'rgba(111, 66, 193, 0.1)',
                       borderRadius: '8px',
@@ -239,7 +239,7 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
                       <span style={{ fontSize: '2rem', marginRight: '1rem' }}>🧠</span>
                       <h3 className="iconbox_title text-white mb-0">Your Trading Patterns</h3>
                     </div>
-                    
+
                     <div className="row">
                       <div className="col-md-6 mb-4">
                         <div className="p-3" style={{
@@ -264,7 +264,7 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="mb-4">
                       <h6 className="text-secondary mb-3">⚠️ Emotional Triggers</h6>
                       <div className="d-flex flex-wrap gap-2">
@@ -280,7 +280,7 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
                         ))}
                       </div>
                     </div>
-                    
+
                     <div>
                       <h6 className="text-secondary mb-3">✅ Success Factors</h6>
                       <div className="d-flex flex-wrap gap-2">
@@ -305,7 +305,7 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
                       <span style={{ fontSize: '2rem', marginRight: '1rem' }}>🔮</span>
                       <h3 className="iconbox_title text-white mb-0">AI Price Predictions</h3>
                     </div>
-                    
+
                     <div className="space-y-4">
                       {[
                         { label: 'ETH (3 months)', price: insights.predictions.data.eth_3month.price, confidence: insights.predictions.data.eth_3month.confidence, color: '#22c55e' },
@@ -323,9 +323,9 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
                             </span>
                           </div>
                           <div className="progress" style={{ height: '6px', background: 'rgba(255,255,255,0.1)' }}>
-                            <motion.div 
+                            <motion.div
                               className="progress-bar"
-                              style={{ 
+                              style={{
                                 background: prediction.color,
                                 borderRadius: '3px'
                               }}
@@ -349,7 +349,7 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
       </section>
 
       {/* Detailed Recommendations */}
-      <section className="section_space">
+      <section style={{ paddingTop: '1rem', paddingBottom: '3rem' }}>
         <div className="container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -363,7 +363,7 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
                   <span style={{ fontSize: '2rem', marginRight: '1rem' }}>🎯</span>
                   <h3 className="iconbox_title text-white mb-0">Personalized Recommendations</h3>
                 </div>
-                
+
                 <div className="row">
                   {sortedRecommendations.map((rec, index) => (
                     <div key={rec.id} className="col-lg-6 mb-4">

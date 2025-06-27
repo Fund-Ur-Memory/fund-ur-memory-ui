@@ -75,6 +75,77 @@
   transition: all 0.3s ease;
 }
 
+/* Vault Action Buttons */
+.vault-action-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.vault-action-button:hover {
+  transform: translateY(-2px);
+}
+
+.vault-action-button:active {
+  transform: translateY(0);
+}
+
+.vault-action-button:disabled {
+  transform: none !important;
+  cursor: not-allowed !important;
+}
+
+/* Button Ripple Effect */
+.vault-action-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.vault-action-button:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Status Badges */
+.vault-status-badge {
+  position: relative;
+  overflow: hidden;
+}
+
+.vault-status-completed {
+  animation: pulse-success 2s infinite;
+}
+
+.vault-status-ready {
+  animation: pulse-warning 2s infinite;
+}
+
+@keyframes pulse-success {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+  }
+}
+
+@keyframes pulse-warning {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.5);
+  }
+}
+
 .vault-card-container:hover .vault-message-box {
   background: linear-gradient(135deg,
     rgba(255, 255, 255, 0.08),

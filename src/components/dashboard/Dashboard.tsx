@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAccount, useEnsName, useBalance, useDisconnect } from "wagmi";
 import { OverviewTab } from "./tabs/OverviewTab";
 import { VaultsTab } from "./tabs/VaultsTab";
+import { HistoryTab } from "./tabs/HistoryTab";
 import { AIInsightsTab } from "./tabs/AIInsightsTab";
 import { ProfileTab } from "./tabs/ProfileTab";
 import { LoadingSpinner } from "./common/LoadingSpinner";
@@ -372,6 +373,7 @@ const DashboardHeader: React.FC<{
   const tabs = [
     { id: 'overview', label: 'Overview', icon: '📊' },
     { id: 'vaults', label: 'Vaults', icon: '🔒' },
+    { id: 'history', label: 'History', icon: '📜' },
     { id: 'ai', label: 'AI Insights', icon: '🧠' },
     { id: 'profile', label: 'Profile', icon: '⚙️' }
   ];
@@ -594,23 +596,31 @@ export const Dashboard: React.FC<DashboardProps> = ({
   }
 
   const renderActiveTab = () => {
-    const tabProps = {
+    const commonTabProps = {
       data,
+      isPrivacyMode,
+      onRefetch: refetch,
+    };
+
+    // VaultsTab and HistoryTab have different props (no data prop needed)
+    const vaultsTabProps = {
       isPrivacyMode,
       onRefetch: refetch,
     };
 
     switch (activeTab) {
       case "overview":
-        return <OverviewTab {...tabProps} />;
+        return <OverviewTab {...commonTabProps} />;
       case "vaults":
-        return <VaultsTab {...tabProps} />;
+        return <VaultsTab {...vaultsTabProps} />;
+      case "history":
+        return <HistoryTab {...vaultsTabProps} />;
       case "ai":
-        return <AIInsightsTab {...tabProps} />;
+        return <AIInsightsTab {...commonTabProps} />;
       case "profile":
-        return <ProfileTab {...tabProps} userAddress={userAddress} onDisconnect={handleDisconnect} />;
+        return <ProfileTab {...commonTabProps} userAddress={userAddress} onDisconnect={handleDisconnect} />;
       default:
-        return <OverviewTab {...tabProps} />;
+        return <OverviewTab {...commonTabProps} />;
     }
   };
 
