@@ -8,7 +8,6 @@ import { CreateVaultModal } from '../modals/CreateVaultModal'
 import { useCreateVault } from '../../../hooks/dashboard/useCreateVault'
 import { useGetVaults } from '../../../hooks/contracts/useGetVaults'
 import { useAccount } from 'wagmi'
-import { contractHealthCheck } from '../../../utils/contractDebugger'
 import '../../../styles/header-compact.css'
 import '../../../styles/vault-cards.css'
 
@@ -64,17 +63,7 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
     onRefetch?.()
   }
 
-  const handleDebugContract = async () => {
-    if (connectedAddress) {
-      console.log('🔍 Running contract health check...')
-      const healthCheck = await contractHealthCheck(connectedAddress)
-      console.log('🏥 Health check complete:', healthCheck)
 
-      if (!healthCheck.isHealthy) {
-        console.log('⚠️ Issues found:', healthCheck.recommendations)
-      }
-    }
-  }
 
   const handleVaultWithdraw = (vaultId: number) => {
     console.log(`✅ Vault ${vaultId} withdrawn successfully`)

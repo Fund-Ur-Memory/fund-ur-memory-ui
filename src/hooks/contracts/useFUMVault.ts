@@ -25,14 +25,23 @@ export const useFUMVault = (): UseFUMVaultReturn => {
     args: unknown[],
     value?: bigint
   ): Promise<TransactionResult> => {
+    console.log('🔗 Executing contract write...')
+    console.log('📋 Function:', functionName)
+    console.log('📊 Arguments:', args)
+    console.log('💰 Value:', value?.toString() || '0')
+    console.log('🏠 Contract:', FUM_VAULT_CONFIG.address)
+
     if (!address) {
+      console.error('❌ Wallet not connected')
       return { hash: '', success: false, error: 'Wallet not connected' }
     }
 
+    console.log('👤 Connected address:', address)
     setIsLoading(true)
     setError(null)
 
     try {
+      console.log('📡 Sending transaction...')
       const hash = await writeContractAsync({
         address: FUM_VAULT_CONFIG.address,
         abi: FUM_VAULT_CONFIG.abi,
@@ -41,13 +50,18 @@ export const useFUMVault = (): UseFUMVaultReturn => {
         value,
       })
 
+      console.log('✅ Transaction sent successfully!')
+      console.log('🔗 Transaction hash:', hash)
       return { hash, success: true }
     } catch (err) {
+      console.error('💥 Contract write failed:', err)
       const errorMessage = err instanceof Error ? err.message : 'Transaction failed'
+      console.error('📄 Error message:', errorMessage)
       setError(errorMessage)
       return { hash: '', success: false, error: errorMessage }
     } finally {
       setIsLoading(false)
+      console.log('🏁 Contract write execution completed')
     }
   }, [address, writeContractAsync])
 

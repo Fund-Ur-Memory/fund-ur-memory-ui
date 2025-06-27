@@ -1,11 +1,11 @@
 // src/contracts/FUMVault.ts
-import type { Address } from 'viem'
+import type { Address, Abi } from 'viem'
 import FUMVaultABI from '../contratcs/FUMVault.json'
 
 // Contract Configuration
 export const FUM_VAULT_CONFIG = {
   address: '0xEF5a0f3F1e6924F3Fb5160C3e0A4DB3ed3B5DEEb' as Address,
-  abi: FUMVaultABI,
+  abi: FUMVaultABI as Abi,
   chainId: 43113, // Avalanche Fuji testnet
 } as const
 

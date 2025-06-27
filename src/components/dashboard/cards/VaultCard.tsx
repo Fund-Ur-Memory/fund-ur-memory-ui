@@ -6,18 +6,7 @@ import { useVaultTokenPrice } from '../../../hooks/useTokenPrice'
 import type { FormattedVault } from '../../../types/contracts'
 import '../../../styles/vault-cards.css'
 
-// Helper function to get asset color
-const getAssetColor = (tokenSymbol: string): string => {
-  const colors: Record<string, string> = {
-    'ETH': '#627EEA',
-    'AVAX': '#E84142',
-    'MONAD': '#8B5CF6',
-    'BTC': '#F7931A',
-    'USDC': '#2775CA',
-    'USDT': '#26A17B'
-  }
-  return colors[tokenSymbol] || '#6B7280'
-}
+
 
 interface VaultCardProps {
   vault: FormattedVault

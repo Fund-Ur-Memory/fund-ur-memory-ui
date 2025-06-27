@@ -3,6 +3,7 @@
 
 import { readContract } from 'wagmi/actions'
 import { FUM_VAULT_CONFIG } from '../contracts/FUMVault'
+import { config } from '../components/config/wagmi'
 import type { Address } from 'viem'
 
 /**
@@ -17,7 +18,7 @@ export const debugContractCalls = async (userAddress: Address) => {
   try {
     // Test 1: Check if contract exists by calling a simple view function
     console.log('\n📋 Test 1: Getting contract stats...')
-    const stats = await readContract({
+    const stats = await readContract(config, {
       address: FUM_VAULT_CONFIG.address,
       abi: FUM_VAULT_CONFIG.abi,
       functionName: 'getContractStats',
@@ -26,7 +27,7 @@ export const debugContractCalls = async (userAddress: Address) => {
 
     // Test 2: Get owner vaults
     console.log('\n📋 Test 2: Getting owner vaults...')
-    const vaultIds = await readContract({
+    const vaultIds = await readContract(config, {
       address: FUM_VAULT_CONFIG.address,
       abi: FUM_VAULT_CONFIG.abi,
       functionName: 'getOwnerVaults',
@@ -38,7 +39,7 @@ export const debugContractCalls = async (userAddress: Address) => {
     if (vaultIds && Array.isArray(vaultIds) && vaultIds.length > 0) {
       console.log('\n📋 Test 3: Getting first vault data...')
       const firstVaultId = vaultIds[0]
-      const vaultData = await readContract({
+      const vaultData = await readContract(config, {
         address: FUM_VAULT_CONFIG.address,
         abi: FUM_VAULT_CONFIG.abi,
         functionName: 'getVault',
@@ -75,7 +76,7 @@ export const checkNetwork = () => {
       .then((chainId: string) => {
         const currentChainId = parseInt(chainId, 16)
         const expectedChainId = FUM_VAULT_CONFIG.chainId
-        
+
         console.log('🌐 Network check:', {
           currentChainId,
           expectedChainId,
@@ -90,7 +91,7 @@ export const checkNetwork = () => {
         }
       })
   }
-  
+
   return Promise.resolve({
     currentChainId: null,
     expectedChainId: FUM_VAULT_CONFIG.chainId,
@@ -103,27 +104,27 @@ export const checkNetwork = () => {
  * Test specific contract function
  */
 export const testContractFunction = async (
-  functionName: string, 
+  functionName: string,
   args: unknown[] = []
 ) => {
   try {
     console.log(`🧪 Testing ${functionName} with args:`, args)
-    
-    const result = await readContract({
+
+    const result = await readContract(config, {
       address: FUM_VAULT_CONFIG.address,
       abi: FUM_VAULT_CONFIG.abi,
       functionName,
       args,
     })
-    
+
     console.log(`✅ ${functionName} result:`, result)
     return { success: true, result }
-    
+
   } catch (error) {
     console.error(`❌ ${functionName} failed:`, error)
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Unknown error' 
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
     }
   }
 }
@@ -133,7 +134,7 @@ export const testContractFunction = async (
  */
 export const contractHealthCheck = async (userAddress?: Address) => {
   console.log('🏥 Starting contract health check...')
-  
+
   const results = {
     networkCheck: await checkNetwork(),
     contractStats: await testContractFunction('getContractStats'),
@@ -141,8 +142,8 @@ export const contractHealthCheck = async (userAddress?: Address) => {
   }
 
   console.log('🏥 Health check results:', results)
-  
-  const isHealthy = results.networkCheck.isCorrect && 
+
+  const isHealthy = results.networkCheck.isCorrect &&
                    results.contractStats.success &&
                    (results.userVaults?.success !== false)
 
