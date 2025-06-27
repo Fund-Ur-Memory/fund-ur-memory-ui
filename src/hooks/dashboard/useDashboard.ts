@@ -52,18 +52,19 @@ export const useDashboard = (userAddress: string): UseDashboardReturn => {
     } else {
       setLoading(true)
     }
-    
+
     setError(null)
 
     try {
-      const loadingDelay = isRefetch ? 800 : 2000
+      // Reduced loading delay for better UX
+      const loadingDelay = isRefetch ? 300 : 1000
       await new Promise(resolve => setTimeout(resolve, loadingDelay))
-      
+
       const dashboardData = await MockAPIService.getDashboardData(userAddress)
-      
+
       setData(dashboardData)
       setLastUpdated(new Date())
-      
+
       if (isRefetch) {
         toast.success('Dashboard data updated successfully')
       }
@@ -71,7 +72,7 @@ export const useDashboard = (userAddress: string): UseDashboardReturn => {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load dashboard data'
       setError(errorMessage)
       console.error('Dashboard error:', err)
-      
+
       if (isRefetch) {
         toast.error('Failed to refresh dashboard data')
       } else {
@@ -87,32 +88,9 @@ export const useDashboard = (userAddress: string): UseDashboardReturn => {
     fetchDashboardData()
   }, [fetchDashboardData])
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (!document.hidden && data) {
-        fetchDashboardData(true)
-      }
-    }, 5 * 60 * 1000)
+  // Removed auto-refresh interval to prevent automatic data refreshing
 
-    return () => clearInterval(interval)
-  }, [fetchDashboardData, data])
-
-  useEffect(() => {
-    const handleFocus = () => {
-      if (data && !loading && !isRefetching) {
-        const timeSinceLastUpdate = lastUpdated 
-          ? Date.now() - lastUpdated.getTime() 
-          : Infinity
-        
-        if (timeSinceLastUpdate > 2 * 60 * 1000) {
-          fetchDashboardData(true)
-        }
-      }
-    }
-
-    window.addEventListener('focus', handleFocus)
-    return () => window.removeEventListener('focus', handleFocus)
-  }, [data, loading, isRefetching, lastUpdated, fetchDashboardData])
+  // Removed auto-refresh on window focus to prevent automatic data refreshing
 
   const refetch = useCallback(async () => {
     await fetchDashboardData(true)
@@ -120,7 +98,7 @@ export const useDashboard = (userAddress: string): UseDashboardReturn => {
 
   const enhancedSetActiveTab = useCallback((tab: string) => {
     setActiveTab(tab)
-    
+
     // Track tab analytics with proper type checking
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'dashboard_tab_change', {
@@ -132,7 +110,7 @@ export const useDashboard = (userAddress: string): UseDashboardReturn => {
 
   const enhancedSetIsPrivacyMode = useCallback((isPrivate: boolean) => {
     setIsPrivacyMode(isPrivate)
-    
+
     toast.success(
       isPrivate ? 'Privacy mode enabled' : 'Privacy mode disabled',
       {
@@ -140,7 +118,7 @@ export const useDashboard = (userAddress: string): UseDashboardReturn => {
         duration: 2000
       }
     )
-    
+
     // Track privacy mode analytics with proper type checking
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'privacy_mode_toggle', {

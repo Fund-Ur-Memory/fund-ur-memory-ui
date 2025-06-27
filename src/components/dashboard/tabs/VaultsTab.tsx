@@ -4,6 +4,8 @@ import { motion } from 'framer-motion'
 import { Shield, DollarSign, Brain } from 'lucide-react'
 import { VaultCard } from '../cards/VaultCard'
 import { MetricCard } from '../cards/MetricCard'
+import '../../../styles/header-compact.css'
+import '../../../styles/vault-cards.css'
 import { type DashboardData } from '../../../types/dashboard'
 
 interface VaultsTabProps {
@@ -19,8 +21,8 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
   const { vaults } = data
 
   const totalLockedValue = vaults.reduce((sum, vault) => sum + vault.value, 0)
-  const avgAIScore = vaults.length > 0 
-    ? Math.round(vaults.reduce((sum, vault) => sum + vault.aiScore, 0) / vaults.length) 
+  const avgAIScore = vaults.length > 0
+    ? Math.round(vaults.reduce((sum, vault) => sum + vault.aiScore, 0) / vaults.length)
     : 0
 
   const handleVaultClick = (vaultId: number) => {
@@ -52,7 +54,7 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
           {/* Create Vault Button */}
           <div className="row justify-content-center mb-4">
             <div className="col-lg-10 text-center">
-              <button 
+              <button
                 onClick={handleCreateVault}
                 className="ico_creative_btn"
               >
@@ -81,48 +83,44 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
             </div>
           </div>
 
-          {/* Vault Stats */}
-          <div className="row justify-content-center">
-            <div className="col-lg-10">
-              <div className="row">
-                <MetricCard
-                  title="Active Vaults"
-                  value={vaults.length}
-                  subtitle="All performing well"
-                  icon={Shield}
-                  iconColor="text-white"
-                  delay={0}
-                />
-                
-                <MetricCard
-                  title="Total Locked Value"
-                  value={totalLockedValue}
-                  subtitle="Across 3 chains"
-                  icon={DollarSign}
-                  iconColor="text-blue-400"
-                  isPrivate={isPrivacyMode}
-                  delay={0.1}
-                />
-                
-                <MetricCard
-                  title="Avg AI Score"
-                  value={avgAIScore}
-                  subtitle="High confidence"
-                  icon={Brain}
-                  iconColor="text-green-400"
-                  delay={0.2}
-                />
+          {/* Vault Stats - Compact */}
+          <div className="row g-3">
+            <MetricCard
+              title="Active Vaults"
+              value={vaults.length}
+              subtitle="All performing well"
+              icon={Shield}
+              iconColor="text-white"
+              delay={0}
+            />
 
-                <MetricCard
-                  title="Success Rate"
-                  value="87%"
-                  subtitle="Above average"
-                  icon={Brain}
-                  iconColor="text-yellow-400"
-                  delay={0.3}
-                />
-              </div>
-            </div>
+            <MetricCard
+              title="Total Locked Value"
+              value={totalLockedValue}
+              subtitle="Across 3 chains"
+              icon={DollarSign}
+              iconColor="text-blue-400"
+              isPrivate={isPrivacyMode}
+              delay={0.1}
+            />
+
+            <MetricCard
+              title="Avg AI Score"
+              value={avgAIScore}
+              subtitle="High confidence"
+              icon={Brain}
+              iconColor="text-green-400"
+              delay={0.2}
+            />
+
+            <MetricCard
+              title="Success Rate"
+              value="87%"
+              subtitle="Above average"
+              icon={Brain}
+              iconColor="text-yellow-400"
+              delay={0.3}
+            />
           </div>
         </div>
       </section>
@@ -133,7 +131,7 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
           <div className="row justify-content-center">
             <div className="col-lg-10">
               {vaults.length > 0 ? (
-                <div className="row">
+                <div className="row g-2">
                   {vaults.map((vault, index) => (
                     <VaultCard
                       key={vault.id}
@@ -158,7 +156,7 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
                       Create your first commitment vault to start your disciplined investment journey.
                       Lock away assets based on time or market conditions to prevent emotional trading.
                     </p>
-                    
+
                     <div className="row justify-content-center mt-4">
                       <div className="col-lg-8">
                         <div className="row">
@@ -199,7 +197,7 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
                       </div>
                     </div>
 
-                    <button 
+                    <button
                       onClick={handleCreateVault}
                       className="ico_creative_btn mt-4"
                     >
@@ -238,8 +236,10 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
                       </ul>
                     </div>
                     <div className="col-lg-2 text-center">
-                      <button className="btn btn-outline-light btn-sm">
-                        Learn More
+                      <button className="compact-action-btn outline">
+                        <span className="btn_wrapper">
+                          <span className="btn_label">Learn More</span>
+                        </span>
                       </button>
                     </div>
                   </div>

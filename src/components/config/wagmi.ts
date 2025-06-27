@@ -1,6 +1,7 @@
 // src/config/wagmi.ts
 import { getDefaultConfig } from "@rainbow-me/rainbowkit"
 import { type Chain } from "wagmi/chains"
+import { avalancheFuji } from "wagmi/chains"
 
 // Monad Testnet Configuration
 const monadTestnet: Chain = {
@@ -31,6 +32,6 @@ const monadTestnet: Chain = {
 export const config = getDefaultConfig({
   appName: "Fund Ur Memory",
   projectId: "YOUR_WALLETCONNECT_PROJECT_ID",
-  chains: [monadTestnet],
+  chains: [avalancheFuji, monadTestnet],
   ssr: true,
 })
