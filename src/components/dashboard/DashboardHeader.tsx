@@ -85,7 +85,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   onClick={() => onTabChange(tab.id)}
                   className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                     activeTab === tab.id
-                      ? 'text-purple-400 bg-purple-400/20 shadow-lg'
+                      ? 'text-white bg-purple-400/20 shadow-lg'
                       : 'text-gray-300 hover:text-white hover:bg-gray-700/50'
                   }`}
                 >

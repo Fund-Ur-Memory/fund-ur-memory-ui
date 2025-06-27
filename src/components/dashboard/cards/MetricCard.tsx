@@ -20,7 +20,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   title,
   value,
   change,
-  iconColor = 'text-purple-400',
+  iconColor = 'text-white',
   isPrivate = false,
   delay = 0,
   subtitle,
@@ -32,7 +32,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
 
   const getIconEmoji = (iconColor: string) => {
     const iconMap: Record<string, string> = {
-      'text-purple-400': '🔮',
+      'text-white': '🔮',
       'text-green-400': '💚',
       'text-blue-400': '💙',
       'text-red-400': '❤️',
@@ -76,7 +76,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
       >
         <div className="d-flex justify-content-between align-items-start mb-3">
           <div className="text-start flex-grow-1">
-            <p className="text-secondary mb-1 small">{title}</p>
+            <p className="text-gray mb-1 small">{title}</p>
             <h3 className="heading_text text-white mb-0" style={{ fontSize: '1.8rem' }}>
               {displayValue}
             </h3>

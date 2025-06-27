@@ -2,7 +2,6 @@
 import React from 'react'
 import { TrendingUp, DollarSign, Shield, Brain } from 'lucide-react'
 import { MetricCard } from '../cards/MetricCard'
-import { PortfolioCard } from '../cards/PortfolioCard'
 import { type DashboardData } from '../../../types/dashboard'
 import { motion } from 'framer-motion'
 import { type AIRecommendation, type Transaction } from '../../../types/dashboard'
@@ -89,7 +88,7 @@ const OverviewAIRecommendationCard: React.FC<{
               </span>
             </div>
             
-            <p className="text-secondary mb-3 small">{recommendation.description}</p>
+            <p className="text-gray mb-3 small">{recommendation.description}</p>
             
             <div className="d-flex justify-content-between align-items-center">
               <div className="d-flex gap-2">
@@ -221,7 +220,7 @@ const OverviewActivityCard: React.FC<{
                 <h6 className="text-white mb-1">
                   {getTransactionLabel(tx.type)}
                 </h6>
-                <p className="text-secondary mb-0 small">{tx.conditions || 'No conditions'}</p>
+                <p className="text-gray mb-0 small">{tx.conditions || 'No conditions'}</p>
               </div>
             </div>
             
@@ -229,12 +228,12 @@ const OverviewActivityCard: React.FC<{
               <p className="text-white mb-1 fw-bold">
                 {isPrivate ? '••••' : tx.amount} {tx.asset}
               </p>
-              <p className="text-secondary mb-1 small">
+              <p className="text-gray mb-1 small">
                 {formatDate(tx.date)}
               </p>
               <div className="d-flex align-items-center justify-content-end">
                 <span className="me-2">{getStatusIcon(tx.status)}</span>
-                <span className="small text-secondary">
+                <span className="small text-gray">
                   {tx.status}
                 </span>
               </div>
@@ -246,7 +245,7 @@ const OverviewActivityCard: React.FC<{
       {transactions.length === 0 && (
         <div className="text-center py-5">
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📝</div>
-          <p className="text-secondary">No recent activity</p>
+          <p className="text-gray">No recent activity</p>
         </div>
       )}
     </div>
@@ -272,7 +271,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
             <div className="col-lg-10">
               <div className="ico_heading_block text-center">
                 <h2 className="heading_text mb-0 text-white">Portfolio Overview</h2>
-                <p className="text-secondary mt-3">Your comprehensive wealth management dashboard</p>
+                <p className="text-gray mt-3">Your comprehensive wealth management dashboard</p>
               </div>
             </div>
           </motion.div>
@@ -295,7 +294,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
                   title="Active Vaults"
                   value={profile.activeVaults}
                   icon={Shield}
-                  iconColor="text-purple-400"
+                  iconColor="text-white"
                   delay={0.1}
                   subtitle="3 expiring soon"
                 />
@@ -323,15 +322,6 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
           </div>
         </div>
       </section>
-
-      {/* Portfolio Allocation */}
-      <PortfolioCard
-        allocation={portfolio.allocation}
-        totalValue={portfolio.totalValue}
-        change24h={portfolio.change24h}
-        isPrivate={isPrivacyMode}
-        onRebalance={() => console.log('Rebalance portfolio')}
-      />
 
       {/* AI Recommendations Section */}
       <section className="section_space pb-0">

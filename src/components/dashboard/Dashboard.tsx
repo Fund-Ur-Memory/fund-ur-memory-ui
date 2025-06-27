@@ -57,7 +57,7 @@ class DashboardErrorBoundary extends React.Component<
                     <div className="ico_iconbox_block p-5 text-center">
                       <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" style={{ width: '4rem', height: '4rem' }} />
                       <h2 className="heading_text text-white mb-4">Something went wrong</h2>
-                      <p className="text-secondary mb-4">
+                      <p className="text-gray mb-4">
                         We encountered an unexpected error while loading the dashboard.
                       </p>
                       <div className="d-flex justify-content-center gap-3 flex-wrap">
@@ -86,7 +86,7 @@ class DashboardErrorBoundary extends React.Component<
                       </div>
                       {this.state.error && (
                         <details className="mt-4 text-left">
-                          <summary className="text-secondary cursor-pointer text-sm">
+                          <summary className="text-gray cursor-pointer text-sm">
                             Error Details
                           </summary>
                           <pre className="mt-2 p-2 bg-gray-800 rounded text-xs text-red-300 overflow-auto" style={{
@@ -190,10 +190,10 @@ const DashboardLoadingScreen: React.FC = () => {
                 <h2 className="heading_text text-white mb-2">
                   Analyzing Your Wallet
                 </h2>
-                <p className="text-secondary mb-4">
+                <p className="text-gray mb-4">
                   Connected to: {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Wallet'}
                 </p>
-                <p className="text-secondary mb-6">
+                <p className="text-gray mb-6">
                   AI agents are reviewing your transaction history and building personalized insights...
                 </p>
                 
@@ -236,7 +236,7 @@ const DashboardLoadingScreen: React.FC = () => {
                               {step}
                             </motion.span>
                           </motion.div>
-                          <span className="text-secondary">{label}</span>
+                          <span className="text-gray">{label}</span>
                         </div>
                       </motion.div>
                     ))}
@@ -288,7 +288,7 @@ const DashboardErrorScreen: React.FC<{
                 <h2 className="heading_text text-white mb-2">
                   Error Loading Dashboard
                 </h2>
-                <p className="text-secondary mb-4">{error}</p>
+                <p className="text-gray mb-4">{error}</p>
                 
                 <div className="d-flex justify-content-center gap-3 flex-wrap">
                   <button onClick={onRetry} className="ico_creative_btn">
@@ -377,7 +377,7 @@ const DashboardHeader: React.FC<{
               {balance && ` • ${balance} MON`}
             </p>
             {lastUpdated && (
-              <p className="text-secondary small">
+              <p className="text-gray small">
                 Last updated: {formatLastUpdated(lastUpdated)}
               </p>
             )}

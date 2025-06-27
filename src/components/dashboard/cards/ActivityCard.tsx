@@ -51,7 +51,7 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
   const getIconColor = (type: Transaction['type']) => {
     switch (type) {
       case 'vault_create':
-        return 'text-purple-400 bg-purple-500/20'
+        return 'text-white bg-purple-500/20'
       case 'vault_execute':
         return 'text-green-400 bg-green-500/20'
       case 'cross_chain_transfer':
@@ -73,7 +73,7 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
           {onViewAll && (
             <button 
               onClick={onViewAll}
-              className="text-purple-400 hover:text-purple-300 text-sm font-medium flex items-center transition-colors"
+              className="text-white hover:text-purple-300 text-sm font-medium flex items-center transition-colors"
             >
               View All
               <ChevronRight className="w-4 h-4 ml-1" />

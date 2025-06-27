@@ -122,7 +122,7 @@ export const VaultCard: React.FC<VaultCardProps> = ({
             </div>
             
             {vault.condition === 'Time Lock' && (
-              <div className="flex items-center text-purple-400">
+              <div className="flex items-center text-white">
                 <span className="text-sm">⏰ Time Lock</span>
               </div>
             )}

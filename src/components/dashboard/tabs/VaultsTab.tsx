@@ -90,7 +90,7 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
                   value={vaults.length}
                   subtitle="All performing well"
                   icon={Shield}
-                  iconColor="text-purple-400"
+                  iconColor="text-white"
                   delay={0}
                 />
                 

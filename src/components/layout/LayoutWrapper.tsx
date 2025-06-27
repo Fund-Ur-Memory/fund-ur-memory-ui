@@ -49,7 +49,7 @@ export const LayoutWrapper: React.FC<LayoutWrapperProps> = ({
                   onClick={() => handleNavigation('/')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                     currentPage === 'home'
-                      ? 'text-purple-400 bg-purple-400/20'
+                      ? 'text-white bg-purple-400/20'
                       : 'text-gray-300 hover:text-white hover:bg-gray-700/50'
                   }`}
                 >
@@ -85,7 +85,7 @@ export const LayoutWrapper: React.FC<LayoutWrapperProps> = ({
                       onClick={() => handleNavigation('/dashboard')}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                         currentPage === 'dashboard'
-                          ? 'text-purple-400 bg-purple-400/20'
+                          ? 'text-white bg-purple-400/20'
                           : 'text-gray-300 hover:text-white hover:bg-gray-700/50'
                       }`}
                     >
@@ -95,7 +95,7 @@ export const LayoutWrapper: React.FC<LayoutWrapperProps> = ({
                       onClick={() => handleNavigation('/profile')}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                         currentPage === 'profile'
-                          ? 'text-purple-400 bg-purple-400/20'
+                          ? 'text-white bg-purple-400/20'
                           : 'text-gray-300 hover:text-white hover:bg-gray-700/50'
                       }`}
                     >
@@ -109,7 +109,7 @@ export const LayoutWrapper: React.FC<LayoutWrapperProps> = ({
             {/* Connect Wallet Button */}
             <div className="flex items-center">
               <div className="ico_btn_outline flex items-center space-x-2 px-4 py-2 border border-purple-500/50 rounded-lg bg-purple-500/10 backdrop-blur-sm">
-                <span className="text-purple-400">
+                <span className="text-white">
                   <i className="fa-solid fa-user"></i>
                 </span>
                 <ConnectButton />
@@ -135,7 +135,7 @@ export const LayoutWrapper: React.FC<LayoutWrapperProps> = ({
                   smooth={true}
                   duration={500}
                   offset={-100}
-                  className="text-gray-400 hover:text-purple-400 transition-colors cursor-pointer"
+                  className="text-gray-400 hover:text-white transition-colors cursor-pointer"
                   to="id_ico_about_section"
                 >
                   About
@@ -144,19 +144,19 @@ export const LayoutWrapper: React.FC<LayoutWrapperProps> = ({
                 <>
                   <button 
                     onClick={() => handleNavigation('/')}
-                    className="text-gray-400 hover:text-purple-400 transition-colors"
+                    className="text-gray-400 hover:text-white transition-colors"
                   >
                     Home
                   </button>
                   <button 
                     onClick={() => handleNavigation('/dashboard')}
-                    className="text-gray-400 hover:text-purple-400 transition-colors"
+                    className="text-gray-400 hover:text-white transition-colors"
                   >
                     Dashboard
                   </button>
                   <button 
                     onClick={() => handleNavigation('/profile')}
-                    className="text-gray-400 hover:text-purple-400 transition-colors"
+                    className="text-gray-400 hover:text-white transition-colors"
                   >
                     Profile
                   </button>
@@ -226,7 +226,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               onClick={() => onPrivacyToggle(!isPrivacyMode)}
               className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
                 isPrivacyMode 
-                  ? 'bg-purple-600/20 text-purple-400 border border-purple-500/50' 
+                  ? 'bg-purple-600/20 text-white border border-purple-500/50' 
                   : 'bg-gray-800/50 text-gray-400 border border-gray-700'
               }`}
             >
