@@ -1,40 +1,97 @@
 // src/components/dashboard/tabs/VaultsTab.tsx - Final fixed version
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Shield, DollarSign, Brain } from 'lucide-react'
+import { Shield, DollarSign, CheckCircle, Clock } from 'lucide-react'
 import { VaultCard } from '../cards/VaultCard'
 import { MetricCard } from '../cards/MetricCard'
-import { type DashboardData } from '../../../types/dashboard'
+import { CreateVaultModal } from '../modals/CreateVaultModal'
+import { useCreateVault } from '../../../hooks/dashboard/useCreateVault'
+import { useGetVaults } from '../../../hooks/contracts/useGetVaults'
+import { useAccount } from 'wagmi'
+import { contractHealthCheck } from '../../../utils/contractDebugger'
+import '../../../styles/header-compact.css'
+import '../../../styles/vault-cards.css'
+
 
 interface VaultsTabProps {
-  data: DashboardData
   isPrivacyMode: boolean
   onRefetch: () => void
 }
 
-export const VaultsTab: React.FC<VaultsTabProps> = ({
-  data,
-  isPrivacyMode,
-}) => {
-  const { vaults } = data
 
-  const totalLockedValue = vaults.reduce((sum, vault) => sum + vault.value, 0)
-  const avgAIScore = vaults.length > 0 
-    ? Math.round(vaults.reduce((sum, vault) => sum + vault.aiScore, 0) / vaults.length) 
-    : 0
+
+export const VaultsTab: React.FC<VaultsTabProps> = ({
+  isPrivacyMode,
+  onRefetch,
+}) => {
+  // Get connected wallet address
+  const { address: connectedAddress, isConnected } = useAccount()
+
+  // Use real vault data from contract for connected user only
+  const { vaults: contractVaults, refetch, isLoading: isLoadingVaults } = useGetVaults(connectedAddress)
+  const { isModalOpen, isCreating, openModal, closeModal, createVault } = useCreateVault()
+
+  // Only show user's own ACTIVE vaults if connected, otherwise show empty state
+  const allUserVaults = isConnected && contractVaults.length > 0
+    ? contractVaults
+    : []
+
+  // Filter to show only ACTIVE vaults in the Vaults tab
+  const userVaults = allUserVaults.filter(v => v.status?.name === 'ACTIVE')
+
+  // Calculate user-specific metrics from their active vaults
+  const userMetrics = {
+    totalActiveVaults: userVaults.length,
+    totalLockedValue: userVaults.reduce((sum, vault) => sum + (vault.amount?.usd || 0), 0),
+    avgProgress: userVaults.length > 0
+      ? Math.round(userVaults.reduce((sum, vault) => sum + (vault.progress || 0), 0) / userVaults.length)
+      : 0,
+    // Time-based metrics for active vaults
+    timeBasedVaults: userVaults.filter(v => v.conditionType?.name?.includes('TIME')).length,
+    priceBasedVaults: userVaults.filter(v => v.conditionType?.name?.includes('PRICE')).length
+  }
 
   const handleVaultClick = (vaultId: number) => {
     console.log('View vault details:', vaultId)
   }
 
   const handleCreateVault = () => {
-    console.log('Create new vault')
+    openModal()
+  }
+
+  const handleRefresh = async () => {
+    await refetch()
+    onRefetch?.()
+  }
+
+  const handleDebugContract = async () => {
+    if (connectedAddress) {
+      console.log('🔍 Running contract health check...')
+      const healthCheck = await contractHealthCheck(connectedAddress)
+      console.log('🏥 Health check complete:', healthCheck)
+
+      if (!healthCheck.isHealthy) {
+        console.log('⚠️ Issues found:', healthCheck.recommendations)
+      }
+    }
+  }
+
+  const handleVaultWithdraw = (vaultId: number) => {
+    console.log(`✅ Vault ${vaultId} withdrawn successfully`)
+    // Refresh vault data
+    refetch()
+  }
+
+  const handleVaultEmergencyWithdraw = (vaultId: number) => {
+    console.log(`🚨 Vault ${vaultId} emergency withdrawn successfully`)
+    // Refresh vault data
+    refetch()
   }
 
   return (
     <div>
       {/* Header Section */}
-      <section className="section_space pb-0">
+      <section style={{ paddingTop: '2rem', paddingBottom: '0' }}>
         <div className="container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -52,7 +109,7 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
           {/* Create Vault Button */}
           <div className="row justify-content-center mb-4">
             <div className="col-lg-10 text-center">
-              <button 
+              <button
                 onClick={handleCreateVault}
                 className="ico_creative_btn"
               >
@@ -81,71 +138,103 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
             </div>
           </div>
 
-          {/* Vault Stats */}
-          <div className="row justify-content-center">
-            <div className="col-lg-10">
-              <div className="row">
-                <MetricCard
-                  title="Active Vaults"
-                  value={vaults.length}
-                  subtitle="All performing well"
-                  icon={Shield}
-                  iconColor="text-white"
-                  delay={0}
-                />
-                
-                <MetricCard
-                  title="Total Locked Value"
-                  value={totalLockedValue}
-                  subtitle="Across 3 chains"
-                  icon={DollarSign}
-                  iconColor="text-blue-400"
-                  isPrivate={isPrivacyMode}
-                  delay={0.1}
-                />
-                
-                <MetricCard
-                  title="Avg AI Score"
-                  value={avgAIScore}
-                  subtitle="High confidence"
-                  icon={Brain}
-                  iconColor="text-green-400"
-                  delay={0.2}
-                />
+          {/* Active Vault Stats - Only show if connected */}
+          {isConnected && (
+            <div className="row g-3">
+              <MetricCard
+                title="Active Vaults"
+                value={userMetrics.totalActiveVaults}
+                subtitle="Currently locked"
+                icon={Shield}
+                iconColor="text-white"
+                delay={0}
+              />
 
-                <MetricCard
-                  title="Success Rate"
-                  value="87%"
-                  subtitle="Above average"
-                  icon={Brain}
-                  iconColor="text-yellow-400"
-                  delay={0.3}
-                />
-              </div>
+              <MetricCard
+                title="Locked Value"
+                value={userMetrics.totalLockedValue}
+                subtitle="In active vaults"
+                icon={DollarSign}
+                iconColor="text-blue-400"
+                isPrivate={isPrivacyMode}
+                delay={0.1}
+              />
+
+              <MetricCard
+                title="Time-Based"
+                value={userMetrics.timeBasedVaults}
+                subtitle="Time conditions"
+                icon={Clock}
+                iconColor="text-yellow-400"
+                delay={0.2}
+              />
+
+              <MetricCard
+                title="Avg Progress"
+                value={`${userMetrics.avgProgress}%`}
+                subtitle="Completion rate"
+                icon={CheckCircle}
+                iconColor="text-green-400"
+                delay={0.3}
+              />
             </div>
-          </div>
+          )}
         </div>
       </section>
 
       {/* Vaults Grid Section */}
-      <section className="section_space">
+      <section style={{ paddingTop: '1rem', paddingBottom: '3rem' }}>
         <div className="container">
           <div className="row justify-content-center">
             <div className="col-lg-10">
-              {vaults.length > 0 ? (
-                <div className="row">
-                  {vaults.map((vault, index) => (
+              {!isConnected ? (
+                /* Wallet Not Connected State */
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center py-5"
+                >
+                  <div className="ico_iconbox_block p-5">
+                    <div style={{ fontSize: '4rem', marginBottom: '2rem' }}>🔗</div>
+                    <h3 className="heading_text text-white mb-4">Connect Your Wallet</h3>
+                    <p className="text-secondary mb-4">
+                      Connect your wallet to view and manage your commitment vaults.
+                      Your vaults are tied to your wallet address for security.
+                    </p>
+                  </div>
+                </motion.div>
+              ) : isLoadingVaults ? (
+                /* Loading State */
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center py-5"
+                >
+                  <div className="ico_iconbox_block p-5">
+                    <div style={{ fontSize: '4rem', marginBottom: '2rem' }}>⏳</div>
+                    <h3 className="heading_text text-white mb-4">Loading Your Vaults</h3>
+                    <p className="text-secondary mb-4">
+                      Fetching your commitment vaults from the blockchain...
+                    </p>
+                  </div>
+                </motion.div>
+              ) : userVaults.length > 0 ? (
+                /* User Has Vaults */
+                <div className="row g-2">
+                  {userVaults.map((vault, index) => (
                     <VaultCard
                       key={vault.id}
                       vault={vault}
                       isPrivate={isPrivacyMode}
                       onClick={() => handleVaultClick(vault.id)}
                       delay={index * 0.1}
+                      onWithdraw={handleVaultWithdraw}
+                      onEmergencyWithdraw={handleVaultEmergencyWithdraw}
                     />
                   ))}
                 </div>
               ) : (
-                /* Empty State */
+                /* Connected User - No Vaults */
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -153,12 +242,14 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
                 >
                   <div className="ico_iconbox_block p-5">
                     <div style={{ fontSize: '4rem', marginBottom: '2rem' }}>🔒</div>
-                    <h3 className="heading_text text-white mb-4">No Vaults Yet</h3>
+                    <h3 className="heading_text text-white mb-4">No Active Vaults</h3>
                     <p className="text-secondary mb-4">
-                      Create your first commitment vault to start your disciplined investment journey.
-                      Lock away assets based on time or market conditions to prevent emotional trading.
+                      {allUserVaults.length > 0
+                        ? "All your vaults have been completed or withdrawn. Check the History tab to view past vaults, or create a new one to continue building discipline."
+                        : "You haven't created any commitment vaults yet. Start your disciplined investment journey by creating your first vault with time-based or price-based conditions."
+                      }
                     </p>
-                    
+
                     <div className="row justify-content-center mt-4">
                       <div className="col-lg-8">
                         <div className="row">
@@ -199,14 +290,34 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
                       </div>
                     </div>
 
-                    <button 
-                      onClick={handleCreateVault}
-                      className="ico_creative_btn mt-4"
-                    >
-                      <span className="btn_wrapper">
-                        <span className="btn_label">Create Your First Vault</span>
-                      </span>
-                    </button>
+                    <div className="d-flex gap-3 justify-content-center mt-4">
+                      <button
+                        onClick={handleCreateVault}
+                        className="ico_creative_btn"
+                      >
+                        <span className="btn_wrapper">
+                          <span className="btn_label">
+                            {allUserVaults.length > 0 ? 'Create New Vault' : 'Create Your First Vault'}
+                          </span>
+                        </span>
+                      </button>
+
+                      {/* Debug button - remove in production */}
+                      {/* <button
+                        onClick={handleDebugContract}
+                        className="btn btn-outline-secondary"
+                        style={{
+                          borderRadius: '12px',
+                          padding: '12px 24px',
+                          fontWeight: '600',
+                          fontSize: '0.9rem',
+                          border: '1px solid rgba(255, 255, 255, 0.3)',
+                          color: 'rgba(255, 255, 255, 0.8)'
+                        }}
+                      >
+                        🔍 Debug Contract
+                      </button> */}
+                    </div>
                   </div>
                 </motion.div>
               )}
@@ -215,8 +326,8 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
         </div>
       </section>
 
-      {/* Vault Management Tips */}
-      {vaults.length > 0 && (
+      {/* Vault Management Tips - Only show if user has vaults */}
+      {isConnected && userVaults.length > 0 && (
         <section className="section_space pt-0">
           <div className="container">
             <div className="row justify-content-center">
@@ -238,8 +349,10 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
                       </ul>
                     </div>
                     <div className="col-lg-2 text-center">
-                      <button className="btn btn-outline-light btn-sm">
-                        Learn More
+                      <button className="compact-action-btn outline">
+                        <span className="btn_wrapper">
+                          <span className="btn_label">Learn More</span>
+                        </span>
                       </button>
                     </div>
                   </div>
@@ -249,6 +362,18 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
           </div>
         </section>
       )}
+
+      {/* Create Vault Modal */}
+      <CreateVaultModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onCreateVault={async (vaultData) => {
+          await createVault(vaultData)
+          // Refresh vault data after successful creation
+          await handleRefresh()
+        }}
+        isLoading={isCreating}
+      />
     </div>
   )
 }

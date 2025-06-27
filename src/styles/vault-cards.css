@@ -1,0 +1,265 @@
+/* Vault Cards Custom Styling */
+/* Matches the website's ico_iconbox_block theme */
+
+.vault-card-container {
+  position: relative;
+  height: 100%;
+}
+
+.vault-card-container .ico_iconbox_block {
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.vault-card-container .ico_iconbox_block:hover {
+  transform: translateY(-1px);
+  box-shadow: 0px -4px 12px -4px rgba(111, 66, 193, 0.6);
+}
+
+.vault-card-container .ico_iconbox_block:hover:before {
+  background: linear-gradient(90deg,
+    rgba(111, 66, 193, 0.08),
+    rgba(157, 91, 232, 0.08)
+  );
+}
+
+/* Asset Icon Animation */
+.vault-asset-icon {
+  transition: all 0.3s ease;
+}
+
+.vault-card-container:hover .vault-asset-icon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* Progress Bar Animation */
+.vault-progress-bar {
+  position: relative;
+  overflow: hidden;
+}
+
+.vault-progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Status Indicator Pulse */
+.vault-status-indicator {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Message Box Hover Effect */
+.vault-message-box {
+  transition: all 0.3s ease;
+}
+
+/* Vault Action Buttons */
+.vault-action-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.vault-action-button:hover {
+  transform: translateY(-2px);
+}
+
+.vault-action-button:active {
+  transform: translateY(0);
+}
+
+.vault-action-button:disabled {
+  transform: none !important;
+  cursor: not-allowed !important;
+}
+
+/* Button Ripple Effect */
+.vault-action-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.vault-action-button:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Status Badges */
+.vault-status-badge {
+  position: relative;
+  overflow: hidden;
+}
+
+.vault-status-completed {
+  animation: pulse-success 2s infinite;
+}
+
+.vault-status-ready {
+  animation: pulse-warning 2s infinite;
+}
+
+@keyframes pulse-success {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+  }
+}
+
+@keyframes pulse-warning {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.5);
+  }
+}
+
+.vault-card-container:hover .vault-message-box {
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.04)
+  );
+  border-left-color: var(--bs-secondary);
+}
+
+/* AI Score Badge Animation */
+.vault-ai-score {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.vault-ai-score::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.vault-card-container:hover .vault-ai-score::before {
+  left: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .vault-card-container .ico_iconbox_block {
+    padding: 20px;
+    min-height: 230px;
+  }
+
+  .vault-details-grid {
+    grid-template-columns: 1fr !important;
+    gap: 6px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .vault-card-container .ico_iconbox_block {
+    padding: 15px;
+    min-height: 210px;
+  }
+}
+
+/* Loading State */
+.vault-card-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.vault-card-loading .ico_iconbox_block::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  animation: loading-shimmer 1.5s infinite;
+}
+
+@keyframes loading-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Focus States for Accessibility */
+.vault-card-container .ico_iconbox_block:focus {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: 2px;
+}
+
+.vault-card-container .ico_iconbox_block:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .vault-card-container .ico_iconbox_block {
+    border-width: 2px;
+  }
+
+  .vault-asset-icon {
+    border-width: 3px;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .vault-card-container .ico_iconbox_block,
+  .vault-asset-icon,
+  .vault-progress-bar::after,
+  .vault-status-indicator,
+  .vault-message-box,
+  .vault-ai-score {
+    animation: none;
+    transition: none;
+  }
+
+  .vault-card-container .ico_iconbox_block:hover {
+    transform: none;
+  }
+}

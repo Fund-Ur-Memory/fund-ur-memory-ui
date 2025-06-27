@@ -1,6 +1,6 @@
 // src/components/dashboard/DashboardHeader.tsx - Fixed version with complete JSX
 import React from 'react'
-import { TrendingUp, Shield, Brain, Settings, Bell, RefreshCw, Clock } from 'lucide-react'
+import { TrendingUp, Shield, Archive, Brain, Settings, Bell, RefreshCw, Clock } from 'lucide-react'
 import { PrivacyToggle } from './common/PrivacyToggle'
 import { Button } from '../ui/Button'
 import { motion } from 'framer-motion'
@@ -33,6 +33,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   const tabs = [
     { id: 'overview', label: 'Overview', icon: TrendingUp },
     { id: 'vaults', label: 'Vaults', icon: Shield },
+    { id: 'history', label: 'History', icon: Archive },
     { id: 'ai', label: 'AI Insights', icon: Brain },
     { id: 'profile', label: 'Profile', icon: Settings }
   ]
@@ -43,12 +44,12 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
   const formatLastUpdated = (date: Date | null) => {
     if (!date) return 'Never'
-    
+
     const now = Date.now()
     const diff = now - date.getTime()
     const minutes = Math.floor(diff / 60000)
     const hours = Math.floor(diff / 3600000)
-    
+
     if (minutes < 1) return 'Just now'
     if (minutes < 60) return `${minutes}m ago`
     if (hours < 24) return `${hours}h ago`
@@ -64,7 +65,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             <div className="flex-shrink-0">
               <h1 className="text-2xl font-bold text-white">F.U.M Dashboard</h1>
             </div>
-            
+
             {/* Last Updated Info */}
             {lastUpdated && (
               <motion.div
@@ -76,7 +77,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 <span>Updated {formatLastUpdated(lastUpdated)}</span>
               </motion.div>
             )}
-            
+
             {/* Desktop Navigation */}
             <nav className="hidden md:flex space-x-4">
               {tabs.map((tab) => (
@@ -95,7 +96,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               ))}
             </nav>
           </div>
-          
+
           {/* Right Side Actions */}
           <div className="flex items-center space-x-3">
             {/* User Address */}
@@ -105,31 +106,31 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 {truncateAddress(userAddress)}
               </span>
             </div>
-            
+
             {/* Refresh Button */}
             {onRefresh && (
               <button
                 onClick={onRefresh}
                 disabled={isRefetching}
                 className={`p-2 bg-gray-800 rounded-lg transition-all ${
-                  isRefetching 
-                    ? 'opacity-50 cursor-not-allowed' 
+                  isRefetching
+                    ? 'opacity-50 cursor-not-allowed'
                     : 'hover:bg-gray-700'
                 }`}
                 title="Refresh dashboard data"
               >
-                <RefreshCw 
-                  className={`w-5 h-5 text-gray-400 ${isRefetching ? 'animate-spin' : ''}`} 
+                <RefreshCw
+                  className={`w-5 h-5 text-gray-400 ${isRefetching ? 'animate-spin' : ''}`}
                 />
               </button>
             )}
-            
+
             {/* Privacy Toggle */}
-            <PrivacyToggle 
+            <PrivacyToggle
               isPrivate={isPrivacyMode}
               onToggle={onPrivacyToggle}
             />
-            
+
             {/* Notifications */}
             <button className="relative p-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors">
               <Bell className="w-5 h-5 text-gray-400" />
@@ -143,7 +144,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 </motion.span>
               )}
             </button>
-            
+
             {/* Disconnect Button */}
             <Button
               variant="danger"
@@ -154,7 +155,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             </Button>
           </div>
         </div>
-        
+
         {/* Mobile Navigation */}
         <div className="md:hidden pb-3">
           <div className="flex space-x-1 bg-gray-800/50 rounded-xl p-1">

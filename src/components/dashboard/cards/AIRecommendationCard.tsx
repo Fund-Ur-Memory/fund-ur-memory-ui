@@ -102,7 +102,7 @@ export const AIRecommendationCard: React.FC<AIRecommendationCardProps> = ({
                   recommendation.priority === 'medium' ? 'bg-yellow-400' :
                   'bg-green-400'
                 }`} />
-                <span className="text-gray-500 text-xs">
+                <span className="text-white text-xs">
                   {recommendation.confidence}% confidence
                 </span>
               </div>

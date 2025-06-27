@@ -1,9 +1,10 @@
 "use client";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useState, useEffect } from "react";
 import { Link } from "react-scroll";
 import Logo from "/images/site_logo/site_logo.png";
 import MobileMenu from "./MobileMenu";
+import { CustomConnectButton } from "./common/CustomConnectButton";
+import "../styles/header-compact.css";
 
 const Header = () => {
   const [mobailActive, setMobailState] = useState(false);
@@ -121,14 +122,7 @@ const Header = () => {
                   </button>
                 </li>
                 <li>
-                  <div className="ico_btn_outline">
-                    <span className="btn_icon">
-                      <i className="fa-solid fa-user"></i>
-                    </span>
-                    <span className="btn_label">
-                      <ConnectButton />
-                    </span>
-                  </div>
+                  <CustomConnectButton />
                 </li>
               </ul>
             </div>
