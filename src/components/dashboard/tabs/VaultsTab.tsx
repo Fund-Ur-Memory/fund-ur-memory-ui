@@ -68,6 +68,10 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
   }
 
   const handleCommitmentVaultCreate = async (formData: VaultFormData) => {
+    console.log('🎯 VaultsTab: Creating vault with form data:', formData)
+    console.log('💰 VaultsTab: USD Amount:', formData.usdAmount)
+    console.log('🪙 VaultsTab: Converted Token Amount:', formData._convertedTokenAmount)
+
     if (pendingAiAnalysis) {
       await createVault(formData, pendingAiAnalysis.data)
     } else {

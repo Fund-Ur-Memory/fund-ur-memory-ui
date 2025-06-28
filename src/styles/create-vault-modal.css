@@ -1138,6 +1138,52 @@ input.commitment-title-input::placeholder,
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
 }
 
+/* Price Target Containers */
+.price-target-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 4px;
+}
+
+.price-arrow {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.price-arrow.up {
+  color: #10B981;
+}
+
+.price-arrow.down {
+  color: #EF4444;
+}
+
+/* Remove number input arrows/spinners */
+.price-input::-webkit-outer-spin-button,
+.price-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.price-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* Enhanced price input styling */
+.inline-parameter-input.price-input {
+  background: rgba(17, 24, 39, 0.6);
+  border: 1px solid rgba(107, 114, 128, 0.3);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.inline-parameter-input.price-input:focus {
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.1);
+}
+
 /* Enhanced button loading state */
 .commitment-action-btn:disabled {
   opacity: 0.7;

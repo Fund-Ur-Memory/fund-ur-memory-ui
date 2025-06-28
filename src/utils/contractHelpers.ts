@@ -180,16 +180,39 @@ export const convertFormDataToContractData = (formData: VaultFormData): Contract
   }
 
   console.log('💰 USD amount:', usdAmount)
+  console.log('🔍 Form data _convertedTokenAmount:', formData._convertedTokenAmount)
+  console.log('🔍 Form data keys:', Object.keys(formData))
 
   // Use converted token amount if available (from USD to token conversion)
   let tokenAmount: bigint
-  if (formData._convertedTokenAmount) {
+  if (formData._convertedTokenAmount && formData._convertedTokenAmount !== '') {
     console.log('💱 Using converted token amount:', formData._convertedTokenAmount)
-    tokenAmount = parseAmount(formData._convertedTokenAmount, tokenConfig.decimals)
+    // Remove any commas and parse the converted amount
+    const cleanAmount = formData._convertedTokenAmount.replace(/,/g, '')
+    const convertedAmount = parseFloat(cleanAmount)
+
+    if (!isNaN(convertedAmount) && convertedAmount > 0) {
+      tokenAmount = parseAmount(convertedAmount.toString(), tokenConfig.decimals)
+      console.log('✅ Successfully converted:', {
+        usdAmount,
+        convertedTokenAmount: convertedAmount,
+        tokenAmountWei: tokenAmount.toString(),
+        tokenAmountEther: (convertedAmount).toFixed(6) + ' ' + tokenConfig.symbol
+      })
+    } else {
+      console.error('❌ Invalid converted amount:', formData._convertedTokenAmount)
+      throw new Error('Invalid converted token amount')
+    }
   } else {
     console.log('⚠️ No converted amount found, using USD amount as fallback')
+    console.log('⚠️ This means USD amount will be treated as token amount - INCORRECT!')
     // Fallback: use USD amount directly (for backward compatibility)
     tokenAmount = parseAmount(usdAmount.toString(), tokenConfig.decimals)
+    console.log('⚠️ Using USD amount directly as token amount:', {
+      usdAmount,
+      tokenAmountWei: tokenAmount.toString(),
+      tokenAmountEther: usdAmount + ' ' + tokenConfig.symbol + ' (INCORRECT - should be converted)'
+    })
   }
 
   // Calculate unlock time
@@ -312,8 +335,8 @@ export const convertFormDataToContractData = (formData: VaultFormData): Contract
     })
   }
 
-  // Get condition type
-  const conditionType = getConditionType(formData.condition)
+  // Get condition type (pass price parameters for accurate mapping)
+  const conditionType = getConditionType(formData.condition, formData.priceUp, formData.priceDown)
   console.log('🏷️ Condition type:', conditionType)
 
   const result = {
@@ -391,8 +414,12 @@ export const getConditionTypeName = (conditionType: ConditionType): string => {
   switch (conditionType) {
     case ConditionType.TIME_ONLY:
       return 'TIME_ONLY'
-    case ConditionType.PRICE_ONLY:
-      return 'PRICE_ONLY'
+    case ConditionType.PRICE_UP_ONLY:
+      return 'PRICE_UP_ONLY'
+    case ConditionType.PRICE_DOWN_ONLY:
+      return 'PRICE_DOWN_ONLY'
+    case ConditionType.PRICE_UP_OR_DOWN:
+      return 'PRICE_UP_OR_DOWN'
     case ConditionType.TIME_OR_PRICE:
       return 'TIME_OR_PRICE'
     case ConditionType.TIME_AND_PRICE:
@@ -409,7 +436,11 @@ export const getConditionTypeDisplay = (conditionType: ConditionType): string =>
   switch (conditionType) {
     case ConditionType.TIME_ONLY:
       return 'Time Lock'
-    case ConditionType.PRICE_ONLY:
+    case ConditionType.PRICE_UP_ONLY:
+      return 'Price Target (Up)'
+    case ConditionType.PRICE_DOWN_ONLY:
+      return 'Price Target (Down)'
+    case ConditionType.PRICE_UP_OR_DOWN:
       return 'Price Target'
     case ConditionType.TIME_OR_PRICE:
       return 'Time OR Price'
@@ -432,7 +463,9 @@ export const calculateVaultProgress = (vault: RawVault, currentTime: Date): numb
   const unlockTime = Number(vault.unlockTime) * 1000
   const currentTimeMs = currentTime.getTime()
 
-  if (vault.conditionType === ConditionType.PRICE_ONLY) {
+  if (vault.conditionType === ConditionType.PRICE_UP_ONLY ||
+      vault.conditionType === ConditionType.PRICE_DOWN_ONLY ||
+      vault.conditionType === ConditionType.PRICE_UP_OR_DOWN) {
     // For price-only vaults, progress is harder to calculate without current price
     return 0
   }
@@ -455,7 +488,9 @@ export const calculateTimeRemaining = (vault: RawVault, currentTime: Date): stri
     return 'N/A'
   }
 
-  if (vault.conditionType === ConditionType.PRICE_ONLY) {
+  if (vault.conditionType === ConditionType.PRICE_UP_ONLY ||
+      vault.conditionType === ConditionType.PRICE_DOWN_ONLY ||
+      vault.conditionType === ConditionType.PRICE_UP_OR_DOWN) {
     return 'Price dependent'
   }
 
