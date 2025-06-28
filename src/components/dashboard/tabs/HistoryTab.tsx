@@ -103,6 +103,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
                 icon={Archive}
                 iconColor="text-white"
                 delay={0}
+                valueType="count"
               />
 
               <MetricCard
@@ -113,15 +114,17 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
                 iconColor="text-green-400"
                 isPrivate={isPrivacyMode}
                 delay={0.1}
+                valueType="currency"
               />
 
               <MetricCard
                 title="Success Rate"
-                value={`${historyMetrics.successRate}%`}
+                value={historyMetrics.successRate}
                 subtitle="Completion rate"
                 icon={Clock}
                 iconColor="text-blue-400"
                 delay={0.2}
+                valueType="percentage"
               />
 
               <MetricCard
@@ -131,6 +134,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
                 icon={AlertTriangle}
                 iconColor="text-red-400"
                 delay={0.3}
+                valueType="count"
               />
             </div>
           )}

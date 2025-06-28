@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, ChevronDown, Sparkles, RefreshCw, ArrowUp, ArrowDown } from 'lucide-react'
+import { X, ChevronDown, Sparkles, RefreshCw, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react'
 import type { VaultFormData } from '../../../types/contracts'
 import { useVaultCreationWithConversion } from '../../../hooks/contracts/useCreateVaultWithConversion'
 import '../../../styles/create-vault-modal.css'
@@ -35,6 +35,9 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
     message: ''
   })
 
+  const [inputMode, setInputMode] = useState<'usd' | 'token'>('usd')
+  const [tokenAmount, setTokenAmount] = useState('')
+
   // USD to AVAX conversion
   const {
     avaxAmountFormatted,
@@ -52,6 +55,55 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
 
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [analysisError, setAnalysisError] = useState('')
+
+  const handleSwapInputMode = () => {
+    if (inputMode === 'usd') {
+      // Switching from USD to token
+      if (avaxAmountFormatted && formData.usdAmount) {
+        setTokenAmount(avaxAmountFormatted.replace(/,/g, ''))
+        setFormData(prev => ({ ...prev, usdAmount: '' }))
+      }
+      setInputMode('token')
+    } else {
+      // Switching from token to USD
+      if (tokenAmount && avaxPrice) {
+        const usdValue = (parseFloat(tokenAmount) * avaxPrice).toFixed(2)
+        setFormData(prev => ({ ...prev, usdAmount: usdValue }))
+        setTokenAmount('')
+      }
+      setInputMode('usd')
+    }
+  }
+
+  const handleTokenAmountChange = (value: string) => {
+    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+      if (value === '' || value === '0' || value === '0.' || !/^0\d/.test(value)) {
+        setTokenAmount(value)
+        // Update USD amount based on token amount
+        if (value && avaxPrice) {
+          const usdValue = (parseFloat(value) * avaxPrice).toFixed(2)
+          setFormData(prev => ({ ...prev, usdAmount: usdValue }))
+        } else {
+          setFormData(prev => ({ ...prev, usdAmount: '' }))
+        }
+      }
+    }
+  }
+
+  const handleUsdAmountChange = (value: string) => {
+    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+      if (value === '' || value === '0' || value === '0.' || !/^0\d/.test(value)) {
+        setFormData(prev => ({ ...prev, usdAmount: value }))
+        // Update token amount based on USD amount
+        if (value && avaxPrice) {
+          const tokenValue = (parseFloat(value) / avaxPrice).toFixed(6)
+          setTokenAmount(tokenValue)
+        } else {
+          setTokenAmount('')
+        }
+      }
+    }
+  }
 
   const selectedToken = SUPPORTED_TOKENS.find(token => token.symbol === formData.token)
   const selectedCondition = COMMITMENT_CONDITIONS.find(condition => condition.id === formData.condition)
@@ -86,15 +138,17 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
   }
 
   const generateCommitmentText = () => {
-    const amount = parseFloat(formData.usdAmount)
+    // Use the converted token amount instead of USD amount
+    const tokenAmount = avaxAmountFormatted?.replace(/,/g, '') || formData.usdAmount
     const token = formData.token
+    // const usdAmount = parseFloat(formData.usdAmount)
 
     if (formData.condition === 'TIME_BASED') {
-      return `I want to lock ${amount} ${token} for ${formData.timeValue} ${formData.timeUnit}`
+      return `I want to lock ${tokenAmount} ${token} for ${formData.timeValue} ${formData.timeUnit}`
     } else if (formData.condition === 'PRICE_TARGET') {
-      return `I want to lock ${amount} ${token} until either the price goes up to $${formData.priceUp} or price goes down to $${formData.priceDown}`
+      return `I want to lock ${tokenAmount} ${token} until either the price goes up to $${formData.priceUp} or price goes down to $${formData.priceDown}`
     } else if (formData.condition === 'COMBO') {
-      return `I want to lock ${amount} ${token} for ${formData.timeValue} ${formData.timeUnit} or until the price reaches $${formData.priceUp}`
+      return `I want to lock ${tokenAmount} ${token} for ${formData.timeValue} ${formData.timeUnit} or until the price reaches $${formData.priceUp}`
     }
     return ''
   }
@@ -173,28 +227,64 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
               <div className="commitment-statement">
                 <span className="statement-text">I want to commit</span>
 
-                {/* Enhanced USD Amount Input with AVAX Conversion */}
+                {/* Enhanced Amount Input with USD/Token Toggle */}
                 <div className="amount-input-container">
                   <div className={`amount-input-wrapper ${
-                    formData.usdAmount && parseFloat(formData.usdAmount) > 0 ? 'has-value' : ''
+                    (inputMode === 'usd' && formData.usdAmount && parseFloat(formData.usdAmount) > 0) || 
+                    (inputMode === 'token' && tokenAmount && parseFloat(tokenAmount) > 0) ? 'has-value' : ''
                   } ${
                     validationError && validationError.toLowerCase().includes('amount') ? 'has-error' : ''
                   }`}>
-                    <div className="currency-symbol">$</div>
+                    <div className="currency-symbol">
+                      {inputMode === 'usd' ? '$' : selectedToken?.symbol.charAt(0) || 'A'}
+                    </div>
                     <input
-                      type="number"
-                      value={formData.usdAmount}
-                      onChange={(e) => setFormData(prev => ({ ...prev, usdAmount: e.target.value }))}
-                      placeholder="0.00"
+                      type="text"
+                      value={inputMode === 'usd' ? formData.usdAmount : tokenAmount}
+                      onChange={(e) => {
+                        const value = e.target.value
+                        if (inputMode === 'usd') {
+                          handleUsdAmountChange(value)
+                        } else {
+                          handleTokenAmountChange(value)
+                        }
+                      }}
+                      placeholder={inputMode === 'usd' ? '0.00' : '0.000000'}
                       className="amount-input-field"
-                      min="0"
-                      step="0.01"
                       disabled={isAnalyzing}
+                      style={{ minWidth: '120px', width: 'auto', flex: '1' }}
                     />
-                    <div className="currency-code">USD</div>
+                    <div className="currency-code">{inputMode === 'usd' ? 'USD' : formData.token}</div>
+                    
+                    {/* Swap Button */}
+                    <button
+                      type="button"
+                      onClick={handleSwapInputMode}
+                      className="swap-button"
+                      disabled={isAnalyzing || !avaxPrice}
+                      title={`Switch to ${inputMode === 'usd' ? 'token' : 'USD'} input`}
+                      style={{
+                        marginLeft: '8px',
+                        padding: '8px',
+                        background: 'rgba(154, 68, 151, 0.2)',
+                        border: '1px solid rgba(154, 68, 151, 0.3)',
+                        borderRadius: '8px',
+                        color: '#FFFFFF',
+                        cursor: isAnalyzing || !avaxPrice ? 'not-allowed' : 'pointer',
+                        opacity: isAnalyzing || !avaxPrice ? 0.5 : 1,
+                        transition: 'all 0.2s ease',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        minWidth: '32px',
+                        height: '32px'
+                      }}
+                    >
+                      <ArrowUpDown className="w-4 h-4" />
+                    </button>
                   </div>
 
-                  {/* AVAX Conversion Info */}
+                  {/* Conversion Info */}
                   <div className="conversion-info">
                     {isPriceLoading ? (
                       <motion.div
@@ -227,7 +317,8 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
                           Retry
                         </button>
                       </motion.div>
-                    ) : avaxAmountFormatted ? (
+                    ) : ((inputMode === 'usd' && formData.usdAmount && parseFloat(formData.usdAmount) > 0) || 
+                          (inputMode === 'token' && tokenAmount && parseFloat(tokenAmount) > 0)) ? (
                       <motion.div
                         className="conversion-success"
                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
@@ -235,8 +326,17 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
                         transition={{ duration: 0.4, ease: "easeOut" }}
                       >
                         <div className="conversion-amount">
-                          <span className="amount">{avaxAmountFormatted}</span>
-                          <span className="token">AVAX</span>
+                          {inputMode === 'usd' ? (
+                            <>
+                              <span className="amount">{avaxAmountFormatted}</span>
+                              <span className="token">AVAX</span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="amount">${formData.usdAmount}</span>
+                              <span className="token">USD</span>
+                            </>
+                          )}
                         </div>
                         <div className="price-info">
                           <span className="price-label">1 AVAX = ${avaxPrice?.toFixed(2)}</span>
@@ -249,15 +349,6 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
                             <RefreshCw className={`refresh-icon ${isPriceLoading ? 'spinning' : ''}`} />
                           </button>
                         </div>
-                      </motion.div>
-                    ) : formData.usdAmount && parseFloat(formData.usdAmount) > 0 ? (
-                      <motion.div
-                        className="conversion-placeholder"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <span>Enter amount to see AVAX conversion</span>
                       </motion.div>
                     ) : null}
                   </div>
@@ -369,14 +460,23 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
                     <span className="statement-text">for</span>
                     <div className="inline-parameter-container">
                       <input
-                        type="number"
-                        value={formData.timeValue}
-                        onChange={(e) => setFormData(prev => ({ ...prev, timeValue: parseInt(e.target.value) || 0 }))}
+                        type="text"
+                        value={formData.timeValue?.toString() || ''}
+                        onChange={(e) => {
+                          const value = e.target.value
+                          // Allow only positive integers
+                          if (value === '' || (/^\d+$/.test(value) && parseInt(value) > 0)) {
+                            const numValue = value === '' ? 0 : parseInt(value)
+                            const maxValue = getMaxTimeValue(formData.timeUnit || 'months')
+                            if (numValue <= maxValue) {
+                              setFormData(prev => ({ ...prev, timeValue: numValue }))
+                            }
+                          }
+                        }}
                         placeholder="6"
-                        min="1"
-                        max={getMaxTimeValue(formData.timeUnit || 'months')}
                         className="inline-parameter-input"
                         disabled={isAnalyzing}
+                        style={{ minWidth: '60px', width: 'auto' }}
                       />
                     </div>
 
@@ -439,20 +539,25 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
                       <div className="inline-parameter-container">
                         <span className="inline-parameter-unit">$</span>
                         <input
-                          type="number"
-                          value={formData.priceUp || ''}
+                          type="text"
+                          value={formData.priceUp?.toString() || ''}
                           onChange={(e) => {
                             const value = e.target.value
-                            if (value === '' || parseFloat(value) >= 0) {
-                              setFormData(prev => ({
-                                ...prev,
-                                priceUp: value === '' ? undefined : parseFloat(value)
-                              }))
+                            // Allow empty string, numbers, and decimal points
+                            if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                              // Prevent leading zeros except for decimals like 0.5
+                              if (value === '' || value === '0' || value === '0.' || !/^0\d/.test(value)) {
+                                setFormData(prev => ({
+                                  ...prev,
+                                  priceUp: value === '' ? undefined : parseFloat(value)
+                                }))
+                              }
                             }
                           }}
                           placeholder="0"
                           className="inline-parameter-input price-input"
                           disabled={isAnalyzing}
+                          style={{ minWidth: '80px', width: 'auto' }}
                         />
                       </div>
                     </div>
@@ -467,20 +572,25 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
                           <div className="inline-parameter-container">
                             <span className="inline-parameter-unit">$</span>
                             <input
-                              type="number"
-                              value={formData.priceDown || ''}
+                              type="text"
+                              value={formData.priceDown?.toString() || ''}
                               onChange={(e) => {
                                 const value = e.target.value
-                                if (value === '' || parseFloat(value) >= 0) {
-                                  setFormData(prev => ({
-                                    ...prev,
-                                    priceDown: value === '' ? undefined : parseFloat(value)
-                                  }))
+                                // Allow empty string, numbers, and decimal points
+                                if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                                  // Prevent leading zeros except for decimals like 0.5
+                                  if (value === '' || value === '0' || value === '0.' || !/^0\d/.test(value)) {
+                                    setFormData(prev => ({
+                                      ...prev,
+                                      priceDown: value === '' ? undefined : parseFloat(value)
+                                    }))
+                                  }
                                 }
                               }}
                               placeholder="0"
                               className="inline-parameter-input price-input"
                               disabled={isAnalyzing}
+                              style={{ minWidth: '80px', width: 'auto' }}
                             />
                           </div>
                         </div>

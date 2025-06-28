@@ -402,6 +402,16 @@ export const VaultCard: React.FC<VaultCardProps> = ({
                   {tokenSymbol}
                 </span>
               </p>
+              {/* Show USD equivalent for locked amount */}
+              {!isPrivate && amountUsd && (
+                <p style={{
+                  fontSize: '12px',
+                  color: 'rgba(255, 255, 255, 0.6)',
+                  margin: '2px 0 0 0'
+                }}>
+                  ≈ ${amountUsd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
+                </p>
+              )}
             </div>
 
             <div>

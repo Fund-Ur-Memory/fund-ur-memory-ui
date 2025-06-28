@@ -14,6 +14,7 @@ interface MetricCardProps {
   delay?: number
   subtitle?: string
   onClick?: () => void
+  valueType?: 'currency' | 'count' | 'percentage' | 'custom' // Add explicit value type
 }
 
 export const MetricCard: React.FC<MetricCardProps> = ({
@@ -24,16 +25,30 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   isPrivate = false,
   delay = 0,
   subtitle,
-  onClick
+  onClick,
+  valueType = 'currency' // Default to currency for backward compatibility
 }) => {
   // Debug log to see what values are being passed
   if (title === 'Total Portfolio' || title === 'Active Vaults') {
-    console.log(`📊 MetricCard ${title}:`, { value, change, isPrivate, subtitle })
+    console.log(`📊 MetricCard ${title}:`, { value, change, isPrivate, subtitle, valueType })
   }
   
-  const displayValue = typeof value === 'number'
-    ? formatCurrency(value, isPrivate)
-    : value
+  const displayValue = (() => {
+    if (typeof value === 'string') return value
+    
+    switch (valueType) {
+      case 'currency':
+        return formatCurrency(value, isPrivate)
+      case 'count':
+        return isPrivate ? '••••' : value.toString()
+      case 'percentage':
+        return isPrivate ? '••••' : `${value}%`
+      case 'custom':
+        return isPrivate ? '••••' : value.toString()
+      default:
+        return formatCurrency(value, isPrivate)
+    }
+  })()
 
   const getIconEmoji = (iconColor: string) => {
     const iconMap: Record<string, string> = {

@@ -156,6 +156,7 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
                 icon={Shield}
                 iconColor="text-white"
                 delay={0}
+                valueType="count"
               />
 
               <MetricCard
@@ -166,6 +167,7 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
                 iconColor="text-blue-400"
                 isPrivate={isPrivacyMode}
                 delay={0.1}
+                valueType="currency"
               />
 
               <MetricCard
@@ -175,15 +177,17 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
                 icon={Clock}
                 iconColor="text-yellow-400"
                 delay={0.2}
+                valueType="count"
               />
 
               <MetricCard
                 title="Avg Progress"
-                value={`${userMetrics.avgProgress}%`}
+                value={userMetrics.avgProgress}
                 subtitle="Completion rate"
                 icon={CheckCircle}
                 iconColor="text-green-400"
                 delay={0.3}
+                valueType="percentage"
               />
             </div>
           )}

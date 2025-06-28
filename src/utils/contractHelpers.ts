@@ -204,15 +204,9 @@ export const convertFormDataToContractData = (formData: VaultFormData): Contract
       throw new Error('Invalid converted token amount')
     }
   } else {
-    console.log('⚠️ No converted amount found, using USD amount as fallback')
-    console.log('⚠️ This means USD amount will be treated as token amount - INCORRECT!')
-    // Fallback: use USD amount directly (for backward compatibility)
-    tokenAmount = parseAmount(usdAmount.toString(), tokenConfig.decimals)
-    console.log('⚠️ Using USD amount directly as token amount:', {
-      usdAmount,
-      tokenAmountWei: tokenAmount.toString(),
-      tokenAmountEther: usdAmount + ' ' + tokenConfig.symbol + ' (INCORRECT - should be converted)'
-    })
+    console.error('❌ No converted token amount found. Cannot proceed without proper USD to token conversion.')
+    console.error('❌ This is a critical error - vault creation requires accurate token amounts.')
+    throw new Error('Missing converted token amount. Please ensure USD to token conversion is completed before creating vault.')
   }
 
   // Calculate unlock time

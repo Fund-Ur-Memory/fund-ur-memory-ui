@@ -5,7 +5,8 @@ import { MetricCard } from '../cards/MetricCard'
 import { type DashboardData } from '../../../types/dashboard'
 import { motion } from 'framer-motion'
 import { type Transaction } from '../../../types/dashboard'
-import { formatDate } from '../../../utils/formatters'
+import { formatDate, formatTokenWithUSD } from '../../../utils/formatters'
+import { useMultipleTokenPrices } from '../../../hooks/useTokenPrice'
 import { useGetVaults } from '../../../hooks/contracts/useGetVaults'
 import { useAccount } from 'wagmi'
 import { useVaultsAnalysis } from '../../../hooks/useVaultsAnalysis'
@@ -38,6 +39,14 @@ const OverviewActivityCard: React.FC<{
   onRefresh
 }) => {
   const displayTransactions = transactions.slice(0, maxItems)
+  
+  // Get unique token symbols from transactions
+  const tokenSymbols = [...new Set(transactions.map(tx => tx.asset))].filter(asset => 
+    asset && !asset.includes('$') // Filter out already formatted USD values
+  )
+  
+  // Fetch token prices for transactions
+  const { prices: tokenPrices } = useMultipleTokenPrices(tokenSymbols, true)
 
   // Show loading state
   if (isLoading) {
@@ -229,7 +238,12 @@ const OverviewActivityCard: React.FC<{
             <div className="text-end">
               <div className="d-flex align-items-center justify-content-end mb-1">
                 <p className="text-white mb-0 fw-bold me-2" style={{ fontSize: '1rem' }}>
-                  {isPrivate ? '••••' : tx.amount} {tx.asset}
+                  {isPrivate ? '••••' : formatTokenWithUSD(
+                    tx.amount, 
+                    tx.asset, 
+                    tokenPrices[tx.asset]?.price,
+                    isPrivate
+                  )}
                 </p>
                 {tx.transactionHash && (
                   <span className="text-gray" style={{ fontSize: '0.7rem', opacity: '0.6' }}>
@@ -334,6 +348,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
               iconColor="text-green-400"
               isPrivate={isPrivacyMode}
               delay={0}
+              valueType="currency"
             />
 
             <MetricCard
@@ -343,26 +358,29 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
               iconColor="text-white"
               delay={0.1}
               subtitle={expiringVaults > 0 ? `${expiringVaults} expiring soon` : 'All on track'}
+              valueType="count"
             />
 
             <MetricCard
               title="Total Returns"
-              value={`${profile.totalReturns.toFixed(1)}%`}
+              value={profile.totalReturns}
               change={profile.totalReturns}
               icon={TrendingUp}
               iconColor="text-blue-400"
               isPrivate={isPrivacyMode}
               delay={0.2}
               subtitle={portfolioChangeLabel}
+              valueType="percentage"
             />
 
             <MetricCard
               title="Success Rate"
-              value={`${profile.successRate}%`}
+              value={profile.successRate}
               icon={Brain}
               iconColor="text-green-400"
               delay={0.3}
               subtitle={successRateLabel}
+              valueType="percentage"
             />
           </div>
         </div>

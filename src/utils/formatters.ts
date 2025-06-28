@@ -79,6 +79,26 @@ export const formatContractPrice = (price: bigint, decimals: number = 8): string
   return formatCurrency(formattedPrice)
 }
 
+// Format token amount with USD equivalent
+export const formatTokenWithUSD = (
+  tokenAmount: number, 
+  tokenSymbol: string, 
+  tokenPrice?: number, 
+  isPrivate: boolean = false
+): string => {
+  if (isPrivate) return '••••'
+  
+  const tokenDisplay = `${tokenAmount} ${tokenSymbol}`
+  
+  if (tokenPrice && tokenPrice > 0) {
+    const usdValue = tokenAmount * tokenPrice
+    const usdDisplay = formatCurrency(usdValue, false)
+    return `${tokenDisplay} (${usdDisplay})`
+  }
+  
+  return tokenDisplay
+}
+
 export const formatVaultStatus = (status: string): string => {
   switch (status.toLowerCase()) {
     case 'active':

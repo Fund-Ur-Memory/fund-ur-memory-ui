@@ -62,15 +62,17 @@ export const CommitmentModal: React.FC<CommitmentModalProps> = ({
   };
 
   const generateCommitmentText = () => {
-    const amount = parseFloat(formData.usdAmount);
+    // Use the converted token amount instead of USD amount
+    const tokenAmount = formData._convertedTokenAmount || formData.usdAmount;
     const token = formData.token;
+    const usdAmount = parseFloat(formData.usdAmount);
 
     if (formData.condition === "TIME_BASED") {
-      return `I want to lock ${amount} ${token} for ${formData.timeValue} ${formData.timeUnit}`;
+      return `I want to lock ${tokenAmount} ${token} (${usdAmount} USD) for ${formData.timeValue} ${formData.timeUnit}`;
     } else if (formData.condition === "PRICE_TARGET") {
-      return `I want to lock ${amount} ${token} until either the price goes up to $${formData.priceUp} or price goes down to $${formData.priceDown}`;
+      return `I want to lock ${tokenAmount} ${token} (${usdAmount} USD) until either the price goes up to $${formData.priceUp} or price goes down to $${formData.priceDown}`;
     } else if (formData.condition === "COMBO") {
-      return `I want to lock ${amount} ${token} for ${formData.timeValue} ${formData.timeUnit} or until the price reaches $${formData.targetPrice}`;
+      return `I want to lock ${tokenAmount} ${token} (${usdAmount} USD) for ${formData.timeValue} ${formData.timeUnit} or until the price reaches $${formData.targetPrice}`;
     }
     return "";
   };
@@ -174,7 +176,7 @@ export const CommitmentModal: React.FC<CommitmentModalProps> = ({
                       Amount:{" "}
                     </span>
                     <span style={{ fontWeight: "600" }}>
-                      {formData.usdAmount} {formData.token}
+                      {formData._convertedTokenAmount || formData.usdAmount} {formData.token} (${formData.usdAmount} USD)
                     </span>
                   </div>
                   <div style={{ marginBottom: "0.5rem" }}>
