@@ -1,7 +1,6 @@
 import { useCallback } from 'react'
 import { useCreateVault } from './useCreateVault'
 import { useUsdToAvaxConversion } from '../useUsdToTokenConversion'
-import { parseUnits } from 'viem'
 import type { VaultFormData, TransactionResult } from '../../types/contracts'
 
 /**
@@ -24,7 +23,7 @@ export const useCreateVaultWithConversion = () => {
       // For AVAX token, we need to convert USD to AVAX amount
       if (formData.token === 'AVAX') {
         console.log('💰 Converting USD to AVAX...')
-        
+
         // We need to fetch the current AVAX price
         // This is a simplified approach - in a real implementation,
         // you'd want to use the conversion hook's result
@@ -58,7 +57,7 @@ export const useCreateVaultWithConversion = () => {
       }
     } catch (error) {
       console.error('❌ Vault creation with conversion failed:', error)
-      
+
       let errorMessage = 'Failed to create vault'
       if (error instanceof Error) {
         if (error.message.includes('Unable to fetch')) {
@@ -90,7 +89,7 @@ export const useCreateVaultWithConversion = () => {
  */
 export const useVaultCreationWithConversion = (formData: VaultFormData) => {
   const { createVault, isLoading, error } = useCreateVaultWithConversion()
-  
+
   // Get real-time conversion for display
   const {
     tokenAmount: avaxAmount,
@@ -108,10 +107,10 @@ export const useVaultCreationWithConversion = (formData: VaultFormData) => {
     // Basic validations
     const hasValidTitle = formData.title.trim().length >= 3
     const hasValidMessage = formData.message.trim().length >= 10
-    
+
     // Amount validation using conversion
     const hasValidAmount = isAmountValid && !getValidationError()
-    
+
     // Time validation
     const hasValidTime = (formData.condition === 'TIME_BASED' || formData.condition === 'COMBO')
       ? (formData.timeValue || 0) > 0
@@ -142,7 +141,7 @@ export const useVaultCreationWithConversion = (formData: VaultFormData) => {
       return 'Enter a valid time duration'
     }
 
-    if (formData.condition === 'PRICE_TARGET' && 
+    if (formData.condition === 'PRICE_TARGET' &&
         (formData.priceUp || 0) <= 0 && (formData.priceDown || 0) <= 0) {
       return 'Enter at least one price target'
     }
@@ -164,7 +163,7 @@ export const useVaultCreationWithConversion = (formData: VaultFormData) => {
     createVault,
     isLoading,
     error,
-    
+
     // Conversion info
     avaxAmount,
     avaxAmountFormatted,
@@ -172,7 +171,7 @@ export const useVaultCreationWithConversion = (formData: VaultFormData) => {
     isPriceLoading,
     priceError,
     refreshPrice,
-    
+
     // Validation
     isFormValid: isFormValid(),
     validationError: getFormValidationError(),

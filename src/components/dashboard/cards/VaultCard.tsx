@@ -30,7 +30,6 @@ export const VaultCard: React.FC<VaultCardProps> = ({
   const [isWithdrawing, setIsWithdrawing] = useState(false)
   const [isEmergencyWithdrawing, setIsEmergencyWithdrawing] = useState(false)
   const [operationStatus, setOperationStatus] = useState<'pending' | 'confirming' | 'success' | 'error'>('pending')
-  const [txHash, setTxHash] = useState<string | null>(null)
   const { withdrawVault, emergencyWithdraw, isLoading, txHash: hookTxHash } = useWithdrawVault()
 
   // Get real-time token price
@@ -65,7 +64,6 @@ export const VaultCard: React.FC<VaultCardProps> = ({
     try {
       await withdrawVault(vault.id)
       setOperationStatus('confirming')
-      // setTxHash would be set from the hook's txHash value
 
       // Simulate confirmation delay
       setTimeout(() => {
@@ -88,7 +86,6 @@ export const VaultCard: React.FC<VaultCardProps> = ({
     try {
       await emergencyWithdraw(vault.id)
       setOperationStatus('confirming')
-      // setTxHash would be set from the hook's txHash value
 
       // Simulate confirmation delay
       setTimeout(() => {
@@ -680,7 +677,7 @@ export const VaultCard: React.FC<VaultCardProps> = ({
         amount={amountFormatted}
         tokenSymbol={tokenSymbol}
         status={operationStatus}
-        txHash={hookTxHash || txHash || undefined}
+        txHash={hookTxHash || undefined}
         onClose={() => {
           setIsWithdrawing(false)
           setIsEmergencyWithdrawing(false)

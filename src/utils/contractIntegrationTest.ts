@@ -4,7 +4,7 @@
 
 import type { VaultFormData } from '../types/contracts'
 import { validateVaultFormData, convertFormDataToContractData } from './contractHelpers'
-import { SUPPORTED_TOKENS } from '../contracts/FUMVault'
+import { SUPPORTED_TOKENS, FUM_VAULT_CONFIG } from '../contracts/FUMVault'
 
 /**
  * Test form data validation

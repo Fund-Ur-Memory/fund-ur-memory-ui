@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { 
-  Download, 
-  Zap, 
-  Clock, 
-  CheckCircle, 
-  AlertTriangle, 
-  DollarSign,
+import {
+  Download,
+  Zap,
+  Clock,
+  CheckCircle,
+  AlertTriangle,
   TrendingUp,
   Shield,
   Loader
@@ -40,7 +39,6 @@ export const VaultOperationLoader: React.FC<VaultOperationLoaderProps> = ({
   className = '',
   estimatedTime = 30,
   currentStep = 1,
-  totalSteps = 3,
   message
 }) => {
   const [progress, setProgress] = useState(0)
@@ -51,7 +49,7 @@ export const VaultOperationLoader: React.FC<VaultOperationLoaderProps> = ({
 
     const interval = setInterval(() => {
       setTimeElapsed(prev => prev + 1)
-      
+
       // Simulate progress based on operation type
       if (status === 'pending') {
         setProgress(prev => Math.min(prev + 2, 40))
@@ -194,7 +192,7 @@ export const VaultOperationLoader: React.FC<VaultOperationLoaderProps> = ({
       case 'success':
         return {
           title: 'Operation Successful!',
-          subtitle: operation === 'auto-withdraw' 
+          subtitle: operation === 'auto-withdraw'
             ? 'Funds have been automatically transferred to your wallet'
             : 'Your transaction has been completed successfully'
         }
@@ -242,7 +240,7 @@ export const VaultOperationLoader: React.FC<VaultOperationLoaderProps> = ({
               >
                 {getStatusIcon()}
               </motion.div>
-              
+
               <motion.h2
                 className="text-xl font-bold text-white mb-2"
                 initial={{ y: 20, opacity: 0 }}
@@ -251,7 +249,7 @@ export const VaultOperationLoader: React.FC<VaultOperationLoaderProps> = ({
               >
                 {getStatusMessage().title}
               </motion.h2>
-              
+
               <motion.p
                 className="text-gray-400 text-sm"
                 initial={{ y: 20, opacity: 0 }}
@@ -269,8 +267,8 @@ export const VaultOperationLoader: React.FC<VaultOperationLoaderProps> = ({
                   <motion.div
                     key={index}
                     className={`flex items-center space-x-3 p-2 rounded-lg transition-all duration-300 ${
-                      index < currentStep 
-                        ? `bg-gradient-to-r ${config.bgColor} border ${config.borderColor}` 
+                      index < currentStep
+                        ? `bg-gradient-to-r ${config.bgColor} border ${config.borderColor}`
                         : 'bg-gray-800/50 border border-gray-700/50'
                     }`}
                     initial={{ x: -20, opacity: 0 }}
@@ -293,7 +291,7 @@ export const VaultOperationLoader: React.FC<VaultOperationLoaderProps> = ({
                         <div className="w-5 h-5 rounded-full border-2 border-current" />
                       )}
                     </div>
-                    
+
                     <div className="flex-1">
                       <div className={`text-sm font-medium ${
                         index < currentStep ? 'text-white' : 'text-gray-400'
@@ -323,10 +321,10 @@ export const VaultOperationLoader: React.FC<VaultOperationLoaderProps> = ({
                     <motion.div
                       className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
                       animate={{ x: [-100, 200] }}
-                      transition={{ 
-                        duration: 1.5, 
-                        repeat: Infinity, 
-                        ease: "linear" 
+                      transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        ease: "linear"
                       }}
                     />
                   </motion.div>
