@@ -1,6 +1,6 @@
 // src/contracts/FUMVault.ts
 import type { Address, Abi } from 'viem'
-import FUMVaultABI from '../contratcs/FUMVault.json'
+import FUMVaultABI from './FUMVault.json'
 
 // Contract Configuration
 export const FUM_VAULT_CONFIG = {
