@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Brain } from 'lucide-react'
+import { Brain, TrendingUp, AlertTriangle, Target } from 'lucide-react'
 import { SimpleRecommendationCard } from '../cards/AIRecommendationCard'
 import { type DashboardData, type WalletAnalysisResponse } from '../../../types/dashboard'
+import '../../../styles/header-compact.css'
 
 interface AIInsightsTabProps {
   data: DashboardData
@@ -59,93 +60,240 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
 
   return (
     <div>
-      {/* Header Section */}
-      <section style={{ paddingTop: '2rem', paddingBottom: '0' }}>
+      {/* AI Score Overview Cards - Match Overview Tab Style */}
+      <section style={{ paddingTop: '1rem', paddingBottom: '1.5rem' }}>
         <div className="container">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="row justify-content-center mb-4"
-          >
-            <div className="col-lg-10">
-              <div className="ico_heading_block text-center">
-                <h2 className="heading_text mb-0 text-white">AI Insights & Analysis</h2>
-                <p className="text-secondary mt-3 d-flex align-items-center justify-content-center">
-                  <Brain className="me-2" style={{ width: '20px', height: '20px' }} />
-                  Powered by ElizaOS Agent Maker
-                </p>
+          <div className="row g-3">
+            {/* AI Risk Score Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0, duration: 0.3 }}
+              className="col-lg-3 col-md-6 col-sm-6"
+            >
+              <div
+                className="ico_iconbox_block"
+                style={{
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  height: '100%',
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                  border: '1px solid rgba(139, 92, 246, 0.3)',
+                  borderRadius: '12px',
+                  backdropFilter: 'blur(10px)',
+                  padding: '1.25rem',
+                  minHeight: '140px',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}
+              >
+                <div className="d-flex justify-content-between align-items-start mb-3">
+                  <div className="text-start flex-grow-1">
+                    <p className="text-gray mb-1" style={{ fontSize: '0.8rem', opacity: '0.8', fontWeight: '500' }}>
+                      AI Risk Score
+                    </p>
+                    <h3 className="heading_text text-white mb-0" style={{ fontSize: '1.5rem', fontWeight: '700', lineHeight: '1.2' }}>
+                      {walletAnalysis?.data?.riskScore || aiInsights.riskScore}/100
+                    </h3>
+                    <p className="mt-1" style={{ fontSize: '0.75rem', opacity: '0.7' }}>
+                      {walletAnalysis?.data?.confidencePercentage || aiInsights.confidence}% confidence
+                    </p>
+                  </div>
+                  <div
+                    className="iconbox_icon d-flex align-items-center justify-content-center flex-shrink-0"
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(124, 58, 237, 0.1))',
+                      borderRadius: '10px',
+                      fontSize: '1.2rem',
+                      border: '1px solid rgba(139, 92, 246, 0.3)',
+                      transition: 'all 0.3s ease'
+                    }}
+                  >
+                    🧠
+                  </div>
+                </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+
+            {/* Market Sentiment Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.3 }}
+              className="col-lg-3 col-md-6 col-sm-6"
+            >
+              <div
+                className="ico_iconbox_block"
+                style={{
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  height: '100%',
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                  border: '1px solid rgba(16, 185, 129, 0.3)',
+                  borderRadius: '12px',
+                  backdropFilter: 'blur(10px)',
+                  padding: '1.25rem',
+                  minHeight: '140px',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}
+              >
+                <div className="d-flex justify-content-between align-items-start mb-3">
+                  <div className="text-start flex-grow-1">
+                    <p className="text-gray mb-1" style={{ fontSize: '0.8rem', opacity: '0.8', fontWeight: '500' }}>
+                      Market Sentiment
+                    </p>
+                    <h3 className="heading_text text-white mb-0" style={{ fontSize: '1.5rem', fontWeight: '700', lineHeight: '1.2' }}>
+                      {insights.market.data.sentiment}
+                    </h3>
+                    <p className="mt-1" style={{ fontSize: '0.75rem', opacity: '0.7' }}>
+                      {insights.market.data.trend} trend
+                    </p>
+                  </div>
+                  <div
+                    className="iconbox_icon d-flex align-items-center justify-content-center flex-shrink-0"
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.1))',
+                      borderRadius: '10px',
+                      fontSize: '1.2rem',
+                      border: '1px solid rgba(16, 185, 129, 0.3)',
+                      transition: 'all 0.3s ease'
+                    }}
+                  >
+                    📈
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Risk Profile Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.3 }}
+              className="col-lg-3 col-md-6 col-sm-6"
+            >
+              <div
+                className="ico_iconbox_block"
+                style={{
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  height: '100%',
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                  border: '1px solid rgba(59, 130, 246, 0.3)',
+                  borderRadius: '12px',
+                  backdropFilter: 'blur(10px)',
+                  padding: '1.25rem',
+                  minHeight: '140px',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}
+              >
+                <div className="d-flex justify-content-between align-items-start mb-3">
+                  <div className="text-start flex-grow-1">
+                    <p className="text-gray mb-1" style={{ fontSize: '0.8rem', opacity: '0.8', fontWeight: '500' }}>
+                      Risk Profile
+                    </p>
+                    <h3 className="heading_text text-white mb-0" style={{ fontSize: '1.5rem', fontWeight: '700', lineHeight: '1.2' }}>
+                      {insights.behavioral.data.tradingStyle}
+                    </h3>
+                    <p className="mt-1" style={{ fontSize: '0.75rem', opacity: '0.7' }}>
+                      {insights.behavioral.data.riskTolerance} risk tolerance
+                    </p>
+                  </div>
+                  <div
+                    className="iconbox_icon d-flex align-items-center justify-content-center flex-shrink-0"
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.1))',
+                      borderRadius: '10px',
+                      fontSize: '1.2rem',
+                      border: '1px solid rgba(59, 130, 246, 0.3)',
+                      transition: 'all 0.3s ease'
+                    }}
+                  >
+                    🛡️
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Trading Insights Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.3 }}
+              className="col-lg-3 col-md-6 col-sm-6"
+            >
+              <div
+                className="ico_iconbox_block"
+                style={{
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  height: '100%',
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                  border: '1px solid rgba(245, 158, 11, 0.3)',
+                  borderRadius: '12px',
+                  backdropFilter: 'blur(10px)',
+                  padding: '1.25rem',
+                  minHeight: '140px',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}
+              >
+                <div className="d-flex justify-content-between align-items-start mb-3">
+                  <div className="text-start flex-grow-1">
+                    <p className="text-gray mb-1" style={{ fontSize: '0.8rem', opacity: '0.8', fontWeight: '500' }}>
+                      Hold Time
+                    </p>
+                    <h3 className="heading_text text-white mb-0" style={{ fontSize: '1.5rem', fontWeight: '700', lineHeight: '1.2' }}>
+                      {insights.behavioral.data.averageHoldTime}d
+                    </h3>
+                    <p className="mt-1" style={{ fontSize: '0.75rem', opacity: '0.7' }}>
+                      {insights.behavioral.data.tradeFrequency} trades/month
+                    </p>
+                  </div>
+                  <div
+                    className="iconbox_icon d-flex align-items-center justify-content-center flex-shrink-0"
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.1))',
+                      borderRadius: '10px',
+                      fontSize: '1.2rem',
+                      border: '1px solid rgba(245, 158, 11, 0.3)',
+                      transition: 'all 0.3s ease'
+                    }}
+                  >
+                    ⏰
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* AI Health Score Section */}
-      <section style={{ paddingTop: '1rem', paddingBottom: '0' }}>
+      {/* AI Analysis Header */}
+      <section style={{ paddingTop: '1rem', paddingBottom: '1rem' }}>
         <div className="container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+            transition={{ delay: 0.5 }}
             className="row justify-content-center"
           >
-            <div className="col-lg-6">
-              <div className="ico_iconbox_block text-center p-5" style={{
-                background: 'linear-gradient(135deg, rgba(111, 66, 193, 0.2), rgba(157, 91, 232, 0.2))',
-                border: '1px solid rgba(111, 66, 193, 0.4)'
-              }}>
-                <h3 className="heading_text text-white mb-4">Your AI Risk Score</h3>
-
-                {/* Circular Progress */}
-                <div className="position-relative mx-auto mb-4" style={{ width: '150px', height: '150px' }}>
-                  <svg
-                    className="position-absolute"
-                    style={{ transform: 'rotate(-90deg)', width: '150px', height: '150px' }}
-                    viewBox="0 0 36 36"
-                  >
-                    <path
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      fill="none"
-                      stroke="rgba(255,255,255,0.2)"
-                      strokeWidth="3"
-                    />
-                    <motion.path
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      fill="none"
-                      stroke="url(#gradient)"
-                      strokeWidth="3"
-                      strokeDasharray={`${walletAnalysis?.data?.riskScore || aiInsights.riskScore}, 100`}
-                      strokeLinecap="round"
-                      initial={{ strokeDasharray: "0, 100" }}
-                      animate={{ strokeDasharray: `${walletAnalysis?.data?.riskScore || aiInsights.riskScore}, 100` }}
-                      transition={{ duration: 2, delay: 0.5 }}
-                    />
-                    <defs>
-                      <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#8B5CF6" />
-                        <stop offset="100%" stopColor="#3B82F6" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                  <div className="position-absolute top-50 start-50 translate-middle text-center">
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 1 }}
-                      style={{ fontSize: '2.5rem', fontWeight: 'bold', color: 'white' }}
-                    >
-                      {walletAnalysis?.data?.riskScore || aiInsights.riskScore}
-                    </motion.div>
-                  </div>
+            <div className="col-12">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h3 className="heading_text text-white mb-1" style={{ fontSize: '1.4rem', fontWeight: '600' }}>
+                    Detailed AI Analysis
+                  </h3>
+                  <p className="text-gray mb-0" style={{ opacity: '0.8', fontSize: '0.9rem' }}>
+                    Powered by ElizaOS Agent Maker <Brain className="ms-1" style={{ width: '16px', height: '16px' }} />
+                  </p>
                 </div>
-
-                <h5 className="text-white mb-2">
-                  {walletAnalysis?.data?.riskProfile === 'HIGH_RISK' ? 'High Risk Profile' :
-                   walletAnalysis?.data?.riskProfile === 'MEDIUM_RISK' ? 'Medium Risk Profile' : 'Low Risk Profile'}
-                </h5>
-                <p className="text-secondary mb-0">
-                  {walletAnalysis?.data?.confidencePercentage || aiInsights.confidence}% confidence based on your trading history
-                </p>
               </div>
             </div>
           </motion.div>
@@ -153,32 +301,69 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
       </section>
 
       {/* Insight Categories Navigation */}
-      <section style={{ paddingTop: '1rem', paddingBottom: '0' }}>
+      <section style={{ paddingTop: '0rem', paddingBottom: '0' }}>
         <div className="container">
           <div className="row justify-content-center">
-            <div className="col-lg-10">
-              <ul className="nav unordered_list justify-content-center" role="tablist">
-                {Object.entries(insights).map(([key, insight]) => (
-                  <li key={key} className="nav-item" role="presentation">
-                    <button
-                      className={`nav-link ${selectedInsight === key ? "active" : ""}`}
-                      type="button"
-                      role="tab"
-                      onClick={() => setSelectedInsight(key)}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        minWidth: '160px',
-                        justifyContent: 'center'
-                      }}
-                    >
-                      <span style={{ fontSize: '1.2em' }}>{insight.icon}</span>
-                      {insight.title}
-                    </button>
-                  </li>
-                ))}
-              </ul>
+            <div className="col-12">
+              <div
+                className="d-flex justify-content-center"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  borderRadius: '12px',
+                  padding: '0.3rem',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  maxWidth: '400px',
+                  margin: '0 auto'
+                }}
+              >
+                <ul className="nav d-flex align-items-center gap-1" role="tablist" style={{ margin: 0, padding: 0 }}>
+                  {Object.entries(insights).map(([key, insight]) => (
+                    <li key={key} className="nav-item" role="presentation">
+                      <button
+                        className={`nav-link ${selectedInsight === key ? "active" : ""}`}
+                        type="button"
+                        role="tab"
+                        onClick={() => setSelectedInsight(key)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.4rem',
+                          minWidth: '140px',
+                          justifyContent: 'center',
+                          padding: '0.6rem 1rem',
+                          borderRadius: '8px',
+                          border: 'none',
+                          background: selectedInsight === key
+                            ? 'linear-gradient(135deg, #6f42c1, #9d5be8)'
+                            : 'transparent',
+                          color: selectedInsight === key ? '#fff' : 'rgba(255, 255, 255, 0.7)',
+                          fontWeight: selectedInsight === key ? '600' : '500',
+                          transition: 'all 0.3s ease',
+                          transform: selectedInsight === key ? 'translateY(-1px)' : 'none',
+                          boxShadow: selectedInsight === key ? '0 4px 15px rgba(111, 66, 193, 0.3)' : 'none',
+                          fontSize: '0.85rem'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (selectedInsight !== key) {
+                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
+                            e.currentTarget.style.color = '#fff'
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (selectedInsight !== key) {
+                            e.currentTarget.style.background = 'transparent'
+                            e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'
+                          }
+                        }}
+                      >
+                        <span style={{ fontSize: '1em' }}>{insight.icon}</span>
+                        <span>{insight.title}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         </div>
@@ -194,8 +379,17 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
             transition={{ duration: 0.3 }}
             className="row justify-content-center"
           >
-            <div className="col-lg-10">
-              <div className="ico_iconbox_block p-4">
+            <div className="col-12">
+              <div
+                className="ico_iconbox_block"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '12px',
+                  backdropFilter: 'blur(10px)',
+                  padding: '1.25rem'
+                }}
+              >
                 {selectedInsight === 'market' && (
                   <div>
                     <div className="d-flex align-items-center mb-4">
@@ -204,39 +398,99 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
                     </div>
 
                     <div className="row mb-4">
-                      <div className="col-md-6 mb-3">
-                        <div className="p-3" style={{
-                          background: 'rgba(34, 197, 94, 0.1)',
-                          borderRadius: '8px',
-                          border: '1px solid rgba(34, 197, 94, 0.3)'
-                        }}>
-                          <h6 className="text-secondary mb-1">Market Sentiment</h6>
-                          <h5 className="text-success mb-0 d-flex align-items-center">
+                      <div className="col-md-4 mb-3">
+                        <div
+                          className="p-3"
+                          style={{
+                            background: 'rgba(34, 197, 94, 0.1)',
+                            borderRadius: '10px',
+                            border: '1px solid rgba(34, 197, 94, 0.3)',
+                            transition: 'all 0.3s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-2px)'
+                            e.currentTarget.style.boxShadow = '0 4px 15px rgba(34, 197, 94, 0.2)'
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)'
+                            e.currentTarget.style.boxShadow = 'none'
+                          }}
+                        >
+                          <h6 className="text-secondary mb-1" style={{ fontSize: '0.8rem', fontWeight: '500' }}>Market Sentiment</h6>
+                          <h5 className="text-success mb-0 d-flex align-items-center" style={{ fontSize: '1rem', fontWeight: '600' }}>
                             📈 {insights.market.data.sentiment}
                           </h5>
                         </div>
                       </div>
-                      <div className="col-md-6 mb-3">
-                        <div className="p-3" style={{
-                          background: 'rgba(59, 130, 246, 0.1)',
-                          borderRadius: '8px',
-                          border: '1px solid rgba(59, 130, 246, 0.3)'
-                        }}>
-                          <h6 className="text-secondary mb-1">Trend Direction</h6>
-                          <h5 className="text-info mb-0 d-flex align-items-center">
+                      <div className="col-md-4 mb-3">
+                        <div
+                          className="p-3"
+                          style={{
+                            background: 'rgba(59, 130, 246, 0.1)',
+                            borderRadius: '10px',
+                            border: '1px solid rgba(59, 130, 246, 0.3)',
+                            transition: 'all 0.3s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-2px)'
+                            e.currentTarget.style.boxShadow = '0 4px 15px rgba(59, 130, 246, 0.2)'
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)'
+                            e.currentTarget.style.boxShadow = 'none'
+                          }}
+                        >
+                          <h6 className="text-secondary mb-1" style={{ fontSize: '0.8rem', fontWeight: '500' }}>Trend Direction</h6>
+                          <h5 className="text-info mb-0 d-flex align-items-center" style={{ fontSize: '1rem', fontWeight: '600' }}>
                             🚀 {insights.market.data.trend}
+                          </h5>
+                        </div>
+                      </div>
+                      <div className="col-md-4 mb-3">
+                        <div
+                          className="p-3"
+                          style={{
+                            background: 'rgba(245, 158, 11, 0.1)',
+                            borderRadius: '10px',
+                            border: '1px solid rgba(245, 158, 11, 0.3)',
+                            transition: 'all 0.3s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-2px)'
+                            e.currentTarget.style.boxShadow = '0 4px 15px rgba(245, 158, 11, 0.2)'
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)'
+                            e.currentTarget.style.boxShadow = 'none'
+                          }}
+                        >
+                          <h6 className="text-secondary mb-1" style={{ fontSize: '0.8rem', fontWeight: '500' }}>Volatility</h6>
+                          <h5 className="text-warning mb-0 d-flex align-items-center" style={{ fontSize: '1rem', fontWeight: '600' }}>
+                            ⚡ {insights.market.data.volatility}
                           </h5>
                         </div>
                       </div>
                     </div>
 
-                    <div className="p-3" style={{
-                      background: 'rgba(111, 66, 193, 0.1)',
-                      borderRadius: '8px',
-                      border: '1px solid rgba(111, 66, 193, 0.3)'
-                    }}>
-                      <h6 className="text-secondary mb-2">🤖 AI Recommendation</h6>
-                      <p className="text-white mb-0">{insights.market.data.recommendation}</p>
+                    <div
+                      className="p-3"
+                      style={{
+                        background: 'rgba(111, 66, 193, 0.1)',
+                        borderRadius: '10px',
+                        border: '1px solid rgba(111, 66, 193, 0.3)',
+                        transition: 'all 0.3s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-2px)'
+                        e.currentTarget.style.boxShadow = '0 4px 15px rgba(111, 66, 193, 0.2)'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)'
+                        e.currentTarget.style.boxShadow = 'none'
+                      }}
+                    >
+                      <h6 className="text-secondary mb-2" style={{ fontSize: '0.85rem', fontWeight: '500' }}>🤖 AI Recommendation</h6>
+                      <p className="text-white mb-0" style={{ fontSize: '0.9rem', lineHeight: '1.5' }}>{insights.market.data.recommendation}</p>
                     </div>
                   </div>
                 )}
@@ -349,24 +603,36 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
       </section>
 
       {/* Personalized Recommendations */}
-      <section style={{ paddingTop: '1rem', paddingBottom: '3rem' }}>
+      <section style={{ paddingTop: '1rem', paddingBottom: '2rem' }}>
         <div className="container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.8 }}
             className="row justify-content-center"
           >
-            <div className="col-lg-10">
-              <div className="ico_iconbox_block p-4">
-                <div className="d-flex align-items-center mb-4">
-                  <span style={{ fontSize: '2rem', marginRight: '1rem' }}>🎯</span>
-                  <h3 className="iconbox_title text-white mb-0">Personalized Recommendations</h3>
-                </div>
-
+            <div className="col-12">
+              <div className="mb-3">
+                <h3 className="heading_text text-white mb-1" style={{ fontSize: '1.4rem', fontWeight: '600' }}>
+                  Personalized Recommendations
+                </h3>
+                <p className="text-gray mb-0" style={{ opacity: '0.8', fontSize: '0.9rem' }}>
+                  AI-powered insights tailored to your trading patterns
+                </p>
+              </div>
+              <div
+                className="ico_iconbox_block"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '12px',
+                  backdropFilter: 'blur(10px)',
+                  padding: '1.25rem'
+                }}
+              >
                 <div className="row">
-                  {personalizedRecommendations.map((recommendation, index) => (
-                    <div key={index} className="col-lg-6 mb-4">
+                  {personalizedRecommendations.slice(0, 4).map((recommendation, index) => (
+                    <div key={index} className="col-lg-6 mb-3">
                       <SimpleRecommendationCard
                         recommendation={recommendation}
                         index={index}

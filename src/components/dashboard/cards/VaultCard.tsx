@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Download, AlertTriangle, Clock } from 'lucide-react'
 import { useWithdrawVault } from '../../../hooks/contracts/useWithdrawVault'
 import { useVaultTokenPrice } from '../../../hooks/useTokenPrice'
+import { useVaultProgress } from '../../../hooks/useVaultProgress'
 import { VaultOperationLoader } from '../common/VaultOperationLoader'
 import type { FormattedVault } from '../../../types/contracts'
 import '../../../styles/vault-cards.css'
@@ -35,6 +36,9 @@ export const VaultCard: React.FC<VaultCardProps> = ({
   // Get real-time token price
   const tokenSymbol = vault.token?.symbol || 'UNKNOWN'
   const { price: tokenPrice, formattedPrice, change24h } = useVaultTokenPrice(tokenSymbol)
+  
+  // Get real-time progress calculation
+  const { progress: realTimeProgress, timeRemaining, isUnlocked } = useVaultProgress(vault)
 
   // Safety checks for vault data
   if (!vault || !vault.token || !vault.conditionType || !vault.status) {
@@ -515,13 +519,24 @@ export const VaultCard: React.FC<VaultCardProps> = ({
                   )}
                 </div>
               ) : (
-                <p className="text-white" style={{
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  margin: 0
-                }}>
-                  {unlockTimeFormatted || 'N/A'}
-                </p>
+                <div>
+                  <p className="text-white" style={{
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    margin: 0
+                  }}>
+                    {isUnlocked ? '🔓 Unlocked!' : timeRemaining}
+                  </p>
+                  {!isUnlocked && unlockTimeFormatted && (
+                    <p style={{
+                      color: 'rgba(255, 255, 255, 0.5)',
+                      fontSize: '12px',
+                      margin: '2px 0 0 0'
+                    }}>
+                      {unlockTimeFormatted}
+                    </p>
+                  )}
+                </div>
               )}
             </div>
 
@@ -567,7 +582,7 @@ export const VaultCard: React.FC<VaultCardProps> = ({
                 fontWeight: '600',
                 margin: 0
               }}>
-                {vault.progress}%
+                {realTimeProgress}%
               </p>
             </div>
             <div
@@ -582,9 +597,11 @@ export const VaultCard: React.FC<VaultCardProps> = ({
             >
               <div
                 style={{
-                  width: `${vault.progress}%`,
+                  width: `${realTimeProgress}%`,
                   height: '100%',
-                  background: 'linear-gradient(90deg, var(--bs-primary), var(--bs-secondary))',
+                  background: isUnlocked 
+                    ? 'linear-gradient(90deg, #10b981, #059669)' 
+                    : 'linear-gradient(90deg, var(--bs-primary), var(--bs-secondary))',
                   borderRadius: '3px',
                   transition: 'width 1s ease-out'
                 }}

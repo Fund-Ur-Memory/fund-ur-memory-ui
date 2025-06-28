@@ -7,6 +7,8 @@ import { motion } from 'framer-motion'
 import { type AIRecommendation, type Transaction } from '../../../types/dashboard'
 import { getPriorityIcon } from '../../../utils/helpers'
 import { formatDate } from '../../../utils/formatters'
+import { useGetVaults } from '../../../hooks/contracts/useGetVaults'
+import { useAccount } from 'wagmi'
 import '../../../styles/header-compact.css'
 
 interface OverviewTabProps {
@@ -359,6 +361,30 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
   isPrivacyMode
 }) => {
   const { profile, portfolio, transactions, aiInsights } = data
+  
+  // Log data for debugging (can be removed in production)
+  console.log('📊 OverviewTab data:', {
+    totalValue: portfolio.totalValue,
+    activeVaults: profile.activeVaults,
+    totalReturns: profile.totalReturns,
+    successRate: profile.successRate
+  })
+  
+  // Get real vault data for dynamic subtitles
+  const { address } = useAccount()
+  const { vaults: contractVaults } = useGetVaults(address as `0x${string}`)
+  
+  // Calculate dynamic metrics for subtitles
+  const expiringVaults = contractVaults.filter(vault => {
+    if (!vault.unlockTime?.date) return false
+    const daysUntilExpiry = Math.ceil((vault.unlockTime.date.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+    return daysUntilExpiry <= 7 && daysUntilExpiry > 0
+  }).length
+  
+  const portfolioChangeLabel = portfolio.change24h >= 0 ? 'gaining' : 'declining'
+  const successRateLabel = profile.successRate >= 80 ? 'Excellent' : 
+                          profile.successRate >= 60 ? 'Good' : 
+                          profile.successRate >= 40 ? 'Fair' : 'Needs improvement'
 
   return (
     <div>
@@ -383,17 +409,18 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
               icon={Shield}
               iconColor="text-white"
               delay={0.1}
-              subtitle="3 expiring soon"
+              subtitle={expiringVaults > 0 ? `${expiringVaults} expiring soon` : 'All on track'}
             />
 
             <MetricCard
               title="Total Returns"
-              value={profile.totalReturns}
-              change={12.4}
+              value={`${profile.totalReturns.toFixed(1)}%`}
+              change={profile.totalReturns}
               icon={TrendingUp}
               iconColor="text-blue-400"
               isPrivate={isPrivacyMode}
               delay={0.2}
+              subtitle={portfolioChangeLabel}
             />
 
             <MetricCard
@@ -402,7 +429,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
               icon={Brain}
               iconColor="text-green-400"
               delay={0.3}
-              subtitle="Above average"
+              subtitle={successRateLabel}
             />
           </div>
         </div>

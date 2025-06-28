@@ -5,6 +5,7 @@ import type { Address } from 'viem'
 import { FUM_VAULT_CONFIG } from '../../contracts/FUMVault'
 import type { UseGetVaultsReturn, FormattedVault, RawVault, ConditionType, VaultStatus } from '../../types/contracts'
 import { formatVaultData } from '../../utils/contractHelpers'
+import { appEvents, APP_EVENTS } from '../../utils/events'
 
 export const useGetVaults = (owner?: Address): UseGetVaultsReturn => {
   const { address } = useAccount()
@@ -132,6 +133,22 @@ export const useGetVaults = (owner?: Address): UseGetVaultsReturn => {
       }
     }
   }, [blockNumber, vaults.length, refetch])
+
+  // Listen for vault creation/withdrawal events to auto-refresh
+  useEffect(() => {
+    const handleVaultUpdate = () => {
+      console.log('🔄 Vault updated, refetching vault data...')
+      refetch()
+    }
+
+    appEvents.on(APP_EVENTS.VAULT_CREATED, handleVaultUpdate)
+    appEvents.on(APP_EVENTS.VAULT_WITHDRAWN, handleVaultUpdate)
+
+    return () => {
+      appEvents.off(APP_EVENTS.VAULT_CREATED, handleVaultUpdate)
+      appEvents.off(APP_EVENTS.VAULT_WITHDRAWN, handleVaultUpdate)
+    }
+  }, [refetch])
 
   // Handle loading state
   const isLoading = isLoadingIds || isLoadingVaults

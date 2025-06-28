@@ -26,6 +26,11 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   subtitle,
   onClick
 }) => {
+  // Debug log to see what values are being passed
+  if (title === 'Total Portfolio' || title === 'Active Vaults') {
+    console.log(`📊 MetricCard ${title}:`, { value, change, isPrivate, subtitle })
+  }
+  
   const displayValue = typeof value === 'number'
     ? formatCurrency(value, isPrivate)
     : value

@@ -91,9 +91,16 @@ export const useMultipleTokenPrices = (
   const [prices, setPrices] = useState<Record<string, TokenPriceData | null>>({})
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [lastFetch, setLastFetch] = useState<number>(0)
 
-  const fetchPrices = useCallback(async () => {
+  const fetchPrices = useCallback(async (force = false) => {
     if (!tokenSymbols.length) return
+
+    // Prevent excessive calls - minimum 30 seconds between calls
+    const now = Date.now()
+    if (!force && now - lastFetch < 30000) {
+      return
+    }
 
     setIsLoading(true)
     setError(null)
@@ -101,35 +108,38 @@ export const useMultipleTokenPrices = (
     try {
       const priceData = await fetchMultipleTokenPrices(tokenSymbols)
       setPrices(priceData)
+      setLastFetch(now)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch prices')
       setPrices({})
     } finally {
       setIsLoading(false)
     }
-  }, [tokenSymbols])
+  }, [tokenSymbols, lastFetch])
 
   // Initial fetch
   useEffect(() => {
-    fetchPrices()
-  }, [fetchPrices])
+    if (tokenSymbols.length > 0) {
+      fetchPrices(true) // Force initial fetch
+    }
+  }, [tokenSymbols.join(',')]) // Use join to avoid array dependency issues
 
   // Auto-refresh every 5 minutes if enabled
   useEffect(() => {
     if (!autoRefresh) return
 
     const interval = setInterval(() => {
-      fetchPrices()
+      fetchPrices(true) // Force refresh
     }, 5 * 60 * 1000) // 5 minutes
 
     return () => clearInterval(interval)
-  }, [fetchPrices, autoRefresh])
+  }, [autoRefresh, fetchPrices])
 
   return {
     prices,
     isLoading,
     error,
-    refetch: fetchPrices
+    refetch: () => fetchPrices(true)
   }
 }
 

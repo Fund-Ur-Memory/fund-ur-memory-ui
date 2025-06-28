@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { FUM_VAULT_CONFIG } from '../../contracts/FUMVault'
 import type { Address } from 'viem'
+import { appEvents, APP_EVENTS } from '../../utils/events'
 
 export interface UseWithdrawVaultReturn {
   withdrawVault: (vaultId: number) => Promise<void>
@@ -20,7 +21,7 @@ export const useWithdrawVault = (): UseWithdrawVaultReturn => {
 
   const { writeContract, data: hash, isPending } = useWriteContract()
 
-  const { isLoading: isConfirming } = useWaitForTransactionReceipt({
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash: hash as Address,
   })
 
@@ -30,6 +31,18 @@ export const useWithdrawVault = (): UseWithdrawVaultReturn => {
       setTxHash(hash)
     }
   }, [hash])
+
+  // Handle successful transaction confirmation
+  useEffect(() => {
+    if (isSuccess && hash) {
+      console.log('✅ Withdraw transaction confirmed, refreshing dashboard...')
+      appEvents.emit(APP_EVENTS.VAULT_WITHDRAWN, {
+        hash,
+        timestamp: Date.now()
+      })
+      appEvents.emit(APP_EVENTS.DASHBOARD_REFRESH)
+    }
+  }, [isSuccess, hash])
 
   const withdrawVault = async (vaultId: number) => {
     try {

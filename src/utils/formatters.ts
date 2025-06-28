@@ -1,5 +1,10 @@
 export const formatCurrency = (amount: number, isPrivate: boolean = false): string => {
   if (isPrivate) return '••••••'
+  
+  // Handle invalid or zero amounts
+  if (!amount || isNaN(amount)) {
+    return '$0.00'
+  }
 
   return new Intl.NumberFormat('en-US', {
     style: 'currency',

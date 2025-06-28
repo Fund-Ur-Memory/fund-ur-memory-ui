@@ -5,6 +5,7 @@ import type { VaultFormData, UseCreateVaultReturn, TransactionResult } from '../
 import { convertFormDataToContractData, validateVaultFormData } from '../../utils/contractHelpers'
 import { indexerService } from '../../services/indexerService'
 import type { FUMAnalysisResponse } from '../../services/fumAgentService'
+import { appEvents, APP_EVENTS } from '../../utils/events'
 
 export const useCreateVault = (): UseCreateVaultReturn => {
   const { address } = useAccount()
@@ -156,6 +157,14 @@ export const useCreateVault = (): UseCreateVaultReturn => {
         } else {
           console.log('ℹ️ No AI analysis provided, skipping indexing')
         }
+
+        // Emit vault creation event for dashboard auto-refresh
+        console.log('📡 Emitting vault creation event...')
+        appEvents.emit(APP_EVENTS.VAULT_CREATED, {
+          vaultId: result.vaultId,
+          hash: result.hash,
+          formData
+        })
 
         return result
       } else {
