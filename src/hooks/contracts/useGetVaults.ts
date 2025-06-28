@@ -9,7 +9,8 @@ import { appEvents, APP_EVENTS } from '../../utils/events'
 
 export const useGetVaults = (owner?: Address): UseGetVaultsReturn => {
   const { address } = useAccount()
-  const { data: blockNumber } = useBlockNumber({ watch: true })
+  // Disable block watching to prevent constant refreshing
+  // const { data: blockNumber } = useBlockNumber({ watch: true })
   const [error] = useState<string | null>(null)
 
   // Use the provided owner or the connected wallet address
@@ -124,15 +125,15 @@ export const useGetVaults = (owner?: Address): UseGetVaultsReturn => {
     await refetchVaults()
   }, [refetchIds, refetchVaults])
 
-  // Effect to refetch on new blocks (for real-time updates)
-  useEffect(() => {
-    if (blockNumber && vaults.length > 0) {
-      // Refetch every 10 blocks to avoid too frequent updates
-      if (Number(blockNumber) % 10 === 0) {
-        refetch()
-      }
-    }
-  }, [blockNumber, vaults.length, refetch])
+  // Effect to refetch on new blocks (DISABLED - was causing refresh loops)
+  // useEffect(() => {
+  //   if (blockNumber && vaults.length > 0) {
+  //     // Refetch every 10 blocks to avoid too frequent updates
+  //     if (Number(blockNumber) % 10 === 0) {
+  //       refetch()
+  //     }
+  //   }
+  // }, [blockNumber, vaults.length, refetch])
 
   // Listen for vault creation/withdrawal events to auto-refresh
   useEffect(() => {

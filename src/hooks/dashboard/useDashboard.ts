@@ -102,11 +102,11 @@ export const useDashboard = (): UseDashboardReturn => {
   // For testnet, we don't need ETH balance, focus on AVAX
   const ethBalance = null
 
-  // Get token prices - with reduced frequency
-  const { prices: tokenPrices } = useMultipleTokenPrices(['ETH', 'AVAX'], false) // Disable auto-refresh
+  // Get token prices - enable auto-refresh for real-time portfolio values
+  const { prices: tokenPrices, isLoading: isPricesLoading } = useMultipleTokenPrices(['ETH', 'AVAX'], true) // Enable auto-refresh
   
-  // Debounce data updates to prevent excessive re-renders
-  const [updateTimeout, setUpdateTimeout] = useState<NodeJS.Timeout | null>(null)
+  // Debounce data updates to prevent excessive re-renders - DISABLED
+  // const [updateTimeout, setUpdateTimeout] = useState<NodeJS.Timeout | null>(null)
 
   const buildPortfolioData = useCallback((): AssetAllocation[] => {
     const allocation: AssetAllocation[] = []
@@ -117,12 +117,14 @@ export const useDashboard = (): UseDashboardReturn => {
         const avaxAmount = parseFloat(formatUnits(avaxBalance.value, avaxBalance.decimals))
         const avaxValue = avaxAmount * tokenPrices.AVAX.price
         
-        console.log('💰 AVAX Balance Data:', {
+        console.log('💰 AVAX Balance & Price Data:', {
           raw: avaxBalance.value.toString(),
           formatted: avaxBalance.formatted,
           amount: avaxAmount,
           price: tokenPrices.AVAX.price,
-          value: avaxValue
+          change24h: tokenPrices.AVAX.change24h,
+          value: avaxValue,
+          allTokenPrices: tokenPrices
         })
         
         allocation.push({
@@ -295,6 +297,12 @@ export const useDashboard = (): UseDashboardReturn => {
       return
     }
 
+    // Wait for token prices to load before building portfolio
+    if (isPricesLoading && Object.keys(tokenPrices).length === 0) {
+      console.log('⏳ Waiting for token prices to load...')
+      return
+    }
+
     if (isRefetch) {
       setIsRefetching(true)
     } else {
@@ -384,7 +392,7 @@ export const useDashboard = (): UseDashboardReturn => {
         }
       }
         
-      console.log('🔍 Dashboard Data Build:', {
+      console.log('🔍 Dashboard Data Build with Real Prices:', {
         address,
         totalValue,
         vaultTotalValue,
@@ -471,7 +479,7 @@ export const useDashboard = (): UseDashboardReturn => {
       setLoading(false)
       setIsRefetching(false)
     }
-  }, [address, buildPortfolioData, buildTransactionHistory, buildVaultData, contractVaults, walletAnalysis, vaultStats])
+  }, [address, buildPortfolioData, buildTransactionHistory, buildVaultData, contractVaults, walletAnalysis, vaultStats, isPricesLoading, tokenPrices])
 
   // Fetch dashboard data when address changes or when essential dependencies are ready
   useEffect(() => {
@@ -485,31 +493,39 @@ export const useDashboard = (): UseDashboardReturn => {
     }
   }, [address, dataInitialized])
 
-  // Debounced effect for data updates when vault data changes
+  // Fetch dashboard data when token prices are loaded
   useEffect(() => {
-    if (dataInitialized) {
-      // Clear existing timeout
-      if (updateTimeout) {
-        clearTimeout(updateTimeout)
-      }
-      
-      // Set new timeout to debounce updates
-      const timeout = setTimeout(() => {
-        // Re-fetch dashboard data instead of manually updating
-        // This ensures we get the latest data and avoid stale closures
-        fetchDashboardData(false)
-      }, 500) // 500ms debounce
-      
-      setUpdateTimeout(timeout)
+    if (address && dataInitialized && !isPricesLoading && Object.keys(tokenPrices).length > 0) {
+      console.log('🔄 Token prices loaded, updating dashboard with real prices:', tokenPrices)
+      fetchDashboardData(false)
     }
-    
-    // Cleanup on unmount
-    return () => {
-      if (updateTimeout) {
-        clearTimeout(updateTimeout)
-      }
-    }
-  }, [contractVaults.length, Object.keys(tokenPrices).length, dataInitialized, fetchDashboardData])
+  }, [address, dataInitialized, isPricesLoading, Object.keys(tokenPrices).length, fetchDashboardData])
+
+  // Debounced effect for data updates when vault data changes - DISABLED to prevent refresh loops
+  // useEffect(() => {
+  //   if (dataInitialized) {
+  //     // Clear existing timeout
+  //     if (updateTimeout) {
+  //       clearTimeout(updateTimeout)
+  //     }
+  //     
+  //     // Set new timeout to debounce updates
+  //     const timeout = setTimeout(() => {
+  //       // Re-fetch dashboard data instead of manually updating
+  //       // This ensures we get the latest data and avoid stale closures
+  //       fetchDashboardData(false)
+  //     }, 500) // 500ms debounce
+  //     
+  //     setUpdateTimeout(timeout)
+  //   }
+  //   
+  //   // Cleanup on unmount
+  //   return () => {
+  //     if (updateTimeout) {
+  //       clearTimeout(updateTimeout)
+  //     }
+  //   }
+  // }, [contractVaults.length, Object.keys(tokenPrices).length, dataInitialized, fetchDashboardData])
 
   // Listen for vault creation events to auto-refresh dashboard
   useEffect(() => {

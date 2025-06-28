@@ -123,6 +123,58 @@ export interface DashboardData {
   vaults: Vault[]
 }
 
+// Indexer API response types
+export interface IndexerVault {
+  id: string
+  owner: string
+  token: string
+  amount: string
+  unlockTime: string
+  targetPrice: string
+  priceUp: string
+  priceDown: string
+  conditionType: number
+  status: number
+  createdAt: string
+  updatedAt: string
+  title: string
+  message: string
+  autoWithdraw: boolean
+  creationTxHash: string
+  creationBlockNumber: string
+  unlockedAt: string | null
+  unlockedTxHash: string | null
+  withdrawnAt: string | null
+  withdrawnTxHash: string | null
+  emergencyWithdrawnAt: string | null
+  emergencyPenalty: string | null
+  emergencyTxHash: string | null
+  insight: string | null
+}
+
+export interface VaultResponse {
+  success: boolean
+  vaults: IndexerVault[]
+  message?: string
+}
+
+export interface AIInsightRequest {
+  vaultId: string
+  insight: string
+  analysis?: string
+}
+
+export interface AIInsightResponse {
+  success: boolean
+  data?: {
+    id: string
+    vaultId: string
+    insight: string
+    createdAt: string
+  }
+  message?: string
+}
+
 export interface BaseAnalysis {
   amount?: number;
   tokenSymbol?: string;
