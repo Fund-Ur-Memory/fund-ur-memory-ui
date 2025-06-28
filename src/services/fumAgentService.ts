@@ -1,4 +1,4 @@
-import type { PriceBasedAnalysis, TimeBasedAnalysis } from "../types/dashboard";
+import type { PriceBasedAnalysis, TimeBasedAnalysis, WalletAnalysisResponse } from "../types/dashboard";
 
 type Analysis = TimeBasedAnalysis | PriceBasedAnalysis;
 
@@ -54,7 +54,35 @@ export const fumAgentService = {
         error: error instanceof Error ? error.message : 'Failed to analyze commitment'
       };
     }
+  },
+
+  async analyzeWallet(walletAddress: string): Promise<WalletAnalysisResponse> {
+    try {
+      const response = await fetch('https://fund-ur-memory-agents-production.up.railway.app/api/wallet-analysis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: "Analyze my wallet trading history and provide risk assessment",
+          walletAddress
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error calling wallet analysis:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to analyze wallet'
+      };
+    }
   }
 };
 
-export type { FUMAnalysisResponse, TimeBasedAnalysis, PriceBasedAnalysis, Analysis };
+export type { FUMAnalysisResponse, TimeBasedAnalysis, PriceBasedAnalysis, Analysis, WalletAnalysisResponse };

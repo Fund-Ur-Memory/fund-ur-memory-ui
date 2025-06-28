@@ -89,6 +89,14 @@ export class MockAPIService {
             priority: 'low',
             createdAt: Date.now() - 7200000
           }
+        ],
+        personalizedRecommendations: [
+          "Your trading patterns indicate high risk. Consider implementing strict stop-losses and reducing position sizes.",
+          "High-frequency trading may lead to increased transaction costs and emotional decisions. Consider longer holding periods.",
+          "Short holding periods often indicate emotional trading. Consider implementing a minimum 30-day holding rule.",
+          "While markets are bullish, maintain discipline and avoid FOMO-driven decisions.",
+          "Consider using commitment vaults to lock positions and prevent emotional decisions during market volatility.",
+          "Consider implementing a systematic investment plan with regular rebalancing to reduce emotional decision-making."
         ]
       },
       vaults: [

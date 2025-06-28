@@ -1,56 +1,61 @@
-// src/components/dashboard/tabs/AIInsightsTab.tsx - Consistent UI version
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Brain } from 'lucide-react'
-import { AIRecommendationCard } from '../cards/AIRecommendationCard'
-import { type DashboardData } from '../../../types/dashboard'
-import { sortRecommendationsByPriority } from '../../../utils/helpers'
+import { SimpleRecommendationCard } from '../cards/AIRecommendationCard'
+import { type DashboardData, type WalletAnalysisResponse } from '../../../types/dashboard'
 
 interface AIInsightsTabProps {
   data: DashboardData
+  walletAnalysis: WalletAnalysisResponse | null
   isPrivacyMode: boolean
   onRefetch: () => void
 }
 
 export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
   data,
+  walletAnalysis,
 }) => {
   const [selectedInsight, setSelectedInsight] = useState('market')
   const { aiInsights } = data
+
+  // Get personalized recommendations from wallet analysis or fallback to aiInsights
+  const personalizedRecommendations = walletAnalysis?.data?.personalizedRecommendations || 
+    aiInsights.personalizedRecommendations || [
+      "Your trading patterns indicate high risk. Consider implementing strict stop-losses and reducing position sizes.",
+      "High-frequency trading may lead to increased transaction costs and emotional decisions. Consider longer holding periods.",
+      "Short holding periods often indicate emotional trading. Consider implementing a minimum 30-day holding rule.",
+      "While markets are bullish, maintain discipline and avoid FOMO-driven decisions.",
+      "Consider using commitment vaults to lock positions and prevent emotional decisions during market volatility.",
+      "Consider implementing a systematic investment plan with regular rebalancing to reduce emotional decision-making."
+    ]
 
   const insights = {
     market: {
       title: 'Market Analysis',
       icon: '📊',
       data: {
-        sentiment: aiInsights.marketSentiment,
-        trend: 'Upward',
+        sentiment: walletAnalysis?.data?.marketAnalysis?.sentiment || aiInsights.marketSentiment,
+        trend: walletAnalysis?.data?.marketAnalysis?.trendDirection || 'Upward',
         volatility: 'Medium',
-        recommendation: 'Favorable conditions for long-term commitments'
+        recommendation: walletAnalysis?.data?.marketAnalysis?.aiRecommendation || 'Favorable conditions for long-term commitments'
       }
     },
     behavioral: {
       title: 'Behavioral Patterns',
       icon: '🧠',
       data: {
-        tradingStyle: 'Conservative',
-        emotionalTriggers: ['Market crashes', 'FOMO events'],
+        tradingStyle: walletAnalysis?.data?.riskTolerance === 'AGGRESSIVE' ? 'Aggressive' : 
+                     walletAnalysis?.data?.riskTolerance === 'MODERATE' ? 'Moderate' : 'Conservative',
+        emotionalTriggers: walletAnalysis?.data?.userTradingFactors?.emotionalTradingIndicators || ['Market crashes', 'FOMO events'],
         successFactors: ['Time-based locks', 'Clear exit strategies'],
-        riskTolerance: 'Medium-Low'
-      }
-    },
-    predictions: {
-      title: 'AI Predictions',
-      icon: '🔮',
-      data: {
-        eth_3month: { price: 4200, confidence: 78 },
-        btc_6month: { price: 85000, confidence: 65 },
-        portfolio_1year: { return: 23.5, confidence: 82 }
+        riskTolerance: walletAnalysis?.data?.riskProfile === 'HIGH_RISK' ? 'High' : 
+                      walletAnalysis?.data?.riskProfile === 'MEDIUM_RISK' ? 'Medium' : 'Low',
+        averageHoldTime: walletAnalysis?.data?.userTradingFactors?.averageHoldTime || 12.5,
+        tradeFrequency: walletAnalysis?.data?.userTradingFactors?.tradeFrequency || 8.2,
+        diversificationScore: walletAnalysis?.data?.userTradingFactors?.diversificationScore || 45.8
       }
     }
   }
-
-  const sortedRecommendations = sortRecommendationsByPriority(aiInsights.recommendations)
 
   return (
     <div>
@@ -67,7 +72,7 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
                 <h2 className="heading_text mb-0 text-white">AI Insights & Analysis</h2>
                 <p className="text-secondary mt-3 d-flex align-items-center justify-content-center">
                   <Brain className="me-2" style={{ width: '20px', height: '20px' }} />
-                  Powered by AWS Bedrock Multi-Agent System
+                  Powered by ElizaOS Agent Maker
                 </p>
               </div>
             </div>
@@ -109,10 +114,10 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
                       fill="none"
                       stroke="url(#gradient)"
                       strokeWidth="3"
-                      strokeDasharray={`${aiInsights.riskScore}, 100`}
+                      strokeDasharray={`${walletAnalysis?.data?.riskScore || aiInsights.riskScore}, 100`}
                       strokeLinecap="round"
                       initial={{ strokeDasharray: "0, 100" }}
-                      animate={{ strokeDasharray: `${aiInsights.riskScore}, 100` }}
+                      animate={{ strokeDasharray: `${walletAnalysis?.data?.riskScore || aiInsights.riskScore}, 100` }}
                       transition={{ duration: 2, delay: 0.5 }}
                     />
                     <defs>
@@ -129,14 +134,17 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
                       transition={{ delay: 1 }}
                       style={{ fontSize: '2.5rem', fontWeight: 'bold', color: 'white' }}
                     >
-                      {aiInsights.riskScore}
+                      {walletAnalysis?.data?.riskScore || aiInsights.riskScore}
                     </motion.div>
                   </div>
                 </div>
 
-                <h5 className="text-white mb-2">Low Risk Profile</h5>
+                <h5 className="text-white mb-2">
+                  {walletAnalysis?.data?.riskProfile === 'HIGH_RISK' ? 'High Risk Profile' :
+                   walletAnalysis?.data?.riskProfile === 'MEDIUM_RISK' ? 'Medium Risk Profile' : 'Low Risk Profile'}
+                </h5>
                 <p className="text-secondary mb-0">
-                  {aiInsights.confidence}% confidence based on your trading history
+                  {walletAnalysis?.data?.confidencePercentage || aiInsights.confidence}% confidence based on your trading history
                 </p>
               </div>
             </div>
@@ -240,8 +248,8 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
                       <h3 className="iconbox_title text-white mb-0">Your Trading Patterns</h3>
                     </div>
 
-                    <div className="row">
-                      <div className="col-md-6 mb-4">
+                    <div className="row mb-4">
+                      <div className="col-md-6 mb-3">
                         <div className="p-3" style={{
                           background: 'rgba(255, 255, 255, 0.05)',
                           borderRadius: '8px'
@@ -252,7 +260,7 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
                           </p>
                         </div>
                       </div>
-                      <div className="col-md-6 mb-4">
+                      <div className="col-md-6 mb-3">
                         <div className="p-3" style={{
                           background: 'rgba(255, 255, 255, 0.05)',
                           borderRadius: '8px'
@@ -260,6 +268,42 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
                           <h6 className="text-secondary mb-2">Risk Tolerance</h6>
                           <p className="text-white mb-0 d-flex align-items-center">
                             ⚖️ {insights.behavioral.data.riskTolerance}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="row mb-4">
+                      <div className="col-md-4 mb-3">
+                        <div className="p-3" style={{
+                          background: 'rgba(255, 255, 255, 0.05)',
+                          borderRadius: '8px'
+                        }}>
+                          <h6 className="text-secondary mb-2">Average Hold Time</h6>
+                          <p className="text-white mb-0 d-flex align-items-center">
+                            ⏰ {insights.behavioral.data.averageHoldTime} days
+                          </p>
+                        </div>
+                      </div>
+                      <div className="col-md-4 mb-3">
+                        <div className="p-3" style={{
+                          background: 'rgba(255, 255, 255, 0.05)',
+                          borderRadius: '8px'
+                        }}>
+                          <h6 className="text-secondary mb-2">Trade Frequency</h6>
+                          <p className="text-white mb-0 d-flex align-items-center">
+                            📈 {insights.behavioral.data.tradeFrequency} trades/month
+                          </p>
+                        </div>
+                      </div>
+                      <div className="col-md-4 mb-3">
+                        <div className="p-3" style={{
+                          background: 'rgba(255, 255, 255, 0.05)',
+                          borderRadius: '8px'
+                        }}>
+                          <h6 className="text-secondary mb-2">Diversification</h6>
+                          <p className="text-white mb-0 d-flex align-items-center">
+                            🌐 {insights.behavioral.data.diversificationScore}%
                           </p>
                         </div>
                       </div>
@@ -298,57 +342,13 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
                     </div>
                   </div>
                 )}
-
-                {selectedInsight === 'predictions' && (
-                  <div>
-                    <div className="d-flex align-items-center mb-4">
-                      <span style={{ fontSize: '2rem', marginRight: '1rem' }}>🔮</span>
-                      <h3 className="iconbox_title text-white mb-0">AI Price Predictions</h3>
-                    </div>
-
-                    <div className="space-y-4">
-                      {[
-                        { label: 'ETH (3 months)', price: insights.predictions.data.eth_3month.price, confidence: insights.predictions.data.eth_3month.confidence, color: '#22c55e' },
-                        { label: 'BTC (6 months)', price: insights.predictions.data.btc_6month.price, confidence: insights.predictions.data.btc_6month.confidence, color: '#3b82f6' },
-                        { label: 'Portfolio Return (1 year)', price: insights.predictions.data.portfolio_1year.return, confidence: insights.predictions.data.portfolio_1year.confidence, color: '#8b5cf6', isPercentage: true }
-                      ].map((prediction, index) => (
-                        <div key={index} className="p-3 mb-3" style={{
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          borderRadius: '8px'
-                        }}>
-                          <div className="d-flex justify-content-between align-items-center mb-2">
-                            <h6 className="text-white mb-0">{prediction.label}</h6>
-                            <span className="fw-bold" style={{ color: prediction.color }}>
-                              {prediction.isPercentage ? '+' : '$'}{prediction.price.toLocaleString()}{prediction.isPercentage ? '%' : ''}
-                            </span>
-                          </div>
-                          <div className="progress" style={{ height: '6px', background: 'rgba(255,255,255,0.1)' }}>
-                            <motion.div
-                              className="progress-bar"
-                              style={{
-                                background: prediction.color,
-                                borderRadius: '3px'
-                              }}
-                              initial={{ width: 0 }}
-                              animate={{ width: `${prediction.confidence}%` }}
-                              transition={{ duration: 1, delay: 0.5 + index * 0.2 }}
-                            />
-                          </div>
-                          <p className="text-secondary mb-0 small mt-1">
-                            {prediction.confidence}% confidence
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Detailed Recommendations */}
+      {/* Personalized Recommendations */}
       <section style={{ paddingTop: '1rem', paddingBottom: '3rem' }}>
         <div className="container">
           <motion.div
@@ -365,13 +365,12 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
                 </div>
 
                 <div className="row">
-                  {sortedRecommendations.map((rec, index) => (
-                    <div key={rec.id} className="col-lg-6 mb-4">
-                      <AIRecommendationCard
-                        recommendation={rec}
+                  {personalizedRecommendations.map((recommendation, index) => (
+                    <div key={index} className="col-lg-6 mb-4">
+                      <SimpleRecommendationCard
+                        recommendation={recommendation}
+                        index={index}
                         delay={index * 0.1}
-                        onAction={() => console.log('Execute recommendation:', rec.action)}
-                        onLearnMore={() => console.log('Learn more about:', rec.title)}
                       />
                     </div>
                   ))}

@@ -525,6 +525,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 }) => {
   const {
     data,
+    walletAnalysis,
     loading,
     error,
     activeTab,
@@ -534,7 +535,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
     refetch,
     isRefetching,
     lastUpdated
-  } = useDashboard(userAddress);
+  } = useDashboard();
 
   const { notifications, removeNotification, triggerTestAutoWithdraw } = useAutoWithdrawNotifications();
 
@@ -604,7 +605,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       case "history":
         return <HistoryTab {...vaultsTabProps} />;
       case "ai":
-        return <AIInsightsTab {...commonTabProps} />;
+        return <AIInsightsTab {...commonTabProps} walletAnalysis={walletAnalysis} />;
       case "profile":
         return <ProfileTab {...commonTabProps} userAddress={userAddress} onDisconnect={handleDisconnect} />;
       default:

@@ -69,6 +69,50 @@ export interface AIInsights {
   confidence: number
   marketSentiment: 'Bullish' | 'Bearish' | 'Neutral'
   recommendations: AIRecommendation[]
+  personalizedRecommendations: string[]
+}
+
+export interface MarketAnalysis {
+  sentiment: 'BULLISH' | 'BEARISH' | 'NEUTRAL'
+  trendDirection: 'UPWARD' | 'DOWNWARD' | 'SIDEWAYS'
+  aiRecommendation: string
+}
+
+export interface UserTradingFactors {
+  averageHoldTime: number
+  tradeFrequency: number
+  volatilityTolerance: number
+  diversificationScore: number
+  emotionalTradingIndicators: string[]
+  ethActivity: number
+  avaxActivity: number
+}
+
+export interface MarketData {
+  fearGreedIndex: number
+  marketCapChange24h: number
+  btcChange24h: number
+  ethChange24h: number
+  solChange24h: number
+}
+
+export interface WalletAnalysisResponse {
+  success: boolean
+  data?: {
+    response: string
+    action: string
+    character: string
+    riskScore: number
+    confidencePercentage: number
+    riskProfile: 'LOW_RISK' | 'MEDIUM_RISK' | 'HIGH_RISK'
+    marketAnalysis: MarketAnalysis
+    userTradingFactors: UserTradingFactors
+    riskTolerance: 'CONSERVATIVE' | 'MODERATE' | 'AGGRESSIVE'
+    personalizedRecommendations: string[]
+    walletAddress: string
+    marketData: MarketData
+  }
+  error?: string
 }
 
 export interface DashboardData {
