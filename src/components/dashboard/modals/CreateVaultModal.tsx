@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, ChevronDown, ArrowRight, Clock, Target, Zap } from 'lucide-react'
-import { LoadingSpinner } from '../common/LoadingSpinner'
+import { X, ChevronDown, ArrowRight, Clock, Target, Zap, RefreshCw } from 'lucide-react'
+import { VaultOperationLoader } from '../common/VaultOperationLoader'
+import { useVaultCreationWithConversion } from '../../../hooks/contracts/useCreateVaultWithConversion'
 import type { VaultFormData } from '../../../types/contracts'
 import '../../../styles/create-vault-modal.css'
 import '../../../styles/enhanced-loading.css'
+
 
 interface CreateVaultModalProps {
   isOpen: boolean
@@ -86,10 +88,25 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
     condition: 'TIME_BASED',
     timeValue: 6,
     timeUnit: 'months',
-    targetPrice: 0,
+    targetPrice: 0, // Keep for backward compatibility
+    priceUp: 0,
+    priceDown: 0,
     title: '',
     message: ''
   })
+
+  // Enhanced vault creation with USD to AVAX conversion
+  const {
+    createVault: createVaultWithConversion,
+    isLoading: isCreating,
+    avaxAmountFormatted,
+    avaxPrice,
+    isPriceLoading,
+    priceError,
+    refreshPrice,
+    isFormValid: isFormValidWithConversion,
+    validationError
+  } = useVaultCreationWithConversion(formData)
 
   const [showTokenDropdown, setShowTokenDropdown] = useState(false)
   const [showConditionDropdown, setShowConditionDropdown] = useState(false)
@@ -114,40 +131,21 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
   }, [])
 
   const isFormValid = () => {
-    const usdAmount = parseFloat(formData.usdAmount)
-    const hasValidAmount = usdAmount > 0
-    const hasValidTitle = formData.title.trim().length >= 3
-    const hasValidMessage = formData.message.trim().length >= 10
-    const selectedTokenData = SUPPORTED_TOKENS.find(token => token.symbol === formData.token)
-    const isTokenAvailable = selectedTokenData?.available !== false
-
-    if (!isTokenAvailable) {
-      return false
-    }
-
-    // Check time-based conditions
-    const hasValidTime = (formData.condition === 'TIME_BASED' || formData.condition === 'COMBO')
-      ? (formData.timeValue || 0) > 0
-      : true
-
-    if (formData.condition === 'PRICE_TARGET') {
-      return hasValidAmount && hasValidTitle && hasValidMessage && (formData.targetPrice || 0) > 0
-    }
-
-    if (formData.condition === 'COMBO') {
-      return hasValidAmount && hasValidTitle && hasValidMessage && (formData.targetPrice || 0) > 0 && hasValidTime
-    }
-
-    if (formData.condition === 'TIME_BASED') {
-      return hasValidAmount && hasValidTitle && hasValidMessage && hasValidTime
-    }
-
-    return hasValidAmount && hasValidTitle && hasValidMessage
+    // Use the comprehensive validation from the conversion hook
+    return isFormValidWithConversion
   }
 
-  const handleSubmit = () => {
-    if (!isFormValid() || isLoading) return
-    onCreateVault(formData)
+  const handleSubmit = async () => {
+    if (!isFormValid() || isCreating) return
+
+    try {
+      const result = await createVaultWithConversion(formData)
+      if (result.success) {
+        onCreateVault(formData)
+      }
+    } catch (error) {
+      console.error('Vault creation failed:', error)
+    }
   }
 
   if (!isOpen) return null
@@ -188,19 +186,96 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
               <div className="commitment-statement">
                 <span className="statement-text">I want to commitment</span>
 
-                {/* USD Amount Input - Inline */}
-                <div className="inline-input-container">
-                  <input
-                    type="number"
-                    value={formData.usdAmount}
-                    onChange={(e) => setFormData(prev => ({ ...prev, usdAmount: e.target.value }))}
-                    placeholder="0"
-                    className="inline-amount-input"
-                  />
-                  <span className="currency-label">USD</span>
+                {/* Enhanced USD Amount Input with AVAX Conversion */}
+                <div className="amount-input-container">
+                  <div className={`amount-input-wrapper ${
+                    formData.usdAmount && parseFloat(formData.usdAmount) > 0 ? 'has-value' : ''
+                  } ${
+                    validationError && validationError.toLowerCase().includes('amount') ? 'has-error' : ''
+                  }`}>
+                    <div className="currency-symbol">$</div>
+                    <input
+                      type="number"
+                      value={formData.usdAmount}
+                      onChange={(e) => setFormData(prev => ({ ...prev, usdAmount: e.target.value }))}
+                      placeholder="0.00"
+                      className="amount-input-field"
+                      min="0"
+                      step="0.01"
+                    />
+                    <div className="currency-code">USD</div>
+                  </div>
+
+                  {/* AVAX Conversion Info */}
+                  <div className="conversion-info">
+                    {isPriceLoading ? (
+                      <motion.div
+                        className="conversion-loading"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <div className="loading-dots">
+                          <span></span>
+                          <span></span>
+                          <span></span>
+                        </div>
+                        <span>Getting price...</span>
+                      </motion.div>
+                    ) : priceError ? (
+                      <motion.div
+                        className="conversion-error"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <span className="error-icon">⚠</span>
+                        <span>Price unavailable</span>
+                        <button
+                          type="button"
+                          onClick={refreshPrice}
+                          className="retry-btn"
+                        >
+                          Retry
+                        </button>
+                      </motion.div>
+                    ) : avaxAmountFormatted ? (
+                      <motion.div
+                        className="conversion-success"
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
+                      >
+                        <div className="conversion-amount">
+                          <span className="amount">{avaxAmountFormatted}</span>
+                          <span className="token">AVAX</span>
+                        </div>
+                        <div className="price-info">
+                          <span className="price-label">1 AVAX = ${avaxPrice?.toFixed(2)}</span>
+                          <button
+                            type="button"
+                            onClick={refreshPrice}
+                            className="refresh-btn"
+                            title="Refresh price"
+                          >
+                            <RefreshCw className={`refresh-icon ${isPriceLoading ? 'spinning' : ''}`} />
+                          </button>
+                        </div>
+                      </motion.div>
+                    ) : formData.usdAmount && parseFloat(formData.usdAmount) > 0 ? (
+                      <motion.div
+                        className="conversion-placeholder"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <span>Enter amount to see AVAX conversion</span>
+                      </motion.div>
+                    ) : null}
+                  </div>
                 </div>
 
-                <span className="statement-text">with</span>
+                <span className="statement-text">in</span>
 
                 {/* Token Dropdown - Inline */}
                 <div className="inline-dropdown-container">
@@ -355,17 +430,65 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
                 {(formData.condition === 'PRICE_TARGET' || formData.condition === 'COMBO') && (
                   <>
                     {formData.condition === 'COMBO' && <span className="parameter-separator">or</span>}
-                    <span className="statement-text">at</span>
-                    <div className="inline-parameter-container">
-                      <span className="inline-parameter-unit">$</span>
-                      <input
-                        type="number"
-                        value={formData.targetPrice}
-                        onChange={(e) => setFormData(prev => ({ ...prev, targetPrice: parseFloat(e.target.value) || 0 }))}
-                        placeholder="0"
-                        step="0.01"
-                        className="inline-parameter-input"
-                      />
+                    <span className="statement-text">when price</span>
+
+                    {/* Price Target Group */}
+                    <div className="price-target-group">
+                      {/* Price Up Input */}
+                      <div className="price-input-wrapper">
+                        <span className="price-direction-label">reaches</span>
+                        <div className="inline-parameter-container">
+                          <span className="inline-parameter-unit">$</span>
+                          <input
+                            type="number"
+                            value={formData.priceUp || ''}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              priceUp: parseFloat(e.target.value) || 0,
+                              targetPrice: parseFloat(e.target.value) || prev.targetPrice // Backward compatibility
+                            }))}
+                            placeholder="e.g. 100"
+                            step="0.01"
+                            min="0.01"
+                            max="1000000"
+                            className="inline-parameter-input price-up-input"
+                            title="Set a price target above current price (bullish)"
+                          />
+                        </div>
+                        <span className="price-direction-indicator up" title="Price Up">↗</span>
+                      </div>
+
+                      <span className="price-separator">or</span>
+
+                      {/* Price Down Input */}
+                      <div className="price-input-wrapper">
+                        <span className="price-direction-label">drops to</span>
+                        <div className="inline-parameter-container">
+                          <span className="inline-parameter-unit">$</span>
+                          <input
+                            type="number"
+                            value={formData.priceDown || ''}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              priceDown: parseFloat(e.target.value) || 0
+                            }))}
+                            placeholder="e.g. 20"
+                            step="0.01"
+                            min="0.01"
+                            max="1000000"
+                            className="inline-parameter-input price-down-input"
+                            title="Set a price target below current price (bearish)"
+                          />
+                        </div>
+                        <span className="price-direction-indicator down" title="Price Down">↘</span>
+                      </div>
+                    </div>
+
+                    {/* Price Target Helper Text */}
+                    <div className="price-helper-text">
+                      <span className="helper-text">
+                        Set one or both price targets. Vault unlocks when either target is reached.
+                      </span>
                     </div>
                   </>
                 )}
@@ -440,17 +563,7 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
                     {isLoading ? 'Creating Vault...' : "Create Vault"}
                   </span>
                   <span className="btn_icon_right">
-                    {isLoading ? (
-                      <LoadingSpinner
-                        size="xs"
-                        variant="dots"
-                        color="white"
-                        text=""
-                        className="inline-flex"
-                      />
-                    ) : (
-                      <ArrowRight className="w-5 h-5" />
-                    )}
+                    <ArrowRight className="w-5 h-5" />
                   </span>
                 </span>
               </button>
@@ -458,18 +571,7 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
               {!isFormValid() && (
                 <div className="validation-message">
                   <p className="error-text">
-                    {!formData.usdAmount || parseFloat(formData.usdAmount) <= 0
-                      ? 'Enter a valid USD amount'
-                      : formData.title.trim().length < 3
-                      ? 'Title must be at least 3 characters'
-                      : formData.message.trim().length < 10
-                      ? 'Message must be at least 10 characters'
-                      : formData.condition === 'PRICE_TARGET' && (formData.targetPrice || 0) <= 0
-                      ? 'Enter a valid target price'
-                      : formData.condition === 'COMBO' && ((formData.targetPrice || 0) <= 0 || (formData.timeMonths || 0) <= 0)
-                      ? 'Enter valid time and price for combo'
-                      : 'Please complete all fields'
-                    }
+                    {validationError || 'Please complete all fields correctly'}
                   </p>
                 </div>
               )}
@@ -477,6 +579,17 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
           </div>
         </motion.div>
       </motion.div>
+
+      {/* Enhanced Loading for Vault Creation */}
+      <VaultOperationLoader
+        isVisible={isCreating}
+        operation="creating"
+        amount={formData.usdAmount}
+        tokenSymbol={formData.token}
+        status="pending"
+        estimatedTime={45}
+        message="Creating your commitment vault on the blockchain..."
+      />
     </AnimatePresence>
   )
 }

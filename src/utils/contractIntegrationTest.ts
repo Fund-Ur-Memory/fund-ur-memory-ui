@@ -4,7 +4,7 @@
 
 import type { VaultFormData } from '../types/contracts'
 import { validateVaultFormData, convertFormDataToContractData } from './contractHelpers'
-import { SUPPORTED_TOKENS } from '../contracts/FUMVault'
+import { SUPPORTED_TOKENS, FUM_VAULT_CONFIG } from '../contracts/FUMVault'
 
 /**
  * Test form data validation
@@ -104,24 +104,34 @@ export const testVaultConditions = () => {
     timeMonths: 12
   }
 
-  // Price-based vault
+  // Price-based vault (new format)
   const priceVault: VaultFormData = {
+    ...baseFormData,
+    condition: 'PRICE_TARGET',
+    priceUp: 5000,
+    priceDown: 2000
+  }
+
+  // Price-based vault (legacy format)
+  const legacyPriceVault: VaultFormData = {
     ...baseFormData,
     condition: 'PRICE_TARGET',
     targetPrice: 5000
   }
 
-  // Combo vault
+  // Combo vault (new format)
   const comboVault: VaultFormData = {
     ...baseFormData,
     condition: 'COMBO',
     timeMonths: 6,
-    targetPrice: 4000
+    priceUp: 4000,
+    priceDown: 1500
   }
 
   const testCases = [
     { name: 'Time Vault', data: timeVault },
-    { name: 'Price Vault', data: priceVault },
+    { name: 'Price Vault (New)', data: priceVault },
+    { name: 'Price Vault (Legacy)', data: legacyPriceVault },
     { name: 'Combo Vault', data: comboVault }
   ]
 
@@ -198,6 +208,9 @@ export const runContractIntegrationTests = () => {
   console.log('🚀 Running Contract Integration Tests...')
   console.log('=====================================')
 
+  testNewContractIntegration()
+  console.log('')
+
   testFormValidation()
   console.log('')
 
@@ -214,6 +227,57 @@ export const runContractIntegrationTests = () => {
   console.log('')
 
   console.log('✅ All tests completed!')
+}
+
+/**
+ * Test the new contract address and ABI integration
+ */
+export const testNewContractIntegration = () => {
+  console.log('🧪 Testing New Contract Integration...')
+  console.log('=====================================')
+
+  // Test 1: Contract Configuration
+  console.log('\n1. Testing Contract Configuration:')
+  console.log('✅ Contract Address:', FUM_VAULT_CONFIG.address)
+  console.log('✅ Chain ID:', FUM_VAULT_CONFIG.chainId)
+
+  // Verify the new contract address
+  const expectedAddress = '0x7Aa2608EeA7679FA66196DECd78989Bb13DACD38'
+  if (FUM_VAULT_CONFIG.address === expectedAddress) {
+    console.log('✅ Contract address updated correctly!')
+  } else {
+    console.error('❌ Contract address mismatch!')
+    console.error('Expected:', expectedAddress)
+    console.error('Actual:', FUM_VAULT_CONFIG.address)
+  }
+
+  // Test 2: New ABI Functions
+  console.log('\n2. Testing New ABI Functions:')
+  const abi = FUM_VAULT_CONFIG.abi as any[]
+
+  // Check for new function signatures
+  const createPriceVault = abi.find(item =>
+    item.type === 'function' &&
+    item.name === 'createPriceVault'
+  )
+
+  if (createPriceVault) {
+    console.log('✅ createPriceVault function found')
+    console.log('   Parameters:', createPriceVault.inputs?.map((input: any) => input.name).join(', '))
+
+    // Check for new parameters
+    const hasAutoWithdraw = createPriceVault.inputs?.some((input: any) => input.name === '_autoWithdraw')
+    const hasPriceUp = createPriceVault.inputs?.some((input: any) => input.name === '_priceUp')
+    const hasPriceDown = createPriceVault.inputs?.some((input: any) => input.name === '_priceDown')
+
+    console.log('   ✅ Has _autoWithdraw:', hasAutoWithdraw)
+    console.log('   ✅ Has _priceUp:', hasPriceUp)
+    console.log('   ✅ Has _priceDown:', hasPriceDown)
+  } else {
+    console.error('❌ createPriceVault function not found in ABI')
+  }
+
+  console.log('\n🎉 New Contract Integration Test Complete!')
 }
 
 /**
@@ -244,6 +308,7 @@ export const testMockContractInteraction = () => {
 if (typeof window !== 'undefined') {
   (window as any).contractTests = {
     runAll: runContractIntegrationTests,
+    testNewContractIntegration,
     testFormValidation,
     testFormConversion,
     testTokenConfiguration,

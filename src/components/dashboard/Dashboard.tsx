@@ -8,7 +8,9 @@ import { HistoryTab } from "./tabs/HistoryTab";
 import { AIInsightsTab } from "./tabs/AIInsightsTab";
 import { ProfileTab } from "./tabs/ProfileTab";
 import { LoadingSpinner } from "./common/LoadingSpinner";
+import { AutoWithdrawNotification } from "./common/AutoWithdrawNotification";
 import { useDashboard } from "../../hooks/dashboard/useDashboard";
+import { useAutoWithdrawNotifications } from "../../hooks/dashboard/useAutoWithdrawNotifications";
 
 // Add CSS animations
 const dashboardStyles = `
@@ -544,6 +546,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
     lastUpdated
   } = useDashboard(userAddress);
 
+  const { notifications, removeNotification, triggerTestAutoWithdraw } = useAutoWithdrawNotifications();
+
   // Real Web3 hooks for additional data
   const { isConnected } = useAccount()
   const { data: ensName } = useEnsName({ address: userAddress as `0x${string}` })
@@ -704,8 +708,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     backdropFilter: 'blur(10px)'
                   }}
                 >
-                  <LoadingSpinner size="lg" />
-                  <p className="text-white fw-medium mt-3 mb-0">Refreshing data...</p>
+                  <LoadingSpinner
+                    variant="blockchain"
+                    size="lg"
+                    text="Refreshing data..."
+                    subText="Updating vault information from blockchain..."
+                    color="purple"
+                  />
                 </motion.div>
               </motion.div>
             )}
@@ -715,6 +724,30 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </main>
 
         <Footer />
+
+        {/* Auto-Withdraw Notifications */}
+        {notifications.map((notification) => (
+          <AutoWithdrawNotification
+            key={notification.id}
+            isVisible={true}
+            vaultId={notification.vaultId}
+            amount={notification.amount}
+            tokenSymbol={notification.tokenSymbol}
+            status={notification.status}
+            reason={notification.reason}
+            onClose={() => removeNotification(notification.id)}
+          />
+        ))}
+
+        {/* Test Button for Auto-Withdraw (Development Only) */}
+        {import.meta.env.DEV && (
+          <button
+            onClick={triggerTestAutoWithdraw}
+            className="fixed bottom-4 left-4 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm z-50"
+          >
+            Test Auto-Withdraw
+          </button>
+        )}
       </div>
     </DashboardErrorBoundary>
   );

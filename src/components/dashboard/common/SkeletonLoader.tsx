@@ -2,84 +2,60 @@ import React from 'react'
 import { motion } from 'framer-motion'
 
 interface SkeletonLoaderProps {
-  variant?: 'card' | 'text' | 'circle' | 'button' | 'vault-card' | 'metric-card'
-  width?: string | number
-  height?: string | number
+  width?: number | string
+  height?: number | string
   className?: string
-  count?: number
-  animated?: boolean
+  variant?: 'text' | 'circular' | 'rectangular' | 'rounded'
+  animation?: 'pulse' | 'wave' | 'shimmer'
 }
 
 export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
-  variant = 'text',
   width = '100%',
-  height = '1rem',
+  height = 20,
   className = '',
-  count = 1,
-  animated = true
+  variant = 'rectangular',
+  animation = 'shimmer'
 }) => {
+  const getVariantClasses = () => {
+    switch (variant) {
+      case 'circular':
+        return 'rounded-full'
+      case 'rounded':
+        return 'rounded-lg'
+      case 'text':
+        return 'rounded'
+      default:
+        return 'rounded-md'
+    }
+  }
+
+  const getAnimationClasses = () => {
+    switch (animation) {
+      case 'pulse':
+        return 'animate-pulse'
+      case 'wave':
+        return 'animate-bounce'
+      default:
+        return ''
+    }
+  }
+
   const shimmerVariants = {
     initial: { x: '-100%' },
-    animate: { x: '100%' },
+    animate: { x: '100%' }
   }
 
-  const pulseVariants = {
-    initial: { opacity: 0.6 },
-    animate: { opacity: 1 },
-  }
-
-  const getSkeletonStyle = () => {
-    const baseStyle = {
-      width: typeof width === 'number' ? `${width}px` : width,
-      height: typeof height === 'number' ? `${height}px` : height,
-    }
-
-    switch (variant) {
-      case 'circle':
-        return {
-          ...baseStyle,
-          borderRadius: '50%',
-          aspectRatio: '1',
-        }
-      case 'button':
-        return {
-          ...baseStyle,
-          borderRadius: '8px',
-          height: '40px',
-        }
-      case 'card':
-        return {
-          ...baseStyle,
-          borderRadius: '12px',
-          height: '200px',
-        }
-      default:
-        return {
-          ...baseStyle,
-          borderRadius: '4px',
-        }
-    }
-  }
-
-  const renderSkeleton = (index: number = 0) => (
-    <motion.div
-      key={index}
-      className={`relative overflow-hidden bg-gray-700/30 ${className}`}
-      style={getSkeletonStyle()}
-      initial="initial"
-      animate="animate"
-      variants={animated ? pulseVariants : undefined}
-      transition={animated ? {
-        duration: 1.5,
-        repeat: Infinity,
-        repeatType: "reverse",
-        ease: "easeInOut"
-      } : undefined}
+  return (
+    <div
+      className={`bg-gray-700 relative overflow-hidden ${getVariantClasses()} ${getAnimationClasses()} ${className}`}
+      style={{ width, height }}
     >
-      {animated && (
+      {animation === 'shimmer' && (
         <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-600 to-transparent"
           variants={shimmerVariants}
+          initial="initial"
+          animate="animate"
           transition={{
             duration: 1.5,
             repeat: Infinity,
@@ -87,21 +63,11 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
           }}
         />
       )}
-    </motion.div>
-  )
-
-  if (count === 1) {
-    return renderSkeleton()
-  }
-
-  return (
-    <div className="space-y-3">
-      {Array.from({ length: count }, (_, index) => renderSkeleton(index))}
     </div>
   )
 }
 
-// Specialized skeleton components
+// Specialized skeleton components for vault cards
 export const VaultCardSkeleton: React.FC<{ className?: string }> = ({ className = '' }) => (
   <motion.div
     className={`vault-card-container ${className}`}
@@ -117,55 +83,60 @@ export const VaultCardSkeleton: React.FC<{ className?: string }> = ({ className 
     }}>
       {/* Header skeleton */}
       <div className="flex items-center justify-between mb-4">
-        <SkeletonLoader variant="circle" width={50} height={50} />
+        <SkeletonLoader variant="circular" width={50} height={50} />
         <SkeletonLoader width={80} height={24} />
       </div>
 
       {/* Title skeleton */}
-      <SkeletonLoader width="70%" height={20} className="mb-3" />
-      
+      <div className="mb-3">
+        <SkeletonLoader width="70%" height={20} className="mb-2" />
+        <SkeletonLoader width="90%" height={16} />
+      </div>
+
       {/* Amount skeleton */}
-      <SkeletonLoader width="50%" height={24} className="mb-4" />
-      
-      {/* Message skeleton */}
-      <div className="space-y-2 mb-4">
-        <SkeletonLoader width="100%" height={16} />
-        <SkeletonLoader width="80%" height={16} />
-        <SkeletonLoader width="60%" height={16} />
+      <div className="mb-4">
+        <SkeletonLoader width="50%" height={24} className="mb-1" />
+        <SkeletonLoader width="40%" height={16} />
+      </div>
+
+      {/* Progress skeleton */}
+      <div className="mb-4">
+        <SkeletonLoader width="100%" height={8} variant="rounded" />
       </div>
 
       {/* Status skeleton */}
-      <div className="flex items-center justify-between">
-        <SkeletonLoader width={100} height={32} />
-        <SkeletonLoader variant="circle" width={8} height={8} />
+      <div className="flex justify-between items-center">
+        <SkeletonLoader width={60} height={20} />
+        <SkeletonLoader width={80} height={32} variant="rounded" />
       </div>
     </div>
   </motion.div>
 )
 
+// Dashboard metrics skeleton
 export const MetricCardSkeleton: React.FC<{ className?: string }> = ({ className = '' }) => (
   <motion.div
     className={`ico_iconbox_block p-4 ${className}`}
-    style={{
-      background: 'rgba(17, 24, 39, 0.6)',
-      border: '1px solid rgba(107, 114, 128, 0.2)',
-      borderRadius: '12px',
-      minHeight: '120px'
-    }}
     initial={{ opacity: 0, scale: 0.95 }}
     animate={{ opacity: 1, scale: 1 }}
     transition={{ duration: 0.3 }}
+    style={{
+      background: 'rgba(17, 24, 39, 0.6)',
+      border: '1px solid rgba(107, 114, 128, 0.2)',
+      borderRadius: '12px'
+    }}
   >
     <div className="flex items-center justify-between mb-3">
-      <SkeletonLoader variant="circle" width={40} height={40} />
-      <SkeletonLoader width={60} height={20} />
+      <SkeletonLoader variant="circular" width={40} height={40} />
+      <SkeletonLoader width={60} height={16} />
     </div>
     
-    <SkeletonLoader width="80%" height={28} className="mb-2" />
+    <SkeletonLoader width="80%" height={24} className="mb-2" />
     <SkeletonLoader width="60%" height={16} />
   </motion.div>
 )
 
+// Table row skeleton
 export const TableRowSkeleton: React.FC<{ columns?: number; className?: string }> = ({ 
   columns = 4, 
   className = '' 
@@ -179,7 +150,7 @@ export const TableRowSkeleton: React.FC<{ columns?: number; className?: string }
     {Array.from({ length: columns }, (_, index) => (
       <td key={index} className="p-3">
         <SkeletonLoader 
-          width={index === 0 ? "80%" : index === columns - 1 ? "60%" : "100%"} 
+          width={index === 0 ? '80%' : '60%'} 
           height={16} 
         />
       </td>
@@ -199,6 +170,51 @@ export const LoadingStateWrapper: React.FC<{
     layout
     transition={{ duration: 0.3 }}
   >
-    {isLoading ? skeleton : children}
+    <AnimatePresence mode="wait">
+      {isLoading ? (
+        <motion.div
+          key="skeleton"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          {skeleton}
+        </motion.div>
+      ) : (
+        <motion.div
+          key="content"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          {children}
+        </motion.div>
+      )}
+    </AnimatePresence>
   </motion.div>
 )
+
+// Grid skeleton for vault listings
+export const VaultGridSkeleton: React.FC<{ count?: number; className?: string }> = ({ 
+  count = 4, 
+  className = '' 
+}) => (
+  <div className={`row g-2 ${className}`}>
+    {Array.from({ length: count }, (_, index) => (
+      <motion.div
+        key={index}
+        className="col-lg-6 col-md-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.1 }}
+      >
+        <VaultCardSkeleton />
+      </motion.div>
+    ))}
+  </div>
+)
+
+// Import AnimatePresence for LoadingStateWrapper
+import { AnimatePresence } from 'framer-motion'

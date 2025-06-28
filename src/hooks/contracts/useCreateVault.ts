@@ -77,7 +77,8 @@ export const useCreateVault = (): UseCreateVaultReturn => {
 
         case 'PRICE_TARGET':
           console.log('💰 Creating PRICE_TARGET vault...')
-          console.log('🎯 Target price:', Number(contractData.targetPrice) / 1e8, 'USD')
+          console.log('🎯 Price Up:', Number(contractData.priceUp) / 1e8, 'USD')
+          console.log('🎯 Price Down:', Number(contractData.priceDown) / 1e8, 'USD')
           console.log('💰 Amount:', contractData.amount.toString(), 'wei')
           console.log('🏷️ Title:', formData.title)
           console.log('💬 Message:', formData.message)
@@ -85,7 +86,8 @@ export const useCreateVault = (): UseCreateVaultReturn => {
           result = await fumVault.createPriceVault(
             contractData.token,
             contractData.amount,
-            contractData.targetPrice,
+            contractData.priceUp,
+            contractData.priceDown,
             formData.title,
             formData.message
           )
@@ -94,7 +96,8 @@ export const useCreateVault = (): UseCreateVaultReturn => {
         case 'COMBO':
           console.log('🔄 Creating COMBO vault (TIME_OR_PRICE)...')
           console.log('📅 Unlock time:', new Date(Number(contractData.unlockTime) * 1000).toLocaleString())
-          console.log('🎯 Target price:', Number(contractData.targetPrice) / 1e8, 'USD')
+          console.log('🎯 Price Up:', Number(contractData.priceUp) / 1e8, 'USD')
+          console.log('🎯 Price Down:', Number(contractData.priceDown) / 1e8, 'USD')
           console.log('💰 Amount:', contractData.amount.toString(), 'wei')
           console.log('🏷️ Title:', formData.title)
           console.log('💬 Message:', formData.message)
@@ -104,7 +107,8 @@ export const useCreateVault = (): UseCreateVaultReturn => {
             contractData.token,
             contractData.amount,
             contractData.unlockTime,
-            contractData.targetPrice,
+            contractData.priceUp,
+            contractData.priceDown,
             formData.title,
             formData.message
           )

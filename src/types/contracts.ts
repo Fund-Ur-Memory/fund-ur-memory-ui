@@ -27,12 +27,15 @@ export interface RawVault {
   amount: bigint
   unlockTime: bigint
   targetPrice: bigint
+  priceUp: bigint
+  priceDown: bigint
   conditionType: ConditionType
   status: VaultStatus
   createdAt: bigint
   emergencyInitiated: bigint
   title: string
   message: string
+  autoWithdraw: boolean
 }
 
 // Formatted vault data for UI
@@ -58,6 +61,16 @@ export interface FormattedVault {
     formatted: string
   }
   targetPrice: {
+    raw: bigint
+    formatted: number
+    usd: string
+  }
+  priceUp: {
+    raw: bigint
+    formatted: number
+    usd: string
+  }
+  priceDown: {
     raw: bigint
     formatted: number
     usd: string
@@ -90,6 +103,7 @@ export interface FormattedVault {
   canEmergencyWithdraw: boolean
   title: string
   message: string
+  autoWithdraw: boolean
 }
 
 // Emergency penalty data
@@ -136,9 +150,12 @@ export interface VaultFormData {
   timeValue?: number
   timeUnit?: 'minutes' | 'hours' | 'days' | 'months' | 'years'
   timeMonths?: number // Keep for backward compatibility
-  targetPrice?: number
+  targetPrice?: number // Keep for backward compatibility
+  priceUp?: number // New: Price up target
+  priceDown?: number // New: Price down target
   title: string
   message: string
+  _convertedTokenAmount?: string // Internal: converted token amount for contract
 }
 
 // Converted form data for contract interaction
@@ -147,6 +164,8 @@ export interface ContractVaultData {
   amount: bigint
   unlockTime: bigint
   targetPrice: bigint
+  priceUp: bigint
+  priceDown: bigint
   conditionType: ConditionType
   isNativeToken: boolean
 }
@@ -175,10 +194,10 @@ export interface UseGetVaultsReturn {
 
 export interface UseFUMVaultReturn {
   // Vault operations
-  createTimeVault: (token: Address, amount: bigint, unlockTime: bigint, title: string, message: string) => Promise<TransactionResult>
-  createPriceVault: (token: Address, amount: bigint, targetPrice: bigint, title: string, message: string) => Promise<TransactionResult>
-  createTimeOrPriceVault: (token: Address, amount: bigint, unlockTime: bigint, targetPrice: bigint, title: string, message: string) => Promise<TransactionResult>
-  createTimeAndPriceVault: (token: Address, amount: bigint, unlockTime: bigint, targetPrice: bigint, title: string, message: string) => Promise<TransactionResult>
+  createTimeVault: (token: Address, amount: bigint, unlockTime: bigint, title: string, message: string, autoWithdraw?: boolean) => Promise<TransactionResult>
+  createPriceVault: (token: Address, amount: bigint, priceUp: bigint, priceDown: bigint, title: string, message: string, autoWithdraw?: boolean) => Promise<TransactionResult>
+  createTimeOrPriceVault: (token: Address, amount: bigint, unlockTime: bigint, priceUp: bigint, priceDown: bigint, title: string, message: string, autoWithdraw?: boolean) => Promise<TransactionResult>
+  createTimeAndPriceVault: (token: Address, amount: bigint, unlockTime: bigint, priceUp: bigint, priceDown: bigint, title: string, message: string, autoWithdraw?: boolean) => Promise<TransactionResult>
 
   // Vault management
   withdrawVault: (vaultId: number) => Promise<TransactionResult>

@@ -119,6 +119,16 @@ export const formatVaultData = (rawVault: RawVault, vaultId: number): FormattedV
       formatted: formattedTargetPrice,
       usd: `$${formattedTargetPrice.toLocaleString()}`,
     },
+    priceUp: {
+      raw: rawVault.priceUp,
+      formatted: Number(rawVault.priceUp) / 1e8,
+      usd: `$${(Number(rawVault.priceUp) / 1e8).toLocaleString()}`,
+    },
+    priceDown: {
+      raw: rawVault.priceDown,
+      formatted: Number(rawVault.priceDown) / 1e8,
+      usd: `$${(Number(rawVault.priceDown) / 1e8).toLocaleString()}`,
+    },
     conditionType: {
       raw: rawVault.conditionType,
       name: getConditionTypeName(rawVault.conditionType),
@@ -141,6 +151,7 @@ export const formatVaultData = (rawVault: RawVault, vaultId: number): FormattedV
     canEmergencyWithdraw,
     title: rawVault.title,
     message: rawVault.message,
+    autoWithdraw: rawVault.autoWithdraw,
   }
 
   return formattedVault
@@ -161,7 +172,7 @@ export const convertFormDataToContractData = (formData: VaultFormData): Contract
 
   console.log('🪙 Token config:', tokenConfig)
 
-  // Parse USD amount to token amount (simplified - would need price feeds for accurate conversion)
+  // Parse USD amount to token amount
   const usdAmount = parseFloat(formData.usdAmount)
   if (isNaN(usdAmount) || usdAmount <= 0) {
     console.error('❌ Invalid USD amount:', formData.usdAmount)
@@ -170,8 +181,16 @@ export const convertFormDataToContractData = (formData: VaultFormData): Contract
 
   console.log('💰 USD amount:', usdAmount)
 
-  // For now, assume 1:1 ratio for simplicity (would be replaced with actual price conversion)
-  const tokenAmount = parseAmount(usdAmount.toString(), tokenConfig.decimals)
+  // Use converted token amount if available (from USD to token conversion)
+  let tokenAmount: bigint
+  if (formData._convertedTokenAmount) {
+    console.log('💱 Using converted token amount:', formData._convertedTokenAmount)
+    tokenAmount = parseAmount(formData._convertedTokenAmount, tokenConfig.decimals)
+  } else {
+    console.log('⚠️ No converted amount found, using USD amount as fallback')
+    // Fallback: use USD amount directly (for backward compatibility)
+    tokenAmount = parseAmount(usdAmount.toString(), tokenConfig.decimals)
+  }
 
   // Calculate unlock time
   let unlockTime = 0n
@@ -220,30 +239,76 @@ export const convertFormDataToContractData = (formData: VaultFormData): Contract
     })
   }
 
-  // Parse target price
+  // Parse target price and convert to priceUp/priceDown format
   let targetPrice = 0n
-  if (formData.condition === 'PRICE_TARGET' || formData.condition === 'COMBO') {
-    console.log('💰 Calculating target price for condition:', formData.condition)
-    console.log('🎯 Target price input:', formData.targetPrice)
+  let priceUp = 0n
+  let priceDown = 0n
 
-    if (!formData.targetPrice || formData.targetPrice <= 0) {
-      console.error('❌ Invalid target price:', formData.targetPrice)
-      throw new Error('Invalid target price: Price must be greater than 0')
+  if (formData.condition === 'PRICE_TARGET' || formData.condition === 'COMBO') {
+    console.log('💰 Calculating price targets for condition:', formData.condition)
+
+    // Check if new price fields are used
+    if (formData.priceUp !== undefined || formData.priceDown !== undefined) {
+      console.log('🎯 Using new price up/down fields')
+      console.log('📈 Price Up input:', formData.priceUp)
+      console.log('📉 Price Down input:', formData.priceDown)
+
+      // Validate at least one price is set
+      if ((!formData.priceUp || formData.priceUp <= 0) && (!formData.priceDown || formData.priceDown <= 0)) {
+        throw new Error('At least one price target (up or down) must be set and greater than 0')
+      }
+
+      // Parse price up
+      if (formData.priceUp && formData.priceUp > 0) {
+        if (formData.priceUp > 1000000) {
+          throw new Error('Price up target too high (max $1,000,000)')
+        }
+        if (formData.priceUp < 0.01) {
+          throw new Error('Price up target too low (min $0.01)')
+        }
+        priceUp = parsePrice(formData.priceUp)
+      }
+
+      // Parse price down
+      if (formData.priceDown && formData.priceDown > 0) {
+        if (formData.priceDown > 1000000) {
+          throw new Error('Price down target too high (max $1,000,000)')
+        }
+        if (formData.priceDown < 0.01) {
+          throw new Error('Price down target too low (min $0.01)')
+        }
+        priceDown = parsePrice(formData.priceDown)
+      }
+
+      // Set targetPrice for backward compatibility (use priceUp if available, otherwise priceDown)
+      targetPrice = priceUp > 0n ? priceUp : priceDown
+
+    } else if (formData.targetPrice && formData.targetPrice > 0) {
+      // Backward compatibility: use old targetPrice field
+      console.log('🎯 Using legacy targetPrice field:', formData.targetPrice)
+
+      if (formData.targetPrice > 1000000) {
+        throw new Error('Target price too high (max $1,000,000)')
+      }
+      if (formData.targetPrice < 0.01) {
+        throw new Error('Target price too low (min $0.01)')
+      }
+
+      targetPrice = parsePrice(formData.targetPrice)
+      // For backward compatibility, assume price target means "price up" (bullish)
+      priceUp = targetPrice
+      priceDown = 0n
+
+    } else {
+      throw new Error('Price target is required for price-based conditions')
     }
-    // Validate price range (reasonable bounds)
-    if (formData.targetPrice > 1000000) {
-      console.error('❌ Target price too high:', formData.targetPrice)
-      throw new Error('Invalid target price: Price too high (max $1,000,000)')
-    }
-    if (formData.targetPrice < 0.01) {
-      console.error('❌ Target price too low:', formData.targetPrice)
-      throw new Error('Invalid target price: Price too low (min $0.01)')
-    }
-    targetPrice = parsePrice(formData.targetPrice)
-    console.log('💰 Parsed target price:', {
-      input: formData.targetPrice,
-      parsed: targetPrice.toString(),
-      inUSD: Number(targetPrice) / 1e8
+
+    console.log('💰 Parsed price targets:', {
+      priceUp: priceUp.toString(),
+      priceDown: priceDown.toString(),
+      targetPrice: targetPrice.toString(),
+      priceUpUSD: Number(priceUp) / 1e8,
+      priceDownUSD: Number(priceDown) / 1e8
     })
   }
 
@@ -256,6 +321,8 @@ export const convertFormDataToContractData = (formData: VaultFormData): Contract
     amount: tokenAmount,
     unlockTime,
     targetPrice,
+    priceUp,
+    priceDown,
     conditionType,
     isNativeToken: tokenConfig.isNative,
   }
@@ -265,6 +332,8 @@ export const convertFormDataToContractData = (formData: VaultFormData): Contract
     amount: result.amount.toString(),
     unlockTime: result.unlockTime.toString(),
     targetPrice: result.targetPrice.toString(),
+    priceUp: result.priceUp.toString(),
+    priceDown: result.priceDown.toString(),
     conditionType: result.conditionType,
     isNativeToken: result.isNativeToken
   })
@@ -478,8 +547,50 @@ export const validateVaultFormData = (formData: VaultFormData): string[] => {
 
   // Validate price-based conditions
   if (formData.condition === 'PRICE_TARGET' || formData.condition === 'COMBO') {
-    if (!formData.targetPrice || formData.targetPrice <= 0) {
-      errors.push('Target price must be greater than 0')
+    // Check if new price fields are used
+    const hasPriceUp = formData.priceUp && formData.priceUp > 0
+    const hasPriceDown = formData.priceDown && formData.priceDown > 0
+    const hasLegacyPrice = formData.targetPrice && formData.targetPrice > 0
+
+    // At least one price target must be set
+    if (!hasPriceUp && !hasPriceDown && !hasLegacyPrice) {
+      errors.push('At least one price target must be set')
+    }
+
+    // Validate price up if set
+    if (formData.priceUp !== undefined && formData.priceUp !== null) {
+      if (formData.priceUp <= 0) {
+        errors.push('Price up target must be greater than 0')
+      } else if (formData.priceUp > 1000000) {
+        errors.push('Price up target cannot exceed $1,000,000')
+      } else if (formData.priceUp < 0.01) {
+        errors.push('Price up target must be at least $0.01')
+      }
+    }
+
+    // Validate price down if set
+    if (formData.priceDown !== undefined && formData.priceDown !== null) {
+      if (formData.priceDown <= 0) {
+        errors.push('Price down target must be greater than 0')
+      } else if (formData.priceDown > 1000000) {
+        errors.push('Price down target cannot exceed $1,000,000')
+      } else if (formData.priceDown < 0.01) {
+        errors.push('Price down target must be at least $0.01')
+      }
+    }
+
+    // Validate legacy target price if used
+    if (formData.targetPrice !== undefined && formData.targetPrice !== null && formData.targetPrice > 0) {
+      if (formData.targetPrice > 1000000) {
+        errors.push('Target price cannot exceed $1,000,000')
+      } else if (formData.targetPrice < 0.01) {
+        errors.push('Target price must be at least $0.01')
+      }
+    }
+
+    // Validate price logic: price up should be higher than price down if both are set
+    if (hasPriceUp && hasPriceDown && formData.priceUp! <= formData.priceDown!) {
+      errors.push('Price up target must be higher than price down target')
     }
   }
 

@@ -1,7 +1,6 @@
-/* Enhanced Loading Animations for F.U.M */
-/* Modern, smooth, and performant loading states */
+/* Enhanced Loading Animations for F.U.M Vault Operations */
 
-/* Base loading animations */
+/* Keyframe Animations */
 @keyframes enhanced-spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
@@ -9,68 +8,64 @@
 
 @keyframes enhanced-pulse {
   0%, 100% { 
-    opacity: 0.6;
+    opacity: 1; 
     transform: scale(1);
   }
   50% { 
-    opacity: 1;
+    opacity: 0.7; 
     transform: scale(1.05);
+  }
+}
+
+@keyframes enhanced-glow {
+  0%, 100% { 
+    box-shadow: 0 0 5px currentColor; 
+  }
+  50% { 
+    box-shadow: 0 0 20px currentColor, 0 0 30px currentColor; 
+  }
+}
+
+@keyframes enhanced-breathe {
+  0%, 100% { 
+    transform: scale(1); 
+    opacity: 0.8;
+  }
+  50% { 
+    transform: scale(1.1); 
+    opacity: 1;
   }
 }
 
 @keyframes enhanced-shimmer {
   0% { 
-    transform: translateX(-100%);
+    transform: translateX(-100%); 
     opacity: 0;
   }
   50% {
     opacity: 1;
   }
   100% { 
-    transform: translateX(100%);
+    transform: translateX(100%); 
     opacity: 0;
   }
 }
 
 @keyframes enhanced-wave {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-@keyframes enhanced-glow {
   0%, 100% { 
-    box-shadow: 0 0 5px rgba(139, 92, 246, 0.3);
+    transform: translateY(0); 
+    opacity: 0.5;
   }
   50% { 
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.6), 0 0 30px rgba(139, 92, 246, 0.4);
-  }
-}
-
-@keyframes enhanced-breathe {
-  0%, 100% { 
-    transform: scale(1);
-    opacity: 0.7;
-  }
-  50% { 
-    transform: scale(1.1);
+    transform: translateY(-10px); 
     opacity: 1;
   }
 }
 
-@keyframes enhanced-orbit {
-  0% { transform: rotate(0deg) translateX(20px) rotate(0deg); }
-  100% { transform: rotate(360deg) translateX(20px) rotate(-360deg); }
-}
-
-@keyframes enhanced-typewriter {
-  0% { width: 0; }
-  100% { width: 100%; }
-}
-
-@keyframes enhanced-fade-in-up {
+@keyframes enhanced-slide-in-up {
   0% {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(30px);
   }
   100% {
     opacity: 1;
@@ -86,6 +81,17 @@
   100% {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+@keyframes enhanced-fade-in-scale {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
@@ -120,15 +126,10 @@
 }
 
 .skeleton-enhanced-card {
-  background: linear-gradient(
-    135deg,
-    rgba(17, 24, 39, 0.6) 0%,
-    rgba(31, 41, 55, 0.6) 100%
-  );
-  border: 1px solid rgba(107, 114, 128, 0.2);
-  border-radius: 12px;
   position: relative;
   overflow: hidden;
+  background: rgba(17, 24, 39, 0.6);
+  border: 1px solid rgba(107, 114, 128, 0.2);
 }
 
 .skeleton-enhanced-card::before {
@@ -141,38 +142,55 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.1),
+    rgba(139, 92, 246, 0.1),
     transparent
   );
   animation: enhanced-shimmer 2s infinite;
 }
 
-/* Progress indicators */
+/* Progress bar enhancements */
 .progress-enhanced {
   position: relative;
-  background: rgba(107, 114, 128, 0.3);
-  border-radius: 9999px;
   overflow: hidden;
+  background: rgba(107, 114, 128, 0.2);
+  border-radius: 8px;
 }
 
 .progress-enhanced-bar {
-  height: 100%;
+  position: relative;
   background: linear-gradient(
     90deg,
     #8B5CF6,
-    #A78BFA,
-    #8B5CF6
+    #A855F7,
+    #C084FC
   );
   background-size: 200% 100%;
   animation: enhanced-shimmer 2s infinite;
-  border-radius: 9999px;
-  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: inherit;
+  transition: width 0.5s ease-out;
+}
+
+.progress-enhanced-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: enhanced-shimmer 1.5s infinite;
 }
 
 /* Button loading states */
 .button-loading-enhanced {
   position: relative;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .button-loading-enhanced::before {
@@ -192,9 +210,9 @@
 }
 
 .button-loading-enhanced .loading-dots {
-  display: inline-flex;
-  align-items: center;
+  display: flex;
   gap: 4px;
+  align-items: center;
 }
 
 .button-loading-enhanced .loading-dot {
@@ -237,85 +255,103 @@
   border-radius: inherit;
 }
 
-/* Transaction loading states */
+/* Operation-specific loading styles */
+.vault-withdraw-loading {
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.1),
+    rgba(37, 99, 235, 0.1)
+  );
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  animation: enhanced-glow 2s infinite;
+}
+
+.vault-auto-withdraw-loading {
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.1),
+    rgba(124, 58, 237, 0.1)
+  );
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  animation: enhanced-pulse 1.5s infinite;
+}
+
+.vault-emergency-loading {
+  background: linear-gradient(
+    135deg,
+    rgba(239, 68, 68, 0.1),
+    rgba(220, 38, 38, 0.1)
+  );
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  animation: enhanced-breathe 1s infinite;
+}
+
+.vault-price-check-loading {
+  background: linear-gradient(
+    135deg,
+    rgba(34, 197, 94, 0.1),
+    rgba(22, 163, 74, 0.1)
+  );
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  animation: enhanced-glow 3s infinite;
+}
+
+/* Transaction status indicators */
 .transaction-loading-enhanced {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  position: relative;
+  padding: 12px 16px;
+  background: rgba(17, 24, 39, 0.8);
+  border: 1px solid rgba(107, 114, 128, 0.3);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
 }
 
 .transaction-loading-enhanced .tx-spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(139, 92, 246, 0.3);
-  border-top: 2px solid #8B5CF6;
-  border-radius: 50%;
   animation: enhanced-spin 1s linear infinite;
 }
 
-.transaction-loading-enhanced .tx-dots {
-  display: flex;
-  gap: 2px;
-}
-
 .transaction-loading-enhanced .tx-dot {
-  width: 3px;
-  height: 3px;
-  background: #8B5CF6;
-  border-radius: 50%;
-  animation: enhanced-wave 1s ease-in-out infinite;
+  animation: enhanced-pulse 1.5s infinite;
 }
 
-.transaction-loading-enhanced .tx-dot:nth-child(2) {
-  animation-delay: 0.15s;
-}
-
-.transaction-loading-enhanced .tx-dot:nth-child(3) {
-  animation-delay: 0.3s;
-}
-
-/* Modal loading overlay */
+/* Modal loading overlays */
 .modal-loading-enhanced {
   position: absolute;
-  inset: 0;
-  background: rgba(4, 6, 18, 0.8);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10;
-  border-radius: inherit;
+  z-index: 1000;
 }
 
 .modal-loading-enhanced .loading-content {
+  background: rgba(17, 24, 39, 0.95);
+  border: 1px solid rgba(107, 114, 128, 0.3);
+  border-radius: 12px;
+  padding: 24px;
   text-align: center;
-  color: white;
+  animation: enhanced-fade-in-scale 0.3s ease-out;
 }
 
 .modal-loading-enhanced .loading-spinner {
-  width: 40px;
-  height: 40px;
-  margin: 0 auto 16px;
-  border: 3px solid rgba(139, 92, 246, 0.3);
-  border-top: 3px solid #8B5CF6;
-  border-radius: 50%;
   animation: enhanced-spin 1s linear infinite;
+  margin-bottom: 16px;
 }
 
-/* Responsive loading states */
+/* Responsive adjustments */
 @media (max-width: 768px) {
   .skeleton-enhanced-card {
     min-height: 200px;
   }
   
-  .loading-spinner-enhanced {
-    width: 24px;
-    height: 24px;
-  }
-  
-  .modal-loading-enhanced .loading-spinner {
-    width: 32px;
-    height: 32px;
+  .modal-loading-enhanced .loading-content {
+    margin: 16px;
+    padding: 20px;
   }
 }
 
@@ -338,20 +374,5 @@
   
   .skeleton-enhanced {
     background: rgba(255, 255, 255, 0.1);
-  }
-}
-
-/* High contrast mode */
-@media (prefers-contrast: high) {
-  .skeleton-enhanced {
-    background: rgba(255, 255, 255, 0.2);
-  }
-  
-  .progress-enhanced {
-    background: rgba(255, 255, 255, 0.3);
-  }
-  
-  .progress-enhanced-bar {
-    background: #FFFFFF;
   }
 }

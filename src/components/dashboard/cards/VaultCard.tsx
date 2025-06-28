@@ -3,8 +3,10 @@ import { motion } from 'framer-motion'
 import { Download, AlertTriangle, Clock } from 'lucide-react'
 import { useWithdrawVault } from '../../../hooks/contracts/useWithdrawVault'
 import { useVaultTokenPrice } from '../../../hooks/useTokenPrice'
+import { VaultOperationLoader } from '../common/VaultOperationLoader'
 import type { FormattedVault } from '../../../types/contracts'
 import '../../../styles/vault-cards.css'
+import '../../../styles/enhanced-loading.css'
 
 
 
@@ -26,7 +28,9 @@ export const VaultCard: React.FC<VaultCardProps> = ({
   onEmergencyWithdraw
 }) => {
   const [isWithdrawing, setIsWithdrawing] = useState(false)
-  const { withdrawVault, emergencyWithdraw, isLoading } = useWithdrawVault()
+  const [isEmergencyWithdrawing, setIsEmergencyWithdrawing] = useState(false)
+  const [operationStatus, setOperationStatus] = useState<'pending' | 'confirming' | 'success' | 'error'>('pending')
+  const { withdrawVault, emergencyWithdraw, isLoading, txHash: hookTxHash } = useWithdrawVault()
 
   // Get real-time token price
   const tokenSymbol = vault.token?.symbol || 'UNKNOWN'
@@ -56,27 +60,43 @@ export const VaultCard: React.FC<VaultCardProps> = ({
     if (!vault.canWithdraw) return
 
     setIsWithdrawing(true)
+    setOperationStatus('pending')
     try {
       await withdrawVault(vault.id)
-      onWithdraw?.(vault.id)
+      setOperationStatus('confirming')
+
+      // Simulate confirmation delay
+      setTimeout(() => {
+        setOperationStatus('success')
+        onWithdraw?.(vault.id)
+        setTimeout(() => setIsWithdrawing(false), 2000)
+      }, 3000)
     } catch (err) {
       console.error('Withdraw failed:', err)
-    } finally {
-      setIsWithdrawing(false)
+      setOperationStatus('error')
+      setTimeout(() => setIsWithdrawing(false), 3000)
     }
   }
 
   const handleEmergencyWithdraw = async () => {
     if (!vault.canEmergencyWithdraw) return
 
-    setIsWithdrawing(true)
+    setIsEmergencyWithdrawing(true)
+    setOperationStatus('pending')
     try {
       await emergencyWithdraw(vault.id)
-      onEmergencyWithdraw?.(vault.id)
+      setOperationStatus('confirming')
+
+      // Simulate confirmation delay
+      setTimeout(() => {
+        setOperationStatus('success')
+        onEmergencyWithdraw?.(vault.id)
+        setTimeout(() => setIsEmergencyWithdrawing(false), 2000)
+      }, 3000)
     } catch (err) {
       console.error('Emergency withdraw failed:', err)
-    } finally {
-      setIsWithdrawing(false)
+      setOperationStatus('error')
+      setTimeout(() => setIsEmergencyWithdrawing(false), 3000)
     }
   }
 
@@ -438,18 +458,71 @@ export const VaultCard: React.FC<VaultCardProps> = ({
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px'
               }}>
-                {vault.conditionType?.name?.includes('PRICE') ? 'Target Price' : 'Unlock Time'}
+                {vault.conditionType?.name?.includes('PRICE') ? 'Price Targets' : 'Unlock Time'}
               </p>
-              <p className="text-white" style={{
-                fontSize: '16px',
-                fontWeight: '600',
-                margin: 0
-              }}>
-                {vault.conditionType?.name?.includes('PRICE')
-                  ? (targetPriceUsd || 'N/A')
-                  : (unlockTimeFormatted || 'N/A')
-                }
-              </p>
+
+              {vault.conditionType?.name?.includes('PRICE') ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  {/* Price Up Target */}
+                  {vault.priceUp && Number(vault.priceUp.formatted) > 0 && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{
+                        color: '#10B981',
+                        fontSize: '14px',
+                        fontWeight: '600'
+                      }}>
+                        ↗ {vault.priceUp.usd}
+                      </span>
+                      <span style={{
+                        color: 'rgba(255, 255, 255, 0.6)',
+                        fontSize: '11px'
+                      }}>
+                        (up)
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Price Down Target */}
+                  {vault.priceDown && Number(vault.priceDown.formatted) > 0 && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{
+                        color: '#EF4444',
+                        fontSize: '14px',
+                        fontWeight: '600'
+                      }}>
+                        ↘ {vault.priceDown.usd}
+                      </span>
+                      <span style={{
+                        color: 'rgba(255, 255, 255, 0.6)',
+                        fontSize: '11px'
+                      }}>
+                        (down)
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Legacy Target Price (fallback) */}
+                  {(!vault.priceUp || Number(vault.priceUp.formatted) === 0) &&
+                   (!vault.priceDown || Number(vault.priceDown.formatted) === 0) &&
+                   targetPriceUsd && (
+                    <span style={{
+                      color: '#8B5CF6',
+                      fontSize: '14px',
+                      fontWeight: '600'
+                    }}>
+                      {targetPriceUsd}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <p className="text-white" style={{
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  margin: 0
+                }}>
+                  {unlockTimeFormatted || 'N/A'}
+                </p>
+              )}
             </div>
 
             <div>
@@ -595,6 +668,22 @@ export const VaultCard: React.FC<VaultCardProps> = ({
         )}
         </div>
       </div>
+
+      {/* Enhanced Loading Overlay for Vault Operations */}
+      <VaultOperationLoader
+        isVisible={isWithdrawing || isEmergencyWithdrawing}
+        operation={isEmergencyWithdrawing ? 'emergency-withdraw' : 'withdraw'}
+        vaultId={vault.id}
+        amount={amountFormatted}
+        tokenSymbol={tokenSymbol}
+        status={operationStatus}
+        txHash={hookTxHash || undefined}
+        onClose={() => {
+          setIsWithdrawing(false)
+          setIsEmergencyWithdrawing(false)
+        }}
+        estimatedTime={isEmergencyWithdrawing ? 45 : 30}
+      />
     </motion.div>
   )
 }

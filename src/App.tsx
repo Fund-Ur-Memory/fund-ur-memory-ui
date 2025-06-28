@@ -5,7 +5,7 @@ import { injected } from 'wagmi/connectors'
 import HomePage from "./components/HomePage"
 import ErrorPage from "./components/ErrorPage"
 import { Dashboard } from './components/dashboard/Dashboard'
-import { WalletConnectionAnimation } from './components/dashboard/common/WalletConnectionAnimation'
+
 
 import "@rainbow-me/rainbowkit/styles.css"
 import "./styles/enhanced-loading.css"
@@ -240,33 +240,14 @@ const ProfilePage = () => {
   )
 }
 
-// Connection Guard Component with enhanced wallet connection animation
+// Connection Guard Component
 const ConnectionGuard = ({ children }: { children?: React.ReactNode }) => {
   const { isConnected, isConnecting } = useAccount()
-  const { connect, isPending, connectors } = useConnect()
-  const [showAnimation, setShowAnimation] = useState(false)
-  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'success' | 'error'>('connecting')
+  const { connect, isPending } = useConnect()
 
   const handleConnect = () => {
-    setShowAnimation(true)
-    setConnectionStatus('connecting')
     connect({ connector: injected() })
   }
-
-  // Handle connection state changes
-  useEffect(() => {
-    if (isConnected) {
-      setConnectionStatus('success')
-      setTimeout(() => {
-        setShowAnimation(false)
-      }, 2000) // Show success for 2 seconds
-    } else if (!isConnecting && !isPending && showAnimation) {
-      setConnectionStatus('error')
-      setTimeout(() => {
-        setShowAnimation(false)
-      }, 3000) // Show error for 3 seconds
-    }
-  }, [isConnected, isConnecting, isPending, showAnimation])
 
   if (isConnected && children) {
     return <>{children}</>
@@ -331,62 +312,19 @@ const ConnectionGuard = ({ children }: { children?: React.ReactNode }) => {
         <Footer />
       </div>
 
-      {/* Enhanced Wallet Connection Animation */}
-      <WalletConnectionAnimation
-        isVisible={showAnimation || isConnecting || isPending}
-        status={connectionStatus}
-        walletName={connectors[0]?.name || 'MetaMask'}
-        onComplete={() => setShowAnimation(false)}
-      />
+
     </>
   )
 }
 
-// Loading screen for navigation
-const LoadingScreen = ({ message = "Loading..." }: { message?: string }) => (
-  <div className="index_ico page_wrapper">
-    <Header />
-    <main className="page_content">
-      <section className="ico_hero_section section_decoration text-center" style={{
-        backgroundImage: `url(${"/images/shapes/shape_net_ico_hero_section_bg.svg"})`,
-        minHeight: "80vh",
-        display: "flex",
-        alignItems: "center"
-      }}>
-        <div className="container">
-          <div className="text-center">
-            <div className="ico_progress">
-              <div className="progress">
-                <div
-                  className="progress-bar progress-bar-striped progress-bar-animated"
-                  role="progressbar"
-                  style={{
-                    width: "75%",
-                    background: "linear-gradient(135deg, #6f42c1, #9d5be8)"
-                  }}
-                  aria-valuenow={75}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                ></div>
-              </div>
-            </div>
-            <h2 className="heading_text text-white mt-4">{message}</h2>
-            <p className="text-secondary">Please wait while we set things up...</p>
-          </div>
-        </div>
-      </section>
-    </main>
-    <Footer />
-  </div>
-)
+
 
 // Main App Component with real Web3 integration
 function AppContent() {
   const [currentPath, setCurrentPath] = useState(window.location.pathname)
-  const [isLoading, setIsLoading] = useState(false)
 
   // Real Web3 hooks
-  const { address, isConnected, isConnecting } = useAccount()
+  const { address, isConnected } = useAccount()
   const { disconnect } = useDisconnect()
 
   useEffect(() => {
@@ -399,25 +337,19 @@ function AppContent() {
     return () => window.removeEventListener('popstate', handlePopState)
   }, [])
 
-  // Enhanced navigation with loading states
+  // Simple navigation
   const navigate = (path: string, requiresAuth = false) => {
     if (requiresAuth && !isConnected) {
       toast.error('Please connect your wallet first')
       return
     }
 
-    setIsLoading(true)
-
-    // Simulate navigation delay for better UX
-    setTimeout(() => {
-      window.history.pushState({}, '', path)
-      setCurrentPath(path)
-      setIsLoading(false)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    }, 300)
+    window.history.pushState({}, '', path)
+    setCurrentPath(path)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  // Enhanced disconnect handler
+  // Simple disconnect handler
   const handleDisconnect = () => {
     disconnect()
     toast.success('Wallet disconnected successfully')
@@ -430,25 +362,6 @@ function AppContent() {
       toast.success(`Wallet connected: ${address.slice(0, 6)}...${address.slice(-4)}`)
     }
   }, [isConnected, address])
-
-  // Enhanced loading states with wallet connection animation
-  if (isLoading) {
-    return <LoadingScreen message="Navigating..." />
-  }
-
-  // Use enhanced wallet connection animation for connecting state
-  if (isConnecting) {
-    return (
-      <>
-        <LoadingScreen message="Connecting Wallet..." />
-        <WalletConnectionAnimation
-          isVisible={true}
-          status="connecting"
-          walletName="MetaMask"
-        />
-      </>
-    )
-  }
 
   // Enhanced routing logic with real Web3 state
   const renderPage = () => {
