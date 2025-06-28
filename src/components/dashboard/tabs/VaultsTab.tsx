@@ -1,5 +1,4 @@
-// src/components/dashboard/tabs/VaultsTab.tsx - Final fixed version
-import React from 'react'
+import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Shield, DollarSign, CheckCircle, Clock } from 'lucide-react'
 import { VaultCard } from '../cards/VaultCard'
@@ -7,48 +6,42 @@ import { MetricCard } from '../cards/MetricCard'
 import { CreateVaultModal } from '../modals/CreateVaultModal'
 import { LoadingSpinner } from '../common/LoadingSpinner'
 import { VaultGridSkeleton } from '../common/SkeletonLoader'
+import { CommitmentModal } from '../modals/CommitmentModal'
 import { useCreateVault } from '../../../hooks/dashboard/useCreateVault'
 import { useGetVaults } from '../../../hooks/contracts/useGetVaults'
 import { useAccount } from 'wagmi'
+import type { VaultFormData } from '../../../types/contracts'
+import type { FUMAnalysisResponse } from '../../../services/fumAgentService'
 import '../../../styles/header-compact.css'
 import '../../../styles/vault-cards.css'
 import '../../../styles/enhanced-loading.css'
-
 
 interface VaultsTabProps {
   isPrivacyMode: boolean
   onRefetch: () => void
 }
 
-
-
 export const VaultsTab: React.FC<VaultsTabProps> = ({
   isPrivacyMode,
   onRefetch,
 }) => {
-  // Get connected wallet address
   const { address: connectedAddress, isConnected } = useAccount()
-
-  // Use real vault data from contract for connected user only
   const { vaults: contractVaults, refetch, isLoading: isLoadingVaults } = useGetVaults(connectedAddress)
   const { isModalOpen, isCreating, openModal, closeModal, createVault } = useCreateVault()
-
-  // Only show user's own ACTIVE vaults if connected, otherwise show empty state
+  const [isCommitmentModalOpen, setIsCommitmentModalOpen] = useState(false)
+  const [pendingFormData, setPendingFormData] = useState<VaultFormData | null>(null)
+  const [pendingAiAnalysis, setPendingAiAnalysis] = useState<FUMAnalysisResponse | null>(null)
   const allUserVaults = isConnected && contractVaults.length > 0
     ? contractVaults
     : []
 
-  // Filter to show only ACTIVE vaults in the Vaults tab
   const userVaults = allUserVaults.filter(v => v.status?.name === 'ACTIVE')
-
-  // Calculate user-specific metrics from their active vaults
   const userMetrics = {
     totalActiveVaults: userVaults.length,
     totalLockedValue: userVaults.reduce((sum, vault) => sum + (vault.amount?.usd || 0), 0),
     avgProgress: userVaults.length > 0
       ? Math.round(userVaults.reduce((sum, vault) => sum + (vault.progress || 0), 0) / userVaults.length)
       : 0,
-    // Time-based metrics for active vaults
     timeBasedVaults: userVaults.filter(v => v.conditionType?.name?.includes('TIME')).length,
     priceBasedVaults: userVaults.filter(v => v.conditionType?.name?.includes('PRICE')).length
   }
@@ -61,22 +54,41 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
     openModal()
   }
 
+  const handleAnalysisComplete = (formData: VaultFormData, aiAnalysis: FUMAnalysisResponse) => {
+    setPendingFormData(formData)
+    setPendingAiAnalysis(aiAnalysis)
+    setIsCommitmentModalOpen(true)
+    closeModal()
+  }
+
+  const handleCommitmentModalClose = () => {
+    setIsCommitmentModalOpen(false)
+    setPendingFormData(null)
+    setPendingAiAnalysis(null)
+  }
+
+  const handleCommitmentVaultCreate = async (formData: VaultFormData) => {
+    if (pendingAiAnalysis) {
+      await createVault(formData, pendingAiAnalysis.data)
+    } else {
+      await createVault(formData)
+    }
+    handleCommitmentModalClose()
+    await handleRefresh()
+  }
+
   const handleRefresh = async () => {
     await refetch()
     onRefetch?.()
   }
 
-
-
   const handleVaultWithdraw = (vaultId: number) => {
     console.log(`✅ Vault ${vaultId} withdrawn successfully`)
-    // Refresh vault data
     refetch()
   }
 
   const handleVaultEmergencyWithdraw = (vaultId: number) => {
     console.log(`🚨 Vault ${vaultId} emergency withdrawn successfully`)
-    // Refresh vault data
     refetch()
   }
 
@@ -361,13 +373,21 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
       <CreateVaultModal
         isOpen={isModalOpen}
         onClose={closeModal}
-        onCreateVault={async (vaultData) => {
-          await createVault(vaultData)
-          // Refresh vault data after successful creation
-          await handleRefresh()
-        }}
+        onAnalysisComplete={handleAnalysisComplete}
         isLoading={isCreating}
       />
+
+      {/* Commitment Modal */}
+      {pendingFormData && (
+        <CommitmentModal
+          isOpen={isCommitmentModalOpen}
+          onClose={handleCommitmentModalClose}
+          onCreateVault={handleCommitmentVaultCreate}
+          formData={pendingFormData}
+          aiAnalysis={pendingAiAnalysis}
+          isLoading={isCreating}
+        />
+      )}
     </div>
   )
 }

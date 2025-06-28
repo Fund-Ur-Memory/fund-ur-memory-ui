@@ -64,3 +64,25 @@ export const formatLargeNumber = (num: number): string => {
   if (num >= 1e3) return (num / 1e3).toFixed(1) + 'K'
   return num.toString()
 }
+
+export const getMaxTimeValue = (timeUnit: string): number => {
+  switch (timeUnit) {
+    case 'minutes': return 60 * 24 * 30
+    case 'hours': return 24 * 30
+    case 'days': return 365
+    case 'months': return 24
+    case 'years': return 5
+    default: return 24
+  }
+}
+
+export const getDefaultTimeValue = (timeUnit: string): number => {
+  switch (timeUnit) {
+    case 'minutes': return 30
+    case 'hours': return 24
+    case 'days': return 30
+    case 'months': return 6
+    case 'years': return 1
+    default: return 6
+  }
+}

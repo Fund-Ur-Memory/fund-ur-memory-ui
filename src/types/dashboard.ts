@@ -78,3 +78,86 @@ export interface DashboardData {
   aiInsights: AIInsights
   vaults: Vault[]
 }
+
+export interface BaseAnalysis {
+  amount?: number;
+  tokenSymbol?: string;
+  currentPrice?: number;
+}
+
+export interface TimeBasedAnalysis extends BaseAnalysis {
+  score: number;
+  recommendation: string;
+  factors: string[];
+  riskLevel: string;
+  behavioralInsights: string[];
+  marketConditions: string[];
+  suggestedOptimizations: string[];
+  fearGreedInsights: string[];
+  expectedReturn?: {
+    duration: number;
+    durationUnit: string;
+    initialInvestment: number;
+    predictedValue: number;
+    expectedReturn: number;
+    expectedReturnPercentage: number;
+    bestCaseScenario: number;
+    worstCaseScenario: number;
+    confidence: number;
+    pricePredictions?: Array<{
+      targetDate: string;
+      predictedPrice: number;
+      confidence: number;
+      priceChange: number;
+      priceChangePercentage: number;
+      factors: string[];
+    }>;
+  };
+  pricePredictions?: Array<{
+    targetDate: string;
+    predictedPrice: number;
+    confidence: number;
+    priceChange: number;
+    priceChangePercentage: number;
+    factors: string[];
+  }>;
+}
+
+// Price-based commitment analysis
+export interface PriceBasedAnalysis extends BaseAnalysis {
+  upTarget: number;
+  downTarget: number;
+  upTargetAnalysis: {
+    targetPrice: number;
+    targetType: 'UP' | 'DOWN';
+    expectedDays: number;
+    confidence: number;
+    probability: number;
+    riskFactors: string[];
+    marketConditions: string[];
+  };
+  downTargetAnalysis: {
+    targetPrice: number;
+    targetType: 'UP' | 'DOWN';
+    expectedDays: number;
+    confidence: number;
+    probability: number;
+    riskFactors: string[];
+    marketConditions: string[];
+  };
+  overallRisk: string;
+  expectedReturn: {
+    upScenario: number;
+    downScenario: number;
+    weightedAverage: number;
+    bestCase: number;
+    worstCase: number;
+  };
+  insights: string[];
+  recommendations: string[];
+  timeToReachTargets: {
+    upTarget: number;
+    downTarget: number;
+    averageTime: number;
+  };
+}

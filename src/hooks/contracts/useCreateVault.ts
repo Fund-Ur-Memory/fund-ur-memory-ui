@@ -1,17 +1,19 @@
-// src/hooks/contracts/useCreateVault.ts
 import { useCallback } from 'react'
 import { useAccount } from 'wagmi'
 import { useFUMVault } from './useFUMVault'
 import type { VaultFormData, UseCreateVaultReturn, TransactionResult } from '../../types/contracts'
 import { convertFormDataToContractData, validateVaultFormData } from '../../utils/contractHelpers'
+import { indexerService } from '../../services/indexerService'
+import type { FUMAnalysisResponse } from '../../services/fumAgentService'
 
 export const useCreateVault = (): UseCreateVaultReturn => {
   const { address } = useAccount()
   const fumVault = useFUMVault()
 
-  const createVault = useCallback(async (formData: VaultFormData): Promise<TransactionResult> => {
+  const createVault = useCallback(async (formData: VaultFormData, aiAnalysis?: FUMAnalysisResponse['data']): Promise<TransactionResult> => {
     console.log('🚀 Starting vault creation process...')
     console.log('📋 Form data:', formData)
+    console.log('🤖 AI analysis:', aiAnalysis)
 
     // Check wallet connection
     if (!address) {
@@ -41,7 +43,6 @@ export const useCreateVault = (): UseCreateVaultReturn => {
     try {
       console.log('🔄 Converting form data to contract parameters...')
 
-      // Convert form data to contract parameters
       const contractData = convertFormDataToContractData(formData)
 
       console.log('📊 Contract data:', {
@@ -53,7 +54,6 @@ export const useCreateVault = (): UseCreateVaultReturn => {
         isNativeToken: contractData.isNativeToken
       })
 
-      // Determine which contract function to call based on condition type
       let result: TransactionResult
 
       console.log('🎯 Vault condition type:', formData.condition)
@@ -125,12 +125,36 @@ export const useCreateVault = (): UseCreateVaultReturn => {
 
       console.log('📡 Transaction submitted, waiting for result...')
 
-      // If transaction was successful, try to extract vault ID from logs
       if (result.success && result.hash) {
         console.log('✅ Transaction successful!')
         console.log('🔗 Transaction hash:', result.hash)
-        // TODO: Parse transaction receipt to get vault ID from VaultCreated event
-        // For now, we'll return the result as-is
+        
+        if (aiAnalysis) {
+          console.log('📡 Indexing vault with AI analysis...')
+          try {
+            const indexData = {
+              vault_id: result.vaultId || 1,
+              vault_title: formData.title,
+              commitment_message: formData.message,
+              owner_address: address,
+              metadata: JSON.stringify(aiAnalysis),
+              tx_hash: result.hash
+            }
+            
+            const indexResult = await indexerService.createVault(indexData)
+            
+            if (indexResult.success) {
+              console.log('✅ Vault indexed successfully')
+            } else {
+              console.warn('⚠️ Failed to index vault:', indexResult.error)
+            }
+          } catch (indexError) {
+            console.warn('⚠️ Error during vault indexing:', indexError)
+          }
+        } else {
+          console.log('ℹ️ No AI analysis provided, skipping indexing')
+        }
+        
         return result
       } else {
         console.error('❌ Transaction failed')
@@ -150,7 +174,6 @@ export const useCreateVault = (): UseCreateVaultReturn => {
       let errorMessage = 'Failed to create vault'
 
       if (error instanceof Error) {
-        // Handle specific error types
         if (error.message.includes('insufficient funds')) {
           errorMessage = 'Insufficient funds for this transaction'
         } else if (error.message.includes('user rejected')) {
@@ -166,7 +189,6 @@ export const useCreateVault = (): UseCreateVaultReturn => {
         } else if (error.message.includes('InsufficientAmount')) {
           errorMessage = 'Amount too small. Minimum amount is 0.001 AVAX.'
         } else if (error.message.includes('execution reverted')) {
-          // Extract the revert reason if possible
           const revertMatch = error.message.match(/execution reverted: (.+)/)
           if (revertMatch) {
             errorMessage = `Transaction failed: ${revertMatch[1]}`

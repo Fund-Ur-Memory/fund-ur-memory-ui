@@ -1,4 +1,3 @@
-// src/components/dashboard/Dashboard.tsx - Fixed sizing and layout
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAccount, useEnsName, useBalance, useDisconnect } from "wagmi";
@@ -12,7 +11,6 @@ import { AutoWithdrawNotification } from "./common/AutoWithdrawNotification";
 import { useDashboard } from "../../hooks/dashboard/useDashboard";
 import { useAutoWithdrawNotifications } from "../../hooks/dashboard/useAutoWithdrawNotifications";
 
-// Add CSS animations
 const dashboardStyles = `
   @keyframes pulse {
     0%, 100% { opacity: 1; }
@@ -29,14 +27,12 @@ const dashboardStyles = `
   }
 `;
 
-// Inject styles
 if (typeof document !== 'undefined') {
   const styleSheet = document.createElement("style");
   styleSheet.innerText = dashboardStyles;
   document.head.appendChild(styleSheet);
 }
 
-// Import the existing components for consistency
 import Header from "../Header";
 import Footer from "../Footer";
 import Scrollbar from "../Scrollbar";
@@ -47,7 +43,6 @@ interface DashboardProps {
   onDisconnect: () => void;
 }
 
-// Error Boundary Component
 class DashboardErrorBoundary extends React.Component<
   { children: React.ReactNode; onReset: () => void },
   { hasError: boolean; error: Error | null }
@@ -140,7 +135,6 @@ class DashboardErrorBoundary extends React.Component<
   }
 }
 
-// Connection Status Component
 // const ConnectionStatus: React.FC<{ isOnline: boolean }> = ({ isOnline }) => (
 //   <motion.div
 //     initial={{ opacity: 0, y: -20 }}
@@ -170,7 +164,6 @@ class DashboardErrorBoundary extends React.Component<
 //   </motion.div>
 // )
 
-// Loading Screen Component
 const DashboardLoadingScreen: React.FC = () => {
   const { address } = useAccount()
 
@@ -279,7 +272,6 @@ const DashboardLoadingScreen: React.FC = () => {
   )
 }
 
-// Error Screen Component
 const DashboardErrorScreen: React.FC<{
   error: string;
   onRetry: () => void;
@@ -348,7 +340,6 @@ const DashboardErrorScreen: React.FC<{
   </div>
 )
 
-// Custom Dashboard Header that matches existing design
 const DashboardHeader: React.FC<{
   activeTab: string;
   onTabChange: (tab: string) => void;
@@ -528,7 +519,6 @@ const DashboardHeader: React.FC<{
   );
 };
 
-// Main Dashboard Component
 export const Dashboard: React.FC<DashboardProps> = ({
   userAddress,
   onDisconnect,
@@ -548,15 +538,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   const { notifications, removeNotification, triggerTestAutoWithdraw } = useAutoWithdrawNotifications();
 
-  // Real Web3 hooks for additional data
   const { isConnected } = useAccount()
   const { data: ensName } = useEnsName({ address: userAddress as `0x${string}` })
   const { data: balance } = useBalance({ address: userAddress as `0x${string}` })
   const { disconnect } = useDisconnect()
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_isOnline, _setIsOnline] = React.useState(navigator.onLine);
 
-  // Monitor online status
   React.useEffect(() => {
     const handleOnline = () => _setIsOnline(true);
     const handleOffline = () => _setIsOnline(false);
@@ -570,25 +559,21 @@ export const Dashboard: React.FC<DashboardProps> = ({
     };
   }, [_setIsOnline]);
 
-  // Handle wallet disconnection
   React.useEffect(() => {
     if (!isConnected) {
       onDisconnect()
     }
   }, [isConnected, onDisconnect])
 
-  // Enhanced disconnect handler
   const handleDisconnect = () => {
     disconnect()
     onDisconnect()
   }
 
-  // Loading state
   if (loading) {
     return <DashboardLoadingScreen />;
   }
 
-  // Error state
   if (error || !data) {
     return (
       <DashboardErrorScreen
@@ -606,7 +591,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
       onRefetch: refetch,
     };
 
-    // VaultsTab and HistoryTab have different props (no data prop needed)
     const vaultsTabProps = {
       isPrivacyMode,
       onRefetch: refetch,

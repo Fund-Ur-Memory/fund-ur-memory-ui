@@ -270,7 +270,12 @@
 }
 
 .token-name.coming-soon {
-  color: rgba(139, 92, 246, 0.8);
+  color: rgba(255, 255, 255, 0.3);
+  font-style: italic;
+}
+
+.inline-dropdown-item .coming-soon {
+  color: rgba(255, 255, 255, 0.3);
   font-style: italic;
 }
 

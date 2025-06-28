@@ -1,5 +1,6 @@
 // src/types/contracts.ts
 import type { Address } from 'viem'
+import type { FUMAnalysisResponse } from '../services/fumAgentService'
 
 // Enums from the contract
 export const ConditionType = {
@@ -180,7 +181,7 @@ export interface TransactionResult {
 
 // Hook return types
 export interface UseCreateVaultReturn {
-  createVault: (formData: VaultFormData) => Promise<TransactionResult>
+  createVault: (formData: VaultFormData, aiAnalysis?: FUMAnalysisResponse['data']) => Promise<TransactionResult>
   isLoading: boolean
   error: string | null
 }

@@ -21907,3 +21907,53 @@ body .mfp-wrap .mfp-container .mfp-content .mfp-close:hover::after {
   width: 10px;
   height: 10px;
 }
+
+.ai-analyze-btn {
+  background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
+  border: none;
+}
+
+.ai-analyze-btn:hover {
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+}
+
+.ai-analyze-btn .btn_icon_left {
+  margin-right: 8px;
+}
+
+.ai-analysis-panel {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139, 92, 246, 0.3) transparent;
+}
+
+.ai-analysis-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ai-analysis-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ai-analysis-panel::-webkit-scrollbar-thumb {
+  background-color: rgba(139, 92, 246, 0.3);
+  border-radius: 3px;
+}
+
+.ai-analysis-panel::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(139, 92, 246, 0.5);
+}
+
+.loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(139, 92, 246, 0.3);
+  border-top-color: #a855f7;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

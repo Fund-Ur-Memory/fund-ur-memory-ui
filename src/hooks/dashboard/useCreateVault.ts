@@ -2,13 +2,14 @@ import { useState, useCallback } from 'react'
 import toast from 'react-hot-toast'
 import { useCreateVault as useContractCreateVault } from '../contracts/useCreateVault'
 import type { VaultFormData } from '../../types/contracts'
+import type { FUMAnalysisResponse } from '../../services/fumAgentService'
 
 interface UseCreateVaultReturn {
   isModalOpen: boolean
   isCreating: boolean
   openModal: () => void
   closeModal: () => void
-  createVault: (vaultData: VaultFormData) => Promise<void>
+  createVault: (vaultData: VaultFormData, aiAnalysis?: FUMAnalysisResponse['data']) => Promise<void>
 }
 
 export const useCreateVault = (): UseCreateVaultReturn => {
@@ -23,12 +24,13 @@ export const useCreateVault = (): UseCreateVaultReturn => {
     setIsModalOpen(false)
   }, [])
 
-  const createVault = useCallback(async (vaultData: VaultFormData) => {
+  const createVault = useCallback(async (vaultData: VaultFormData, aiAnalysis?: FUMAnalysisResponse['data']) => {
     try {
       console.log('Creating vault with data:', vaultData)
+      console.log('AI analysis data:', aiAnalysis)
 
       // Call the contract to create the vault
-      const result = await contractCreateVault.createVault(vaultData)
+      const result = await contractCreateVault.createVault(vaultData, aiAnalysis)
 
       if (result.success) {
         toast.success('Vault created successfully!', {
