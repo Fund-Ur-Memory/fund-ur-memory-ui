@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Brain, TrendingUp, AlertTriangle, Target } from 'lucide-react'
-import { SimpleRecommendationCard } from '../cards/AIRecommendationCard'
 import { type DashboardData, type WalletAnalysisResponse } from '../../../types/dashboard'
 import '../../../styles/header-compact.css'
 
@@ -392,206 +391,495 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
               >
                 {selectedInsight === 'market' && (
                   <div>
-                    <div className="d-flex align-items-center mb-4">
-                      <span style={{ fontSize: '2rem', marginRight: '1rem' }}>📊</span>
-                      <h3 className="iconbox_title text-white mb-0">Market Conditions</h3>
+                    <div className="d-flex align-items-center justify-content-between mb-4">
+                      <div className="d-flex align-items-center">
+                        <div
+                          className="me-3 d-flex align-items-center justify-content-center"
+                          style={{
+                            width: '48px',
+                            height: '48px',
+                            background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(16, 185, 129, 0.1))',
+                            borderRadius: '12px',
+                            fontSize: '1.4rem',
+                            border: '1px solid rgba(34, 197, 94, 0.3)'
+                          }}
+                        >
+                          📊
+                        </div>
+                        <div>
+                          <h3 className="text-white mb-1" style={{ fontSize: '1.3rem', fontWeight: '600' }}>
+                            Market Analysis
+                          </h3>
+                          <p className="text-gray mb-0" style={{ fontSize: '0.85rem', opacity: '0.8' }}>
+                            Current market conditions and trends
+                          </p>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="row mb-4">
-                      <div className="col-md-4 mb-3">
-                        <div
-                          className="p-3"
+                    <div className="row g-3 mb-4">
+                      <div className="col-md-4">
+                        <motion.div
+                          whileHover={{ y: -3, scale: 1.02 }}
+                          transition={{ duration: 0.2 }}
                           style={{
-                            background: 'rgba(34, 197, 94, 0.1)',
-                            borderRadius: '10px',
+                            background: 'rgba(255, 255, 255, 0.05)',
+                            borderRadius: '12px',
                             border: '1px solid rgba(34, 197, 94, 0.3)',
-                            transition: 'all 0.3s ease'
+                            backdropFilter: 'blur(10px)',
+                            padding: '1.25rem',
+                            height: '100%',
+                            cursor: 'default'
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = 'translateY(-2px)'
-                            e.currentTarget.style.boxShadow = '0 4px 15px rgba(34, 197, 94, 0.2)'
+                            e.currentTarget.style.border = '1px solid rgba(34, 197, 94, 0.6)'
+                            e.currentTarget.style.boxShadow = '0 8px 25px rgba(34, 197, 94, 0.15)'
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = 'translateY(0)'
+                            e.currentTarget.style.border = '1px solid rgba(34, 197, 94, 0.3)'
                             e.currentTarget.style.boxShadow = 'none'
                           }}
                         >
-                          <h6 className="text-secondary mb-1" style={{ fontSize: '0.8rem', fontWeight: '500' }}>Market Sentiment</h6>
-                          <h5 className="text-success mb-0 d-flex align-items-center" style={{ fontSize: '1rem', fontWeight: '600' }}>
-                            📈 {insights.market.data.sentiment}
-                          </h5>
-                        </div>
+                          <div className="d-flex align-items-center justify-content-between mb-2">
+                            <span className="text-gray" style={{ fontSize: '0.8rem', opacity: '0.8', fontWeight: '500' }}>
+                              Market Sentiment
+                            </span>
+                            <span style={{ fontSize: '1.2rem' }}>📈</span>
+                          </div>
+                          <h4 className="text-white mb-0" style={{ fontSize: '1.3rem', fontWeight: '700' }}>
+                            {insights.market.data.sentiment}
+                          </h4>
+                        </motion.div>
                       </div>
-                      <div className="col-md-4 mb-3">
-                        <div
-                          className="p-3"
+
+                      <div className="col-md-4">
+                        <motion.div
+                          whileHover={{ y: -3, scale: 1.02 }}
+                          transition={{ duration: 0.2 }}
                           style={{
-                            background: 'rgba(59, 130, 246, 0.1)',
-                            borderRadius: '10px',
+                            background: 'rgba(255, 255, 255, 0.05)',
+                            borderRadius: '12px',
                             border: '1px solid rgba(59, 130, 246, 0.3)',
-                            transition: 'all 0.3s ease'
+                            backdropFilter: 'blur(10px)',
+                            padding: '1.25rem',
+                            height: '100%',
+                            cursor: 'default'
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = 'translateY(-2px)'
-                            e.currentTarget.style.boxShadow = '0 4px 15px rgba(59, 130, 246, 0.2)'
+                            e.currentTarget.style.border = '1px solid rgba(59, 130, 246, 0.6)'
+                            e.currentTarget.style.boxShadow = '0 8px 25px rgba(59, 130, 246, 0.15)'
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = 'translateY(0)'
+                            e.currentTarget.style.border = '1px solid rgba(59, 130, 246, 0.3)'
                             e.currentTarget.style.boxShadow = 'none'
                           }}
                         >
-                          <h6 className="text-secondary mb-1" style={{ fontSize: '0.8rem', fontWeight: '500' }}>Trend Direction</h6>
-                          <h5 className="text-info mb-0 d-flex align-items-center" style={{ fontSize: '1rem', fontWeight: '600' }}>
-                            🚀 {insights.market.data.trend}
-                          </h5>
-                        </div>
+                          <div className="d-flex align-items-center justify-content-between mb-2">
+                            <span className="text-gray" style={{ fontSize: '0.8rem', opacity: '0.8', fontWeight: '500' }}>
+                              Trend Direction
+                            </span>
+                            <span style={{ fontSize: '1.2rem' }}>🚀</span>
+                          </div>
+                          <h4 className="text-white mb-0" style={{ fontSize: '1.3rem', fontWeight: '700' }}>
+                            {insights.market.data.trend}
+                          </h4>
+                        </motion.div>
                       </div>
-                      <div className="col-md-4 mb-3">
-                        <div
-                          className="p-3"
+
+                      <div className="col-md-4">
+                        <motion.div
+                          whileHover={{ y: -3, scale: 1.02 }}
+                          transition={{ duration: 0.2 }}
                           style={{
-                            background: 'rgba(245, 158, 11, 0.1)',
-                            borderRadius: '10px',
+                            background: 'rgba(255, 255, 255, 0.05)',
+                            borderRadius: '12px',
                             border: '1px solid rgba(245, 158, 11, 0.3)',
-                            transition: 'all 0.3s ease'
+                            backdropFilter: 'blur(10px)',
+                            padding: '1.25rem',
+                            height: '100%',
+                            cursor: 'default'
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = 'translateY(-2px)'
-                            e.currentTarget.style.boxShadow = '0 4px 15px rgba(245, 158, 11, 0.2)'
+                            e.currentTarget.style.border = '1px solid rgba(245, 158, 11, 0.6)'
+                            e.currentTarget.style.boxShadow = '0 8px 25px rgba(245, 158, 11, 0.15)'
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = 'translateY(0)'
+                            e.currentTarget.style.border = '1px solid rgba(245, 158, 11, 0.3)'
                             e.currentTarget.style.boxShadow = 'none'
                           }}
                         >
-                          <h6 className="text-secondary mb-1" style={{ fontSize: '0.8rem', fontWeight: '500' }}>Volatility</h6>
-                          <h5 className="text-warning mb-0 d-flex align-items-center" style={{ fontSize: '1rem', fontWeight: '600' }}>
-                            ⚡ {insights.market.data.volatility}
-                          </h5>
-                        </div>
+                          <div className="d-flex align-items-center justify-content-between mb-2">
+                            <span className="text-gray" style={{ fontSize: '0.8rem', opacity: '0.8', fontWeight: '500' }}>
+                              Volatility Level
+                            </span>
+                            <span style={{ fontSize: '1.2rem' }}>⚡</span>
+                          </div>
+                          <h4 className="text-white mb-0" style={{ fontSize: '1.3rem', fontWeight: '700' }}>
+                            {insights.market.data.volatility}
+                          </h4>
+                        </motion.div>
                       </div>
                     </div>
 
-                    <div
-                      className="p-3"
+                    <motion.div
+                      whileHover={{ y: -3 }}
+                      transition={{ duration: 0.2 }}
                       style={{
-                        background: 'rgba(111, 66, 193, 0.1)',
-                        borderRadius: '10px',
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        borderRadius: '12px',
                         border: '1px solid rgba(111, 66, 193, 0.3)',
-                        transition: 'all 0.3s ease'
+                        backdropFilter: 'blur(10px)',
+                        padding: '1.5rem'
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-2px)'
-                        e.currentTarget.style.boxShadow = '0 4px 15px rgba(111, 66, 193, 0.2)'
+                        e.currentTarget.style.border = '1px solid rgba(111, 66, 193, 0.6)'
+                        e.currentTarget.style.boxShadow = '0 8px 25px rgba(111, 66, 193, 0.15)'
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'translateY(0)'
+                        e.currentTarget.style.border = '1px solid rgba(111, 66, 193, 0.3)'
                         e.currentTarget.style.boxShadow = 'none'
                       }}
                     >
-                      <h6 className="text-secondary mb-2" style={{ fontSize: '0.85rem', fontWeight: '500' }}>🤖 AI Recommendation</h6>
-                      <p className="text-white mb-0" style={{ fontSize: '0.9rem', lineHeight: '1.5' }}>{insights.market.data.recommendation}</p>
-                    </div>
+                      <div className="d-flex align-items-center mb-3">
+                        <div
+                          className="me-3 d-flex align-items-center justify-content-center"
+                          style={{
+                            width: '40px',
+                            height: '40px',
+                            background: 'linear-gradient(135deg, rgba(111, 66, 193, 0.2), rgba(147, 51, 234, 0.1))',
+                            borderRadius: '10px',
+                            fontSize: '1.2rem',
+                            border: '1px solid rgba(111, 66, 193, 0.3)'
+                          }}
+                        >
+                          🤖
+                        </div>
+                        <h5 className="text-white mb-0" style={{ fontSize: '1.1rem', fontWeight: '600' }}>
+                          AI Market Recommendation
+                        </h5>
+                      </div>
+                      <p className="text-gray mb-0" style={{ fontSize: '0.95rem', lineHeight: '1.6', opacity: '0.9' }}>
+                        {insights.market.data.recommendation}
+                      </p>
+                    </motion.div>
                   </div>
                 )}
 
                 {selectedInsight === 'behavioral' && (
                   <div>
-                    <div className="d-flex align-items-center mb-4">
-                      <span style={{ fontSize: '2rem', marginRight: '1rem' }}>🧠</span>
-                      <h3 className="iconbox_title text-white mb-0">Your Trading Patterns</h3>
-                    </div>
-
-                    <div className="row mb-4">
-                      <div className="col-md-6 mb-3">
-                        <div className="p-3" style={{
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          borderRadius: '8px'
-                        }}>
-                          <h6 className="text-secondary mb-2">Trading Style</h6>
-                          <p className="text-white mb-0 d-flex align-items-center">
-                            🛡️ {insights.behavioral.data.tradingStyle}
-                          </p>
+                    <div className="d-flex align-items-center justify-content-between mb-4">
+                      <div className="d-flex align-items-center">
+                        <div
+                          className="me-3 d-flex align-items-center justify-content-center"
+                          style={{
+                            width: '48px',
+                            height: '48px',
+                            background: 'linear-gradient(135deg, rgba(147, 51, 234, 0.2), rgba(124, 58, 237, 0.1))',
+                            borderRadius: '12px',
+                            fontSize: '1.4rem',
+                            border: '1px solid rgba(147, 51, 234, 0.3)'
+                          }}
+                        >
+                          🧠
                         </div>
-                      </div>
-                      <div className="col-md-6 mb-3">
-                        <div className="p-3" style={{
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          borderRadius: '8px'
-                        }}>
-                          <h6 className="text-secondary mb-2">Risk Tolerance</h6>
-                          <p className="text-white mb-0 d-flex align-items-center">
-                            ⚖️ {insights.behavioral.data.riskTolerance}
+                        <div>
+                          <h3 className="text-white mb-1" style={{ fontSize: '1.3rem', fontWeight: '600' }}>
+                            Behavioral Patterns
+                          </h3>
+                          <p className="text-gray mb-0" style={{ fontSize: '0.85rem', opacity: '0.8' }}>
+                            Your trading psychology and patterns
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="row mb-4">
-                      <div className="col-md-4 mb-3">
-                        <div className="p-3" style={{
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          borderRadius: '8px'
-                        }}>
-                          <h6 className="text-secondary mb-2">Average Hold Time</h6>
-                          <p className="text-white mb-0 d-flex align-items-center">
-                            ⏰ {insights.behavioral.data.averageHoldTime} days
-                          </p>
-                        </div>
+                    <div className="row g-3 mb-4">
+                      <div className="col-md-6">
+                        <motion.div
+                          whileHover={{ y: -3, scale: 1.02 }}
+                          transition={{ duration: 0.2 }}
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.05)',
+                            borderRadius: '12px',
+                            border: '1px solid rgba(59, 130, 246, 0.3)',
+                            backdropFilter: 'blur(10px)',
+                            padding: '1.25rem',
+                            height: '100%',
+                            cursor: 'default'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.border = '1px solid rgba(59, 130, 246, 0.6)'
+                            e.currentTarget.style.boxShadow = '0 8px 25px rgba(59, 130, 246, 0.15)'
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.border = '1px solid rgba(59, 130, 246, 0.3)'
+                            e.currentTarget.style.boxShadow = 'none'
+                          }}
+                        >
+                          <div className="d-flex align-items-center justify-content-between mb-2">
+                            <span className="text-gray" style={{ fontSize: '0.8rem', opacity: '0.8', fontWeight: '500' }}>
+                              Trading Style
+                            </span>
+                            <span style={{ fontSize: '1.2rem' }}>🛡️</span>
+                          </div>
+                          <h4 className="text-white mb-0" style={{ fontSize: '1.3rem', fontWeight: '700' }}>
+                            {insights.behavioral.data.tradingStyle}
+                          </h4>
+                        </motion.div>
                       </div>
-                      <div className="col-md-4 mb-3">
-                        <div className="p-3" style={{
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          borderRadius: '8px'
-                        }}>
-                          <h6 className="text-secondary mb-2">Trade Frequency</h6>
-                          <p className="text-white mb-0 d-flex align-items-center">
-                            📈 {insights.behavioral.data.tradeFrequency} trades/month
-                          </p>
-                        </div>
-                      </div>
-                      <div className="col-md-4 mb-3">
-                        <div className="p-3" style={{
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          borderRadius: '8px'
-                        }}>
-                          <h6 className="text-secondary mb-2">Diversification</h6>
-                          <p className="text-white mb-0 d-flex align-items-center">
-                            🌐 {insights.behavioral.data.diversificationScore}%
-                          </p>
-                        </div>
+
+                      <div className="col-md-6">
+                        <motion.div
+                          whileHover={{ y: -3, scale: 1.02 }}
+                          transition={{ duration: 0.2 }}
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.05)',
+                            borderRadius: '12px',
+                            border: '1px solid rgba(16, 185, 129, 0.3)',
+                            backdropFilter: 'blur(10px)',
+                            padding: '1.25rem',
+                            height: '100%',
+                            cursor: 'default'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.border = '1px solid rgba(16, 185, 129, 0.6)'
+                            e.currentTarget.style.boxShadow = '0 8px 25px rgba(16, 185, 129, 0.15)'
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.border = '1px solid rgba(16, 185, 129, 0.3)'
+                            e.currentTarget.style.boxShadow = 'none'
+                          }}
+                        >
+                          <div className="d-flex align-items-center justify-content-between mb-2">
+                            <span className="text-gray" style={{ fontSize: '0.8rem', opacity: '0.8', fontWeight: '500' }}>
+                              Risk Tolerance
+                            </span>
+                            <span style={{ fontSize: '1.2rem' }}>⚖️</span>
+                          </div>
+                          <h4 className="text-white mb-0" style={{ fontSize: '1.3rem', fontWeight: '700' }}>
+                            {insights.behavioral.data.riskTolerance}
+                          </h4>
+                        </motion.div>
                       </div>
                     </div>
 
-                    <div className="mb-4">
-                      <h6 className="text-secondary mb-3">⚠️ Emotional Triggers</h6>
-                      <div className="d-flex flex-wrap gap-2">
-                        {insights.behavioral.data.emotionalTriggers.map((trigger: string, index: number) => (
-                          <span key={index} className="badge" style={{
-                            background: 'rgba(239, 68, 68, 0.2)',
-                            color: '#fca5a5',
-                            border: '1px solid rgba(239, 68, 68, 0.3)',
-                            padding: '0.5rem 1rem'
-                          }}>
-                            {trigger}
-                          </span>
-                        ))}
+                    <div className="row g-3 mb-4">
+                      <div className="col-md-4">
+                        <motion.div
+                          whileHover={{ y: -3, scale: 1.02 }}
+                          transition={{ duration: 0.2 }}
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.05)',
+                            borderRadius: '12px',
+                            border: '1px solid rgba(245, 158, 11, 0.3)',
+                            backdropFilter: 'blur(10px)',
+                            padding: '1.25rem',
+                            height: '100%',
+                            cursor: 'default'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.border = '1px solid rgba(245, 158, 11, 0.6)'
+                            e.currentTarget.style.boxShadow = '0 8px 25px rgba(245, 158, 11, 0.15)'
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.border = '1px solid rgba(245, 158, 11, 0.3)'
+                            e.currentTarget.style.boxShadow = 'none'
+                          }}
+                        >
+                          <div className="d-flex align-items-center justify-content-between mb-2">
+                            <span className="text-gray" style={{ fontSize: '0.8rem', opacity: '0.8', fontWeight: '500' }}>
+                              Hold Time
+                            </span>
+                            <span style={{ fontSize: '1.2rem' }}>⏰</span>
+                          </div>
+                          <h4 className="text-white mb-0" style={{ fontSize: '1.3rem', fontWeight: '700' }}>
+                            {insights.behavioral.data.averageHoldTime}d
+                          </h4>
+                        </motion.div>
                       </div>
-                    </div>
 
-                    <div>
-                      <h6 className="text-secondary mb-3">✅ Success Factors</h6>
-                      <div className="d-flex flex-wrap gap-2">
-                        {insights.behavioral.data.successFactors.map((factor: string, index: number) => (
-                          <span key={index} className="badge" style={{
-                            background: 'rgba(34, 197, 94, 0.2)',
-                            color: '#86efac',
+                      <div className="col-md-4">
+                        <motion.div
+                          whileHover={{ y: -3, scale: 1.02 }}
+                          transition={{ duration: 0.2 }}
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.05)',
+                            borderRadius: '12px',
+                            border: '1px solid rgba(168, 85, 247, 0.3)',
+                            backdropFilter: 'blur(10px)',
+                            padding: '1.25rem',
+                            height: '100%',
+                            cursor: 'default'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.border = '1px solid rgba(168, 85, 247, 0.6)'
+                            e.currentTarget.style.boxShadow = '0 8px 25px rgba(168, 85, 247, 0.15)'
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.border = '1px solid rgba(168, 85, 247, 0.3)'
+                            e.currentTarget.style.boxShadow = 'none'
+                          }}
+                        >
+                          <div className="d-flex align-items-center justify-content-between mb-2">
+                            <span className="text-gray" style={{ fontSize: '0.8rem', opacity: '0.8', fontWeight: '500' }}>
+                              Trade Frequency
+                            </span>
+                            <span style={{ fontSize: '1.2rem' }}>📈</span>
+                          </div>
+                          <h4 className="text-white mb-0" style={{ fontSize: '1.3rem', fontWeight: '700' }}>
+                            {insights.behavioral.data.tradeFrequency}/mo
+                          </h4>
+                        </motion.div>
+                      </div>
+
+                      <div className="col-md-4">
+                        <motion.div
+                          whileHover={{ y: -3, scale: 1.02 }}
+                          transition={{ duration: 0.2 }}
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.05)',
+                            borderRadius: '12px',
                             border: '1px solid rgba(34, 197, 94, 0.3)',
-                            padding: '0.5rem 1rem'
-                          }}>
-                            {factor}
-                          </span>
-                        ))}
+                            backdropFilter: 'blur(10px)',
+                            padding: '1.25rem',
+                            height: '100%',
+                            cursor: 'default'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.border = '1px solid rgba(34, 197, 94, 0.6)'
+                            e.currentTarget.style.boxShadow = '0 8px 25px rgba(34, 197, 94, 0.15)'
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.border = '1px solid rgba(34, 197, 94, 0.3)'
+                            e.currentTarget.style.boxShadow = 'none'
+                          }}
+                        >
+                          <div className="d-flex align-items-center justify-content-between mb-2">
+                            <span className="text-gray" style={{ fontSize: '0.8rem', opacity: '0.8', fontWeight: '500' }}>
+                              Diversification
+                            </span>
+                            <span style={{ fontSize: '1.2rem' }}>🌐</span>
+                          </div>
+                          <h4 className="text-white mb-0" style={{ fontSize: '1.3rem', fontWeight: '700' }}>
+                            {insights.behavioral.data.diversificationScore}%
+                          </h4>
+                        </motion.div>
+                      </div>
+                    </div>
+
+                    <div className="row g-3">
+                      <div className="col-md-6">
+                        <motion.div
+                          whileHover={{ y: -3 }}
+                          transition={{ duration: 0.2 }}
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.05)',
+                            borderRadius: '12px',
+                            border: '1px solid rgba(239, 68, 68, 0.3)',
+                            backdropFilter: 'blur(10px)',
+                            padding: '1.5rem',
+                            height: '100%'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.border = '1px solid rgba(239, 68, 68, 0.6)'
+                            e.currentTarget.style.boxShadow = '0 8px 25px rgba(239, 68, 68, 0.15)'
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.border = '1px solid rgba(239, 68, 68, 0.3)'
+                            e.currentTarget.style.boxShadow = 'none'
+                          }}
+                        >
+                          <div className="d-flex align-items-center mb-3">
+                            <div
+                              className="me-3 d-flex align-items-center justify-content-center"
+                              style={{
+                                width: '40px',
+                                height: '40px',
+                                background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.1))',
+                                borderRadius: '10px',
+                                fontSize: '1.2rem',
+                                border: '1px solid rgba(239, 68, 68, 0.3)'
+                              }}
+                            >
+                              ⚠️
+                            </div>
+                            <h5 className="text-white mb-0" style={{ fontSize: '1.1rem', fontWeight: '600' }}>
+                              Emotional Triggers
+                            </h5>
+                          </div>
+                          <div className="d-flex flex-wrap gap-2">
+                            {insights.behavioral.data.emotionalTriggers.map((trigger: string, index: number) => (
+                              <span key={index} className="badge" style={{
+                                background: 'rgba(239, 68, 68, 0.15)',
+                                color: 'rgba(239, 68, 68, 0.9)',
+                                border: '1px solid rgba(239, 68, 68, 0.3)',
+                                borderRadius: '8px',
+                                padding: '0.5rem 0.75rem',
+                                fontSize: '0.8rem',
+                                fontWeight: '500'
+                              }}>
+                                {trigger}
+                              </span>
+                            ))}
+                          </div>
+                        </motion.div>
+                      </div>
+
+                      <div className="col-md-6">
+                        <motion.div
+                          whileHover={{ y: -3 }}
+                          transition={{ duration: 0.2 }}
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.05)',
+                            borderRadius: '12px',
+                            border: '1px solid rgba(34, 197, 94, 0.3)',
+                            backdropFilter: 'blur(10px)',
+                            padding: '1.5rem',
+                            height: '100%'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.border = '1px solid rgba(34, 197, 94, 0.6)'
+                            e.currentTarget.style.boxShadow = '0 8px 25px rgba(34, 197, 94, 0.15)'
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.border = '1px solid rgba(34, 197, 94, 0.3)'
+                            e.currentTarget.style.boxShadow = 'none'
+                          }}
+                        >
+                          <div className="d-flex align-items-center mb-3">
+                            <div
+                              className="me-3 d-flex align-items-center justify-content-center"
+                              style={{
+                                width: '40px',
+                                height: '40px',
+                                background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(16, 185, 129, 0.1))',
+                                borderRadius: '10px',
+                                fontSize: '1.2rem',
+                                border: '1px solid rgba(34, 197, 94, 0.3)'
+                              }}
+                            >
+                              ✅
+                            </div>
+                            <h5 className="text-white mb-0" style={{ fontSize: '1.1rem', fontWeight: '600' }}>
+                              Success Factors
+                            </h5>
+                          </div>
+                          <div className="d-flex flex-wrap gap-2">
+                            {insights.behavioral.data.successFactors.map((factor: string, index: number) => (
+                              <span key={index} className="badge" style={{
+                                background: 'rgba(34, 197, 94, 0.15)',
+                                color: 'rgba(34, 197, 94, 0.9)',
+                                border: '1px solid rgba(34, 197, 94, 0.3)',
+                                borderRadius: '8px',
+                                padding: '0.5rem 0.75rem',
+                                fontSize: '0.8rem',
+                                fontWeight: '500'
+                              }}>
+                                {factor}
+                              </span>
+                            ))}
+                          </div>
+                        </motion.div>
                       </div>
                     </div>
                   </div>
@@ -612,34 +900,120 @@ export const AIInsightsTab: React.FC<AIInsightsTabProps> = ({
             className="row justify-content-center"
           >
             <div className="col-12">
-              <div className="mb-3">
-                <h3 className="heading_text text-white mb-1" style={{ fontSize: '1.4rem', fontWeight: '600' }}>
-                  Personalized Recommendations
-                </h3>
-                <p className="text-gray mb-0" style={{ opacity: '0.8', fontSize: '0.9rem' }}>
-                  AI-powered insights tailored to your trading patterns
-                </p>
-              </div>
               <div
                 className="ico_iconbox_block"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                  border: '1px solid rgba(139, 92, 246, 0.3)',
                   borderRadius: '12px',
                   backdropFilter: 'blur(10px)',
-                  padding: '1.25rem'
+                  padding: '1.5rem',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-3px)'
+                  e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.5)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)'
+                  e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.3)'
                 }}
               >
-                <div className="row">
-                  {personalizedRecommendations.slice(0, 4).map((recommendation, index) => (
-                    <div key={index} className="col-lg-6 mb-3">
-                      <SimpleRecommendationCard
-                        recommendation={recommendation}
-                        index={index}
-                        delay={index * 0.1}
-                      />
-                    </div>
+                {/* Header with Icon */}
+                <div className="d-flex align-items-center mb-4">
+                  <div
+                    className="me-3 d-flex align-items-center justify-content-center"
+                    style={{
+                      width: '48px',
+                      height: '48px',
+                      background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(168, 85, 247, 0.2))',
+                      borderRadius: '12px',
+                      border: '1px solid rgba(139, 92, 246, 0.3)'
+                    }}
+                  >
+                    <span style={{ fontSize: '1.5rem' }}>💡</span>
+                  </div>
+                  <div>
+                    <h3 className="heading_text text-white mb-1" style={{ fontSize: '1.3rem', fontWeight: '600' }}>
+                      Personalized Recommendations
+                    </h3>
+                    <p className="text-gray mb-0" style={{ fontSize: '0.85rem', opacity: '0.8' }}>
+                      AI-powered insights tailored to your trading patterns
+                    </p>
+                  </div>
+                </div>
+
+                {/* Recommendations Grid */}
+                <div className="row g-3">
+                  {personalizedRecommendations.slice(0, 6).map((recommendation, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05, duration: 0.3 }}
+                      className="col-lg-6 col-md-12"
+                    >
+                      <div
+                        className="d-flex align-items-start p-3"
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.05)',
+                          borderRadius: '10px',
+                          border: '1px solid rgba(255, 255, 255, 0.1)',
+                          transition: 'all 0.3s ease',
+                          minHeight: '100px'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)'
+                          e.currentTarget.style.transform = 'translateY(-2px)'
+                          e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.3)'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
+                          e.currentTarget.style.transform = 'translateY(0)'
+                          e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'
+                        }}
+                      >
+                        <div
+                          className="me-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                          style={{
+                            width: '36px',
+                            height: '36px',
+                            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(168, 85, 247, 0.15))',
+                            borderRadius: '8px',
+                            border: '1px solid rgba(139, 92, 246, 0.2)'
+                          }}
+                        >
+                          <span style={{ fontSize: '1rem' }}>🎯</span>
+                        </div>
+                        <div className="flex-grow-1">
+                          <div className="d-flex align-items-center mb-2">
+                            <span className="text-gray" style={{ fontSize: '0.75rem', fontWeight: '500', opacity: '0.8' }}>
+                              Recommendation #{index + 1}
+                            </span>
+                          </div>
+                          <p className="text-white mb-0" style={{ 
+                            fontSize: '0.85rem', 
+                            lineHeight: '1.4',
+                            fontWeight: '400'
+                          }}>
+                            {recommendation}
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
                   ))}
+                </div>
+
+                {/* Footer */}
+                <div className="mt-4 pt-3" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                  <div className="d-flex justify-content-between align-items-center">
+                    <span className="text-gray" style={{ fontSize: '0.75rem', opacity: '0.6' }}>
+                      💡 Based on your trading patterns and market analysis
+                    </span>
+                    <span className="text-gray" style={{ fontSize: '0.75rem', opacity: '0.6' }}>
+                      {personalizedRecommendations.length} insights available
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
