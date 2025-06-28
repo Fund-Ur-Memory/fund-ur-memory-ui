@@ -13,6 +13,8 @@ export const useCreateVault = (): UseCreateVaultReturn => {
   const createVault = useCallback(async (formData: VaultFormData, aiAnalysis?: FUMAnalysisResponse['data']): Promise<TransactionResult> => {
     console.log('🚀 Starting vault creation process...')
     console.log('📋 Form data:', formData)
+    console.log('💰 USD Amount:', formData.usdAmount)
+    console.log('🪙 Converted Token Amount:', formData._convertedTokenAmount)
     console.log('🤖 AI analysis:', aiAnalysis)
 
     // Check wallet connection
@@ -128,7 +130,7 @@ export const useCreateVault = (): UseCreateVaultReturn => {
       if (result.success && result.hash) {
         console.log('✅ Transaction successful!')
         console.log('🔗 Transaction hash:', result.hash)
-        
+
         if (aiAnalysis) {
           console.log('📡 Indexing vault with AI analysis...')
           try {
@@ -140,9 +142,9 @@ export const useCreateVault = (): UseCreateVaultReturn => {
               metadata: JSON.stringify(aiAnalysis),
               tx_hash: result.hash
             }
-            
+
             const indexResult = await indexerService.createVault(indexData)
-            
+
             if (indexResult.success) {
               console.log('✅ Vault indexed successfully')
             } else {
@@ -154,7 +156,7 @@ export const useCreateVault = (): UseCreateVaultReturn => {
         } else {
           console.log('ℹ️ No AI analysis provided, skipping indexing')
         }
-        
+
         return result
       } else {
         console.error('❌ Transaction failed')

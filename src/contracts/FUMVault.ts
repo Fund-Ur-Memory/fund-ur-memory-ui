@@ -56,12 +56,14 @@ export const PRICE_FEEDS = {
   ETH_USD: '0x86d67c3D38D2bCeE722E601025C25a575021c6EA',
 } as const
 
-// Condition Type Mapping
+// Condition Type Mapping (updated to match FUMVault.sol)
 export const CONDITION_TYPES = {
   TIME_ONLY: 0,
-  PRICE_ONLY: 1,
-  TIME_OR_PRICE: 2,
-  TIME_AND_PRICE: 3,
+  PRICE_UP_ONLY: 1,
+  PRICE_DOWN_ONLY: 2,
+  PRICE_UP_OR_DOWN: 3,
+  TIME_OR_PRICE: 4,
+  TIME_AND_PRICE: 5,
 } as const
 
 // Vault Status Mapping
@@ -75,9 +77,11 @@ export const VAULT_STATUS = {
 // Reverse mappings for display
 export const CONDITION_TYPE_NAMES = {
   0: 'TIME_ONLY',
-  1: 'PRICE_ONLY',
-  2: 'TIME_OR_PRICE',
-  3: 'TIME_AND_PRICE',
+  1: 'PRICE_UP_ONLY',
+  2: 'PRICE_DOWN_ONLY',
+  3: 'PRICE_UP_OR_DOWN',
+  4: 'TIME_OR_PRICE',
+  5: 'TIME_AND_PRICE',
 } as const
 
 export const VAULT_STATUS_NAMES = {
@@ -93,12 +97,22 @@ export const getTokenConfig = (symbol: string) => {
 }
 
 // Helper function to get condition type number
-export const getConditionType = (condition: string) => {
+export const getConditionType = (condition: string, priceUp?: number, priceDown?: number) => {
   switch (condition) {
     case 'TIME_BASED':
       return CONDITION_TYPES.TIME_ONLY
     case 'PRICE_TARGET':
-      return CONDITION_TYPES.PRICE_ONLY
+      // Determine specific price condition type based on which prices are set
+      if ((priceUp && priceUp > 0) && (priceDown && priceDown > 0)) {
+        return CONDITION_TYPES.PRICE_UP_OR_DOWN
+      } else if (priceUp && priceUp > 0) {
+        return CONDITION_TYPES.PRICE_UP_ONLY
+      } else if (priceDown && priceDown > 0) {
+        return CONDITION_TYPES.PRICE_DOWN_ONLY
+      } else {
+        // Fallback to UP_OR_DOWN for backward compatibility
+        return CONDITION_TYPES.PRICE_UP_OR_DOWN
+      }
     case 'COMBO':
       return CONDITION_TYPES.TIME_OR_PRICE // Default to OR for combo
     default:

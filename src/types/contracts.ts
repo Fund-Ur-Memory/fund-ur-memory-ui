@@ -2,12 +2,14 @@
 import type { Address } from 'viem'
 import type { FUMAnalysisResponse } from '../services/fumAgentService'
 
-// Enums from the contract
+// Enums from the contract (updated to match FUMVault.sol)
 export const ConditionType = {
   TIME_ONLY: 0,
-  PRICE_ONLY: 1,
-  TIME_OR_PRICE: 2,
-  TIME_AND_PRICE: 3,
+  PRICE_UP_ONLY: 1,
+  PRICE_DOWN_ONLY: 2,
+  PRICE_UP_OR_DOWN: 3,
+  TIME_OR_PRICE: 4,
+  TIME_AND_PRICE: 5,
 } as const
 
 export type ConditionType = typeof ConditionType[keyof typeof ConditionType]

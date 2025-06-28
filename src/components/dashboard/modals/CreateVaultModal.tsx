@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, ChevronDown, Sparkles } from 'lucide-react'
+import { X, ChevronDown, Sparkles, RefreshCw, ArrowUp, ArrowDown } from 'lucide-react'
 import type { VaultFormData } from '../../../types/contracts'
+import { useVaultCreationWithConversion } from '../../../hooks/contracts/useCreateVaultWithConversion'
 import '../../../styles/create-vault-modal.css'
 import { COMMITMENT_CONDITIONS, TIME_UNITS, SUPPORTED_TOKENS } from '../../../utils/constants'
 import { getMaxTimeValue, getDefaultTimeValue } from '../../../utils/helpers'
@@ -34,10 +35,21 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
     message: ''
   })
 
+  // USD to AVAX conversion
+  const {
+    avaxAmountFormatted,
+    avaxPrice,
+    isPriceLoading,
+    priceError,
+    refreshPrice,
+    isFormValid: isFormValidWithConversion,
+    validationError
+  } = useVaultCreationWithConversion(formData)
+
   const [showTokenDropdown, setShowTokenDropdown] = useState(false)
   const [showConditionDropdown, setShowConditionDropdown] = useState(false)
   const [showTimeUnitDropdown, setShowTimeUnitDropdown] = useState(false)
-  
+
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [analysisError, setAnalysisError] = useState('')
 
@@ -59,10 +71,7 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
   }, [])
 
   const isFormValid = () => {
-    const usdAmount = parseFloat(formData.usdAmount)
-    const hasValidAmount = usdAmount > 0
-    const hasValidTitle = formData.title.trim().length >= 3
-    const hasValidMessage = formData.message.trim().length >= 10
+    // Use the comprehensive validation from the conversion hook which includes USD to AVAX validation
     const selectedTokenData = SUPPORTED_TOKENS.find(token => token.symbol === formData.token)
     const isTokenAvailable = selectedTokenData?.available !== false
     const selectedConditionData = COMMITMENT_CONDITIONS.find(condition => condition.id === formData.condition)
@@ -72,29 +81,14 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
       return false
     }
 
-    const hasValidTime = (formData.condition === 'TIME_BASED' || formData.condition === 'COMBO')
-      ? (formData.timeValue || 0) > 0
-      : true
-
-    if (formData.condition === 'PRICE_TARGET') {
-      return hasValidAmount && hasValidTitle && hasValidMessage && (formData.priceUp || 0) > 0 && (formData.priceDown || 0) > 0
-    }
-
-    if (formData.condition === 'COMBO') {
-      return hasValidAmount && hasValidTitle && hasValidMessage && (formData.priceUp || 0) > 0 && (formData.priceDown || 0) > 0 && hasValidTime
-    }
-
-    if (formData.condition === 'TIME_BASED') {
-      return hasValidAmount && hasValidTitle && hasValidMessage && hasValidTime
-    }
-
-    return hasValidAmount && hasValidTitle && hasValidMessage
+    // Use the conversion hook's validation which includes amount, title, message, and condition validation
+    return isFormValidWithConversion
   }
 
   const generateCommitmentText = () => {
     const amount = parseFloat(formData.usdAmount)
     const token = formData.token
-    
+
     if (formData.condition === 'TIME_BASED') {
       return `I want to lock ${amount} ${token} for ${formData.timeValue} ${formData.timeUnit}`
     } else if (formData.condition === 'PRICE_TARGET') {
@@ -111,11 +105,23 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
     setIsAnalyzing(true)
     setAnalysisError('')
 
+    // Include USD to AVAX conversion info in the form data
+    const enhancedFormData = {
+      ...formData,
+      avaxAmountFormatted,
+      avaxPrice,
+      _convertedTokenAmount: avaxAmountFormatted?.replace(/,/g, '') // Remove commas for parsing
+    }
+
+    console.log('🔄 Enhanced form data with conversion:', enhancedFormData)
+    console.log('💰 USD Amount:', formData.usdAmount)
+    console.log('🪙 Converted AVAX Amount:', avaxAmountFormatted)
+
     const commitmentText = generateCommitmentText()
     const result = await fumAgentService.analyzeCommitment(commitmentText)
 
     if (result.success && result.data) {
-      onAnalysisComplete(formData, result.data)
+      onAnalysisComplete(enhancedFormData, result.data)
     } else {
       setAnalysisError(result.error || 'Failed to get AI analysis')
     }
@@ -125,7 +131,7 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
 
   const handleSubmit = async () => {
     if (!isFormValid() || isLoading) return
-    
+
     await analyzeCommitment()
   }
 
@@ -167,16 +173,94 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
               <div className="commitment-statement">
                 <span className="statement-text">I want to commit</span>
 
-                {/* USD Amount Input - Inline */}
-                <div className="inline-input-container">
-                  <input
-                    type="number"
-                    value={formData.usdAmount}
-                    onChange={(e) => setFormData(prev => ({ ...prev, usdAmount: e.target.value }))}
-                    placeholder="0"
-                    className="inline-amount-input"
-                    disabled={isAnalyzing}
-                  />
+                {/* Enhanced USD Amount Input with AVAX Conversion */}
+                <div className="amount-input-container">
+                  <div className={`amount-input-wrapper ${
+                    formData.usdAmount && parseFloat(formData.usdAmount) > 0 ? 'has-value' : ''
+                  } ${
+                    validationError && validationError.toLowerCase().includes('amount') ? 'has-error' : ''
+                  }`}>
+                    <div className="currency-symbol">$</div>
+                    <input
+                      type="number"
+                      value={formData.usdAmount}
+                      onChange={(e) => setFormData(prev => ({ ...prev, usdAmount: e.target.value }))}
+                      placeholder="0.00"
+                      className="amount-input-field"
+                      min="0"
+                      step="0.01"
+                      disabled={isAnalyzing}
+                    />
+                    <div className="currency-code">USD</div>
+                  </div>
+
+                  {/* AVAX Conversion Info */}
+                  <div className="conversion-info">
+                    {isPriceLoading ? (
+                      <motion.div
+                        className="conversion-loading"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <div className="loading-dots">
+                          <span></span>
+                          <span></span>
+                          <span></span>
+                        </div>
+                        <span>Getting price...</span>
+                      </motion.div>
+                    ) : priceError ? (
+                      <motion.div
+                        className="conversion-error"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <span className="error-icon">⚠</span>
+                        <span>Price unavailable</span>
+                        <button
+                          type="button"
+                          onClick={refreshPrice}
+                          className="retry-btn"
+                        >
+                          Retry
+                        </button>
+                      </motion.div>
+                    ) : avaxAmountFormatted ? (
+                      <motion.div
+                        className="conversion-success"
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
+                      >
+                        <div className="conversion-amount">
+                          <span className="amount">{avaxAmountFormatted}</span>
+                          <span className="token">AVAX</span>
+                        </div>
+                        <div className="price-info">
+                          <span className="price-label">1 AVAX = ${avaxPrice?.toFixed(2)}</span>
+                          <button
+                            type="button"
+                            onClick={refreshPrice}
+                            className="refresh-btn"
+                            title="Refresh price"
+                          >
+                            <RefreshCw className={`refresh-icon ${isPriceLoading ? 'spinning' : ''}`} />
+                          </button>
+                        </div>
+                      </motion.div>
+                    ) : formData.usdAmount && parseFloat(formData.usdAmount) > 0 ? (
+                      <motion.div
+                        className="conversion-placeholder"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <span>Enter amount to see AVAX conversion</span>
+                      </motion.div>
+                    ) : null}
+                  </div>
                 </div>
 
                 <span className="statement-text">in</span>
@@ -346,48 +430,59 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
                 {(formData.condition === 'PRICE_TARGET' || formData.condition === 'COMBO') && (
                   <>
                     {formData.condition === 'COMBO' && <span className="parameter-separator">or</span>}
-                    <span className="statement-text">at</span>
-                    <div className="inline-parameter-container">
-                      <span className="inline-parameter-unit">$</span>
-                      <input
-                        type="number"
-                        value={formData.priceUp || ''}
-                        onChange={(e) => {
-                          const value = e.target.value
-                          if (value === '' || parseFloat(value) >= 0) {
-                            setFormData(prev => ({ 
-                              ...prev, 
-                              priceUp: value === '' ? undefined : parseFloat(value) 
-                            }))
-                          }
-                        }}
-                        placeholder="0"
-                        className="inline-parameter-input"
-                        disabled={isAnalyzing}
-                      />
+                    <span className="statement-text">when price</span>
+
+                    {/* Price Up Target */}
+                    <div className="price-target-container">
+                      <ArrowUp className="price-arrow up" />
+                      <span className="statement-text">reaches</span>
+                      <div className="inline-parameter-container">
+                        <span className="inline-parameter-unit">$</span>
+                        <input
+                          type="number"
+                          value={formData.priceUp || ''}
+                          onChange={(e) => {
+                            const value = e.target.value
+                            if (value === '' || parseFloat(value) >= 0) {
+                              setFormData(prev => ({
+                                ...prev,
+                                priceUp: value === '' ? undefined : parseFloat(value)
+                              }))
+                            }
+                          }}
+                          placeholder="0"
+                          className="inline-parameter-input price-input"
+                          disabled={isAnalyzing}
+                        />
+                      </div>
                     </div>
-                    
+
                     {formData.condition === 'PRICE_TARGET' && (
                       <>
-                        <span className="statement-text">or down to</span>
-                        <div className="inline-parameter-container">
-                          <span className="inline-parameter-unit">$</span>
-                          <input
-                            type="number"
-                            value={formData.priceDown || ''}
-                            onChange={(e) => {
-                              const value = e.target.value
-                              if (value === '' || parseFloat(value) >= 0) {
-                                setFormData(prev => ({ 
-                                  ...prev, 
-                                  priceDown: value === '' ? undefined : parseFloat(value) 
-                                }))
-                              }
-                            }}
-                            placeholder="0"
-                            className="inline-parameter-input"
-                            disabled={isAnalyzing}
-                          />
+                        <span className="statement-text">or</span>
+                        {/* Price Down Target */}
+                        <div className="price-target-container">
+                          <ArrowDown className="price-arrow down" />
+                          <span className="statement-text">drops to</span>
+                          <div className="inline-parameter-container">
+                            <span className="inline-parameter-unit">$</span>
+                            <input
+                              type="number"
+                              value={formData.priceDown || ''}
+                              onChange={(e) => {
+                                const value = e.target.value
+                                if (value === '' || parseFloat(value) >= 0) {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    priceDown: value === '' ? undefined : parseFloat(value)
+                                  }))
+                                }
+                              }}
+                              placeholder="0"
+                              className="inline-parameter-input price-input"
+                              disabled={isAnalyzing}
+                            />
+                          </div>
                         </div>
                       </>
                     )}
@@ -476,22 +571,7 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
               {!isFormValid() && (
                 <div className="validation-message">
                   <p className="error-text">
-                    {!formData.usdAmount || parseFloat(formData.usdAmount) <= 0
-                      ? 'Enter a valid token amount'
-                      : formData.title.trim().length < 3
-                      ? 'Title must be at least 3 characters'
-                      : formData.message.trim().length < 10
-                      ? 'Message must be at least 10 characters'
-                      : formData.condition === 'PRICE_TARGET' && (formData.priceUp || 0) <= 0
-                      ? 'Enter a valid target price'
-                      : formData.condition === 'PRICE_TARGET' && (formData.priceDown || 0) <= 0
-                      ? 'Enter a valid down target price'
-                      : formData.condition === 'COMBO' && ((formData.priceUp || 0) <= 0 || (formData.timeValue || 0) <= 0)
-                      ? 'Enter valid time and price for combo'
-                      : formData.condition === 'COMBO' && (formData.priceDown || 0) <= 0
-                      ? 'Enter a valid down target price for combo'
-                      : 'Please complete all fields'
-                    }
+                    {validationError || 'Please complete all fields correctly'}
                   </p>
                 </div>
               )}
