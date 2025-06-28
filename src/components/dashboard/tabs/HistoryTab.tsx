@@ -5,11 +5,12 @@ import { Archive, CheckCircle, AlertTriangle, Clock } from 'lucide-react'
 import { VaultCard } from '../cards/VaultCard'
 import { MetricCard } from '../cards/MetricCard'
 import { LoadingSpinner } from '../common/LoadingSpinner'
-import { VaultCardSkeleton } from '../common/SkeletonLoader'
+import { VaultGridSkeleton } from '../common/SkeletonLoader'
 import { useGetVaults } from '../../../hooks/contracts/useGetVaults'
 import { useAccount } from 'wagmi'
 import '../../../styles/header-compact.css'
 import '../../../styles/vault-cards.css'
+import '../../../styles/enhanced-loading.css'
 
 interface HistoryTabProps {
   isPrivacyMode: boolean
@@ -163,28 +164,16 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
                   animate={{ opacity: 1 }}
                   className="row g-2"
                 >
-                  {/* Loading header */}
                   <div className="col-12 text-center mb-4">
                     <LoadingSpinner
                       variant="blockchain"
                       size="lg"
                       text="Loading your vault history..."
+                      subText="Scanning completed and withdrawn vaults..."
                       color="blue"
                     />
                   </div>
-
-                  {/* Skeleton vault cards for history */}
-                  {Array.from({ length: 3 }, (_, index) => (
-                    <motion.div
-                      key={index}
-                      className="col-lg-6 col-md-6"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.15 }}
-                    >
-                      <VaultCardSkeleton />
-                    </motion.div>
-                  ))}
+                  <VaultGridSkeleton count={3} />
                 </motion.div>
               ) : historyVaults.length > 0 ? (
                 /* User Has History Vaults */

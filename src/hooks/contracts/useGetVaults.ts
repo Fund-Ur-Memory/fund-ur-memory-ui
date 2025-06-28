@@ -93,12 +93,15 @@ export const useGetVaults = (owner?: Address): UseGetVaultsReturn => {
               amount: vaultData.amount as bigint,
               unlockTime: vaultData.unlockTime as bigint,
               targetPrice: vaultData.targetPrice as bigint,
+              priceUp: (vaultData.priceUp as bigint) || 0n,
+              priceDown: (vaultData.priceDown as bigint) || 0n,
               conditionType: vaultData.conditionType as ConditionType,
               status: vaultData.status as VaultStatus,
               createdAt: vaultData.createdAt as bigint,
               emergencyInitiated: vaultData.emergencyInitiated as bigint,
               title: (vaultData.title as string) || '',
               message: (vaultData.message as string) || '',
+              autoWithdraw: (vaultData.autoWithdraw as boolean) || false,
             }
 
             const formattedVault = formatVaultData(rawVault, currentVaultId)
@@ -177,12 +180,15 @@ export const useGetVault = (vaultId: number) => {
           amount: vaultData.amount as bigint,
           unlockTime: vaultData.unlockTime as bigint,
           targetPrice: vaultData.targetPrice as bigint,
+          priceUp: (vaultData.priceUp as bigint) || 0n,
+          priceDown: (vaultData.priceDown as bigint) || 0n,
           conditionType: vaultData.conditionType as ConditionType,
           status: vaultData.status as VaultStatus,
           createdAt: vaultData.createdAt as bigint,
           emergencyInitiated: vaultData.emergencyInitiated as bigint,
           title: vaultData.title as string,
           message: vaultData.message as string,
+          autoWithdraw: (vaultData.autoWithdraw as boolean) || false,
         }
 
         const formattedVault = formatVaultData(formattedRawVault, vaultId)

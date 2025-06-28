@@ -71,7 +71,8 @@ export const useFUMVault = (): UseFUMVaultReturn => {
     amount: bigint,
     unlockTime: bigint,
     title: string,
-    message: string
+    message: string,
+    autoWithdraw: boolean = true
   ): Promise<TransactionResult> => {
     console.log('📞 Calling createTimeVault contract function...')
     console.log('📊 Parameters:', {
@@ -80,7 +81,8 @@ export const useFUMVault = (): UseFUMVaultReturn => {
       unlockTime: unlockTime.toString(),
       unlockDate: new Date(Number(unlockTime) * 1000).toLocaleString(),
       title,
-      message
+      message,
+      autoWithdraw
     })
 
     const isNativeToken = token === '0x0000000000000000000000000000000000000000'
@@ -90,7 +92,7 @@ export const useFUMVault = (): UseFUMVaultReturn => {
 
     return executeContractWrite(
       'createTimeVault',
-      [token, amount, unlockTime, title, message],
+      [token, amount, unlockTime, title, message, autoWithdraw],
       value
     )
   }, [executeContractWrite])
@@ -98,18 +100,23 @@ export const useFUMVault = (): UseFUMVaultReturn => {
   const createPriceVault = useCallback(async (
     token: Address,
     amount: bigint,
-    targetPrice: bigint,
+    priceUp: bigint,
+    priceDown: bigint,
     title: string,
-    message: string
+    message: string,
+    autoWithdraw: boolean = true
   ): Promise<TransactionResult> => {
     console.log('📞 Calling createPriceVault contract function...')
     console.log('📊 Parameters:', {
       token,
       amount: amount.toString(),
-      targetPrice: targetPrice.toString(),
-      targetPriceUSD: Number(targetPrice) / 1e8,
+      priceUp: priceUp.toString(),
+      priceDown: priceDown.toString(),
+      priceUpUSD: Number(priceUp) / 1e8,
+      priceDownUSD: Number(priceDown) / 1e8,
       title,
-      message
+      message,
+      autoWithdraw
     })
 
     const isNativeToken = token === '0x0000000000000000000000000000000000000000'
@@ -119,7 +126,7 @@ export const useFUMVault = (): UseFUMVaultReturn => {
 
     return executeContractWrite(
       'createPriceVault',
-      [token, amount, targetPrice, title, message],
+      [token, amount, priceUp, priceDown, title, message, autoWithdraw],
       value
     )
   }, [executeContractWrite])
@@ -128,20 +135,26 @@ export const useFUMVault = (): UseFUMVaultReturn => {
     token: Address,
     amount: bigint,
     unlockTime: bigint,
-    targetPrice: bigint,
+    priceUp: bigint,
+    priceDown: bigint,
     title: string,
-    message: string
+    message: string,
+    autoWithdraw: boolean = true
   ): Promise<TransactionResult> => {
-    console.log('📞 Calling createTimeOrPriceVault contract function (COMBO)...')
+    console.log('📞 Calling createTimeAndPriceVault contract function (TIME OR PRICE)...')
     console.log('📊 Parameters:', {
       token,
       amount: amount.toString(),
       unlockTime: unlockTime.toString(),
       unlockDate: new Date(Number(unlockTime) * 1000).toLocaleString(),
-      targetPrice: targetPrice.toString(),
-      targetPriceUSD: Number(targetPrice) / 1e8,
+      priceUp: priceUp.toString(),
+      priceDown: priceDown.toString(),
+      priceUpUSD: Number(priceUp) / 1e8,
+      priceDownUSD: Number(priceDown) / 1e8,
       title,
-      message
+      message,
+      requireBoth: false,
+      autoWithdraw
     })
     console.log('💡 This vault will unlock when EITHER time OR price condition is met')
 
@@ -151,8 +164,8 @@ export const useFUMVault = (): UseFUMVaultReturn => {
     console.log('💰 Transaction value:', value?.toString() || '0', '(native token:', isNativeToken, ')')
 
     return executeContractWrite(
-      'createTimeOrPriceVault',
-      [token, amount, unlockTime, targetPrice, title, message],
+      'createTimeAndPriceVault',
+      [token, amount, unlockTime, priceUp, priceDown, false, title, message, autoWithdraw],
       value
     )
   }, [executeContractWrite])
@@ -161,16 +174,37 @@ export const useFUMVault = (): UseFUMVaultReturn => {
     token: Address,
     amount: bigint,
     unlockTime: bigint,
-    targetPrice: bigint,
+    priceUp: bigint,
+    priceDown: bigint,
     title: string,
-    message: string
+    message: string,
+    autoWithdraw: boolean = true
   ): Promise<TransactionResult> => {
+    console.log('📞 Calling createTimeAndPriceVault contract function (TIME AND PRICE)...')
+    console.log('📊 Parameters:', {
+      token,
+      amount: amount.toString(),
+      unlockTime: unlockTime.toString(),
+      unlockDate: new Date(Number(unlockTime) * 1000).toLocaleString(),
+      priceUp: priceUp.toString(),
+      priceDown: priceDown.toString(),
+      priceUpUSD: Number(priceUp) / 1e8,
+      priceDownUSD: Number(priceDown) / 1e8,
+      title,
+      message,
+      requireBoth: true,
+      autoWithdraw
+    })
+    console.log('💡 This vault will unlock when BOTH time AND price conditions are met')
+
     const isNativeToken = token === '0x0000000000000000000000000000000000000000'
     const value = isNativeToken ? amount : undefined
 
+    console.log('💰 Transaction value:', value?.toString() || '0', '(native token:', isNativeToken, ')')
+
     return executeContractWrite(
       'createTimeAndPriceVault',
-      [token, amount, unlockTime, targetPrice, title, message],
+      [token, amount, unlockTime, priceUp, priceDown, true, title, message, autoWithdraw],
       value
     )
   }, [executeContractWrite])

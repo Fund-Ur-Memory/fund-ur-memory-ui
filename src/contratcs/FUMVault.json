@@ -12,6 +12,11 @@
   },
   {
     "inputs": [],
+    "name": "AutoWithdrawFailed",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "ConditionsNotMet",
     "type": "error"
   },
@@ -308,6 +313,50 @@
         "type": "uint256"
       },
       {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "autoWithdraw",
+        "type": "bool"
+      }
+    ],
+    "name": "VaultAutoWithdrawUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "vaultId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "VaultAutoWithdrawn",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "vaultId",
+        "type": "uint256"
+      },
+      {
         "indexed": true,
         "internalType": "address",
         "name": "owner",
@@ -341,6 +390,18 @@
         "indexed": false,
         "internalType": "uint256",
         "name": "targetPrice",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "priceUp",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "priceDown",
         "type": "uint256"
       },
       {
@@ -471,6 +532,29 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "_token",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "_safeAutoWithdraw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "_amount",
         "type": "uint256"
@@ -577,7 +661,12 @@
       },
       {
         "internalType": "uint256",
-        "name": "_targetPrice",
+        "name": "_priceUp",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_priceDown",
         "type": "uint256"
       },
       {
@@ -589,6 +678,11 @@
         "internalType": "string",
         "name": "_message",
         "type": "string"
+      },
+      {
+        "internalType": "bool",
+        "name": "_autoWithdraw",
+        "type": "bool"
       }
     ],
     "name": "createPriceVault",
@@ -621,8 +715,18 @@
       },
       {
         "internalType": "uint256",
-        "name": "_targetPrice",
+        "name": "_priceUp",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_priceDown",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "_requireBoth",
+        "type": "bool"
       },
       {
         "internalType": "string",
@@ -633,6 +737,11 @@
         "internalType": "string",
         "name": "_message",
         "type": "string"
+      },
+      {
+        "internalType": "bool",
+        "name": "_autoWithdraw",
+        "type": "bool"
       }
     ],
     "name": "createTimeAndPriceVault",
@@ -664,11 +773,6 @@
         "type": "uint256"
       },
       {
-        "internalType": "uint256",
-        "name": "_targetPrice",
-        "type": "uint256"
-      },
-      {
         "internalType": "string",
         "name": "_title",
         "type": "string"
@@ -677,45 +781,11 @@
         "internalType": "string",
         "name": "_message",
         "type": "string"
-      }
-    ],
-    "name": "createTimeOrPriceVault",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "vaultId",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
       },
       {
-        "internalType": "uint256",
-        "name": "_amount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_unlockTime",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "_title",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "_message",
-        "type": "string"
+        "internalType": "bool",
+        "name": "_autoWithdraw",
+        "type": "bool"
       }
     ],
     "name": "createTimeVault",
@@ -769,6 +839,25 @@
     "name": "executeEmergencyWithdrawal",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "_vaultIds",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "getAutoWithdrawSettings",
+    "outputs": [
+      {
+        "internalType": "bool[]",
+        "name": "autoWithdrawSettings",
+        "type": "bool[]"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -959,6 +1048,16 @@
             "type": "uint256"
           },
           {
+            "internalType": "uint256",
+            "name": "priceUp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "priceDown",
+            "type": "uint256"
+          },
+          {
             "internalType": "enum FUMVault.ConditionType",
             "name": "conditionType",
             "type": "uint8"
@@ -987,11 +1086,35 @@
             "internalType": "string",
             "name": "message",
             "type": "string"
+          },
+          {
+            "internalType": "bool",
+            "name": "autoWithdraw",
+            "type": "bool"
           }
         ],
         "internalType": "struct FUMVault.Vault",
         "name": "vault",
         "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_vaultId",
+        "type": "uint256"
+      }
+    ],
+    "name": "isAutoWithdrawEnabled",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "autoWithdraw",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -1179,6 +1302,24 @@
     "inputs": [
       {
         "internalType": "uint256",
+        "name": "_vaultId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "_autoWithdraw",
+        "type": "bool"
+      }
+    ],
+    "name": "setAutoWithdraw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
         "name": "_interval",
         "type": "uint256"
       }
@@ -1304,6 +1445,16 @@
         "type": "uint256"
       },
       {
+        "internalType": "uint256",
+        "name": "priceUp",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "priceDown",
+        "type": "uint256"
+      },
+      {
         "internalType": "enum FUMVault.ConditionType",
         "name": "conditionType",
         "type": "uint8"
@@ -1332,6 +1483,11 @@
         "internalType": "string",
         "name": "message",
         "type": "string"
+      },
+      {
+        "internalType": "bool",
+        "name": "autoWithdraw",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
