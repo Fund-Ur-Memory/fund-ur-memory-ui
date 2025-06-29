@@ -30,8 +30,7 @@ export const VaultCard: React.FC<VaultCardProps> = ({
 }) => {
   const [isWithdrawing, setIsWithdrawing] = useState(false)
   const [isEmergencyWithdrawing, setIsEmergencyWithdrawing] = useState(false)
-  const [operationStatus, setOperationStatus] = useState<'pending' | 'confirming' | 'success' | 'error'>('pending')
-  const { withdrawVault, emergencyWithdraw, isLoading, txHash: hookTxHash } = useWithdrawVault()
+  const { withdrawVault, emergencyWithdraw, isLoading, operationStatus, txHash: hookTxHash } = useWithdrawVault()
 
   // Get real-time token price
   const tokenSymbol = vault.token?.symbol || 'UNKNOWN'
@@ -64,21 +63,19 @@ export const VaultCard: React.FC<VaultCardProps> = ({
     if (!vault.canWithdraw) return
 
     setIsWithdrawing(true)
-    setOperationStatus('pending')
     try {
-      await withdrawVault(vault.id)
-      setOperationStatus('confirming')
+      const amountFormatted = vault.amount ? parseFloat(vault.amount.formatted).toFixed(4) : '0'
+      const tokenSymbol = vault.token?.symbol || 'UNKNOWN'
 
-      // Simulate confirmation delay
-      setTimeout(() => {
-        setOperationStatus('success')
-        onWithdraw?.(vault.id)
-        setTimeout(() => setIsWithdrawing(false), 2000)
-      }, 3000)
+      await withdrawVault(vault.id, amountFormatted, tokenSymbol)
+      onWithdraw?.(vault.id)
     } catch (err) {
       console.error('Withdraw failed:', err)
-      setOperationStatus('error')
-      setTimeout(() => setIsWithdrawing(false), 3000)
+    } finally {
+      // Keep the withdrawing state until operation completes
+      if (operationStatus === 'success' || operationStatus === 'error') {
+        setTimeout(() => setIsWithdrawing(false), 2000)
+      }
     }
   }
 
@@ -86,21 +83,19 @@ export const VaultCard: React.FC<VaultCardProps> = ({
     if (!vault.canEmergencyWithdraw) return
 
     setIsEmergencyWithdrawing(true)
-    setOperationStatus('pending')
     try {
-      await emergencyWithdraw(vault.id)
-      setOperationStatus('confirming')
+      const amountFormatted = vault.amount ? parseFloat(vault.amount.formatted).toFixed(4) : '0'
+      const tokenSymbol = vault.token?.symbol || 'UNKNOWN'
 
-      // Simulate confirmation delay
-      setTimeout(() => {
-        setOperationStatus('success')
-        onEmergencyWithdraw?.(vault.id)
-        setTimeout(() => setIsEmergencyWithdrawing(false), 2000)
-      }, 3000)
+      await emergencyWithdraw(vault.id, amountFormatted, tokenSymbol)
+      onEmergencyWithdraw?.(vault.id)
     } catch (err) {
       console.error('Emergency withdraw failed:', err)
-      setOperationStatus('error')
-      setTimeout(() => setIsEmergencyWithdrawing(false), 3000)
+    } finally {
+      // Keep the withdrawing state until operation completes
+      if (operationStatus === 'success' || operationStatus === 'error') {
+        setTimeout(() => setIsEmergencyWithdrawing(false), 2000)
+      }
     }
   }
 
@@ -703,7 +698,7 @@ export const VaultCard: React.FC<VaultCardProps> = ({
         vaultId={vault.id}
         amount={amountFormatted}
         tokenSymbol={tokenSymbol}
-        status={operationStatus}
+        status={operationStatus === 'idle' ? 'pending' : operationStatus}
         txHash={hookTxHash || undefined}
         onClose={() => {
           setIsWithdrawing(false)
