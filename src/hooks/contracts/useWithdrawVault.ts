@@ -25,11 +25,7 @@ export const useWithdrawVault = (): UseWithdrawVaultReturn => {
 
   const { writeContract, data: hash, isPending } = useWriteContract()
 
-<<<<<<< Updated upstream
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
-=======
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
->>>>>>> Stashed changes
     hash: hash as Address,
   })
 
@@ -41,25 +37,20 @@ export const useWithdrawVault = (): UseWithdrawVaultReturn => {
     }
   }, [hash])
 
-<<<<<<< Updated upstream
-  // Handle successful transaction confirmation
+  // Handle transaction confirmation
   useEffect(() => {
-    if (isSuccess && hash) {
+    if (isConfirmed && hash) {
+      setOperationStatus('success')
       console.log('✅ Withdraw transaction confirmed, refreshing dashboard...')
+
+      // Emit events for dashboard refresh
       appEvents.emit(APP_EVENTS.VAULT_WITHDRAWN, {
         hash,
         timestamp: Date.now()
       })
       appEvents.emit(APP_EVENTS.DASHBOARD_REFRESH)
-    }
-  }, [isSuccess, hash])
 
-  const withdrawVault = async (vaultId: number) => {
-=======
-  // Handle transaction confirmation
-  useEffect(() => {
-    if (isConfirmed && hash) {
-      setOperationStatus('success')
+      // Show success toast
       if (currentToastId) {
         enhancedToast.success(
           'Withdrawal Successful!',
@@ -81,7 +72,6 @@ export const useWithdrawVault = (): UseWithdrawVaultReturn => {
   }, [isConfirmed, hash, currentToastId])
 
   const withdrawVault = async (vaultId: number, amount?: string, tokenSymbol?: string) => {
->>>>>>> Stashed changes
     try {
       setIsLoading(true)
       setError(null)

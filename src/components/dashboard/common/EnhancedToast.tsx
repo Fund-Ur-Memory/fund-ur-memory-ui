@@ -1,16 +1,13 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { 
-  CheckCircle, 
-  AlertTriangle, 
-  Info, 
-  X, 
+import {
+  CheckCircle,
+  AlertTriangle,
+  Info,
+  X,
   ExternalLink,
   Copy,
-  Loader2,
-  Clock,
-  DollarSign,
-  Zap
+  Loader2
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -35,7 +32,6 @@ export const EnhancedToast: React.FC<EnhancedToastProps> = ({
   title,
   message,
   txHash,
-  duration = 5000,
   showProgress = false,
   progress = 0,
   onClose,
@@ -134,7 +130,7 @@ export const EnhancedToast: React.FC<EnhancedToastProps> = ({
             <h3 className="text-white font-semibold text-sm">{title}</h3>
           </div>
         </div>
-        
+
         {onClose && (
           <button
             onClick={onClose}

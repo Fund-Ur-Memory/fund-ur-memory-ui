@@ -208,15 +208,7 @@ export const AutoWithdrawNotification: React.FC<AutoWithdrawNotificationProps> =
     }
   }
 
-  const getStepText = () => {
-    const steps = [
-      'Checking conditions',
-      'Unlocking vault',
-      'Confirming transaction',
-      'Processing withdrawal'
-    ]
-    return steps[currentStep - 1] || 'Processing'
-  }
+
 
   const getEstimatedTimeRemaining = () => {
     const elapsed = timeElapsed
