@@ -42,7 +42,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
       case 'count':
         return isPrivate ? '••••' : value.toString()
       case 'percentage':
-        return isPrivate ? '••••' : `${value}%`
+        return isPrivate ? '••••' : `${typeof value === 'number' ? value.toFixed(2) : value}%`
       case 'custom':
         return isPrivate ? '••••' : value.toString()
       default:

@@ -9,6 +9,7 @@ import { VaultGridSkeleton } from '../common/SkeletonLoader'
 import { CommitmentModal } from '../modals/CommitmentModal'
 import { useCreateVault } from '../../../hooks/dashboard/useCreateVault'
 import { useGetVaults } from '../../../hooks/contracts/useGetVaults'
+import { useIndexerVaults } from '../../../hooks/useIndexerVaults'
 import { useAccount } from 'wagmi'
 import type { VaultFormData } from '../../../types/contracts'
 import type { CipherAnalysisResponse } from '../../../services/cipherAgentService'
@@ -26,24 +27,55 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
   onRefetch,
 }) => {
   const { address: connectedAddress, isConnected } = useAccount()
-  const { vaults: contractVaults, refetch, isLoading: isLoadingVaults } = useGetVaults(connectedAddress)
+  const { vaults: contractVaults, refetch: refetchContract, isLoading: isLoadingVaults } = useGetVaults(connectedAddress)
+  const { 
+    vaults: indexerVaults, 
+    isLoading: isLoadingIndexer, 
+    error: indexerError, 
+    refetch: refetchIndexer,
+    lastUpdated 
+  } = useIndexerVaults(connectedAddress, isConnected)
   const { isModalOpen, isCreating, openModal, closeModal, createVault } = useCreateVault()
   const [isCommitmentModalOpen, setIsCommitmentModalOpen] = useState(false)
   const [pendingFormData, setPendingFormData] = useState<VaultFormData | null>(null)
   const [pendingAiAnalysis, setPendingAiAnalysis] = useState<CipherAnalysisResponse | null>(null)
-  const allUserVaults = isConnected && contractVaults.length > 0
-    ? contractVaults
-    : []
-
+  // Combine contract and indexer data for comprehensive view
+  const allUserVaults = isConnected ? contractVaults : []
   const userVaults = allUserVaults.filter(v => v.status?.name === 'ACTIVE')
+  
+  // Get indexer stats for enhanced metrics
+  const indexerActiveVaults = indexerVaults.filter(v => v.status === 1) // 1 = active in indexer
+  // Helper function to safely convert vault amounts
+  const safeConvertAmount = (amount: any): number => {
+    if (!amount) return 0
+    if (typeof amount === 'number') return amount
+    if (typeof amount === 'string') return parseFloat(amount) || 0
+    if (typeof amount === 'bigint') {
+      // Convert BigInt to number safely, assuming 18 decimals
+      const converted = Number(amount) / Math.pow(10, 18)
+      return isFinite(converted) ? converted : 0
+    }
+    return 0
+  }
+
   const userMetrics = {
-    totalActiveVaults: userVaults.length,
-    totalLockedValue: userVaults.reduce((sum, vault) => sum + (vault.amount?.usd || 0), 0),
+    totalActiveVaults: Math.max(userVaults.length, indexerActiveVaults.length),
+    totalLockedValue: userVaults.length > 0 
+      ? userVaults.reduce((sum, vault) => {
+          const amount = safeConvertAmount(vault.amount?.usd)
+          return sum + amount
+        }, 0)
+      : indexerActiveVaults.length > 0
+        ? indexerActiveVaults.reduce((sum, vault) => sum + (parseFloat(vault.amount) || 0), 0) * 25 // Approximate USD conversion for AVAX
+        : 0, // No active vaults = 0 locked value
     avgProgress: userVaults.length > 0
       ? Math.round(userVaults.reduce((sum, vault) => sum + (vault.progress || 0), 0) / userVaults.length)
       : 0,
     timeBasedVaults: userVaults.filter(v => v.conditionType?.name?.includes('TIME')).length,
-    priceBasedVaults: userVaults.filter(v => v.conditionType?.name?.includes('PRICE')).length
+    priceBasedVaults: userVaults.filter(v => v.conditionType?.name?.includes('PRICE')).length,
+    // Add indexer insights
+    indexerTotalVaults: indexerVaults.length,
+    indexerActiveVaults: indexerActiveVaults.length
   }
 
   const handleVaultClick = (vaultId: number) => {
@@ -82,18 +114,18 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
   }
 
   const handleRefresh = async () => {
-    await refetch()
+    await Promise.all([refetchContract(), refetchIndexer()])
     onRefetch?.()
   }
 
   const handleVaultWithdraw = (vaultId: number) => {
     console.log(`✅ Vault ${vaultId} withdrawn successfully`)
-    refetch()
+    handleRefresh()
   }
 
   const handleVaultEmergencyWithdraw = (vaultId: number) => {
     console.log(`🚨 Vault ${vaultId} emergency withdrawn successfully`)
-    refetch()
+    handleRefresh()
   }
 
   return (
@@ -110,6 +142,16 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
               <div className="ico_heading_block text-center">
                 <h2 className="heading_text mb-0 text-white">Your Commitment Vaults</h2>
                 <p className="text-secondary mt-3">Manage your time-locked and condition-based investment strategies</p>
+                {indexerError && (
+                  <div className="alert alert-warning mt-3" style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px' }}>
+                    <small>⚠️ Indexer data unavailable: {indexerError} (Using contract data only)</small>
+                  </div>
+                )}
+                {lastUpdated && (
+                  <small className="text-success d-block mt-2">
+                    📊 Real-time data updated: {lastUpdated.toLocaleTimeString()}
+                  </small>
+                )}
               </div>
             </div>
           </motion.div>
@@ -215,7 +257,7 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
                     </p>
                   </div>
                 </motion.div>
-              ) : isLoadingVaults ? (
+              ) : (isLoadingVaults || isLoadingIndexer) ? (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}

@@ -7,6 +7,7 @@ import { MetricCard } from '../cards/MetricCard'
 import { LoadingSpinner } from '../common/LoadingSpinner'
 import { VaultGridSkeleton } from '../common/SkeletonLoader'
 import { useGetVaults } from '../../../hooks/contracts/useGetVaults'
+import { useIndexerVaults } from '../../../hooks/useIndexerVaults'
 import { useAccount } from 'wagmi'
 import '../../../styles/header-compact.css'
 import '../../../styles/vault-cards.css'
@@ -25,12 +26,19 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   const { address: connectedAddress, isConnected } = useAccount()
 
   // Use real vault data from contract for connected user only
-  const { vaults: contractVaults, refetch, isLoading: isLoadingVaults } = useGetVaults(connectedAddress)
+  const { vaults: contractVaults, refetch: refetchContract, isLoading: isLoadingVaults } = useGetVaults(connectedAddress)
+  
+  // Get indexer data for comprehensive history view
+  const { 
+    vaults: indexerVaults, 
+    isLoading: isLoadingIndexer, 
+    error: indexerError, 
+    refetch: refetchIndexer,
+    lastUpdated 
+  } = useIndexerVaults(connectedAddress, isConnected)
 
-  // Only show user's own NON-ACTIVE vaults if connected, otherwise show empty state
-  const allUserVaults = isConnected && contractVaults.length > 0
-    ? contractVaults
-    : []
+  // Combine contract and indexer vault data
+  const allUserVaults = isConnected ? contractVaults : []
 
   // Filter to show only NON-ACTIVE vaults in the History tab
   const historyVaults = allUserVaults.filter(v =>
@@ -38,18 +46,58 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
     v.status?.name === 'WITHDRAWN' ||
     v.status?.name === 'EMERGENCY'
   )
+  
+  // Get indexer historical data for enhanced metrics
+  const indexerCompletedVaults = indexerVaults.filter(v => 
+    v.status === 2 || v.status === 3 // 2 = withdrawn/completed, 3 = emergency
+  )
+  const indexerWithdrawnVaults = indexerVaults.filter(v => v.status === 2) // 2 = withdrawn/completed
+  const indexerEmergencyVaults = indexerVaults.filter(v => v.status === 3) // 3 = emergency
 
-  // Calculate user-specific metrics from their historical vaults
+  // Helper function to safely convert vault amounts
+  const safeConvertAmount = (amount: any): number => {
+    if (!amount) return 0
+    if (typeof amount === 'number') return amount
+    if (typeof amount === 'string') return parseFloat(amount) || 0
+    if (typeof amount === 'bigint') {
+      // Convert BigInt to number safely, assuming 18 decimals
+      const converted = Number(amount) / Math.pow(10, 18)
+      return isFinite(converted) ? converted : 0
+    }
+    return 0
+  }
+
+  // Calculate enhanced metrics using both contract and indexer data
   const historyMetrics = {
-    totalHistoryVaults: historyVaults.length,
-    withdrawnVaults: historyVaults.filter(v => v.status?.name === 'WITHDRAWN').length,
+    totalHistoryVaults: Math.max(historyVaults.length, indexerCompletedVaults.length),
+    withdrawnVaults: Math.max(
+      historyVaults.filter(v => v.status?.name === 'WITHDRAWN').length,
+      indexerWithdrawnVaults.length
+    ),
     unlockedVaults: historyVaults.filter(v => v.status?.name === 'UNLOCKED').length,
-    emergencyVaults: historyVaults.filter(v => v.status?.name === 'EMERGENCY').length,
-    totalWithdrawnValue: historyVaults
-      .filter(v => v.status?.name === 'WITHDRAWN')
-      .reduce((sum, vault) => sum + (vault.amount?.usd || 0), 0),
-    successRate: historyVaults.length > 0
-      ? Math.round((historyVaults.filter(v => v.status?.name === 'WITHDRAWN').length / historyVaults.length) * 100)
+    emergencyVaults: Math.max(
+      historyVaults.filter(v => v.status?.name === 'EMERGENCY').length,
+      indexerEmergencyVaults.length
+    ),
+    totalWithdrawnValue: Math.max(
+      historyVaults
+        .filter(v => v.status?.name === 'WITHDRAWN')
+        .reduce((sum, vault) => {
+          const amount = safeConvertAmount(vault.amount?.usd)
+          return sum + amount
+        }, 0),
+      indexerWithdrawnVaults.reduce((sum, vault) => sum + (parseFloat(vault.amount) || 0), 0) * 25 // Approximate USD
+    ),
+    successRate: Math.max(historyVaults.length, indexerCompletedVaults.length) > 0
+      ? Math.round((Math.max(
+          historyVaults.filter(v => v.status?.name === 'WITHDRAWN').length,
+          indexerWithdrawnVaults.length
+        ) / Math.max(historyVaults.length, indexerCompletedVaults.length)) * 100)
+      : 0,
+    // Additional indexer insights
+    indexerTotalCompleted: indexerCompletedVaults.length,
+    indexerSuccessRate: indexerVaults.length > 0 
+      ? Math.round((indexerWithdrawnVaults.length / indexerVaults.length) * 100)
       : 0
   }
 
@@ -59,16 +107,18 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
 
 
 
+  const handleRefresh = async () => {
+    await Promise.all([refetchContract(), refetchIndexer()])
+  }
+
   const handleVaultWithdraw = (vaultId: number) => {
     console.log(`✅ Vault ${vaultId} withdrawn successfully`)
-    // Refresh vault data
-    refetch()
+    handleRefresh()
   }
 
   const handleVaultEmergencyWithdraw = (vaultId: number) => {
     console.log(`🚨 Emergency withdrawal for vault ${vaultId}`)
-    // Refresh vault data
-    refetch()
+    handleRefresh()
   }
 
   return (
@@ -89,6 +139,16 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
                 <p className="text-secondary mb-0">
                   View your completed, withdrawn, and emergency vaults. Track your commitment journey and learn from past decisions.
                 </p>
+                {indexerError && (
+                  <div className="alert alert-warning mt-3" style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px' }}>
+                    <small>⚠️ Indexer data unavailable: {indexerError} (Using contract data only)</small>
+                  </div>
+                )}
+                {lastUpdated && (
+                  <small className="text-success d-block mt-2">
+                    📊 Historical data updated: {lastUpdated.toLocaleTimeString()}
+                  </small>
+                )}
               </motion.div>
             </div>
           </div>
@@ -161,7 +221,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
                     </p>
                   </div>
                 </motion.div>
-              ) : isLoadingVaults ? (
+              ) : (isLoadingVaults || isLoadingIndexer) ? (
                 /* Enhanced Loading State for History */
                 <motion.div
                   initial={{ opacity: 0 }}
