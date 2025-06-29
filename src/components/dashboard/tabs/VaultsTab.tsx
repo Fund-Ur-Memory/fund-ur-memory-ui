@@ -11,7 +11,7 @@ import { useCreateVault } from '../../../hooks/dashboard/useCreateVault'
 import { useGetVaults } from '../../../hooks/contracts/useGetVaults'
 import { useAccount } from 'wagmi'
 import type { VaultFormData } from '../../../types/contracts'
-import type { FUMAnalysisResponse } from '../../../services/fumAgentService'
+import type { CipherAnalysisResponse } from '../../../services/cipherAgentService'
 import '../../../styles/header-compact.css'
 import '../../../styles/vault-cards.css'
 import '../../../styles/enhanced-loading.css'
@@ -30,7 +30,7 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
   const { isModalOpen, isCreating, openModal, closeModal, createVault } = useCreateVault()
   const [isCommitmentModalOpen, setIsCommitmentModalOpen] = useState(false)
   const [pendingFormData, setPendingFormData] = useState<VaultFormData | null>(null)
-  const [pendingAiAnalysis, setPendingAiAnalysis] = useState<FUMAnalysisResponse | null>(null)
+  const [pendingAiAnalysis, setPendingAiAnalysis] = useState<CipherAnalysisResponse | null>(null)
   const allUserVaults = isConnected && contractVaults.length > 0
     ? contractVaults
     : []
@@ -54,7 +54,7 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
     openModal()
   }
 
-  const handleAnalysisComplete = (formData: VaultFormData, aiAnalysis: FUMAnalysisResponse) => {
+  const handleAnalysisComplete = (formData: VaultFormData, aiAnalysis: CipherAnalysisResponse) => {
     setPendingFormData(formData)
     setPendingAiAnalysis(aiAnalysis)
     setIsCommitmentModalOpen(true)

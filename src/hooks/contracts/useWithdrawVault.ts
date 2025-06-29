@@ -1,7 +1,7 @@
 // src/hooks/contracts/useWithdrawVault.ts
 import { useState, useEffect } from 'react'
 import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
-import { FUM_VAULT_CONFIG } from '../../contracts/FUMVault'
+import { CIPHER_VAULT_CONFIG } from '../../contracts/CipherVault'
 import { enhancedToast } from '../../components/dashboard/common/EnhancedToast'
 import type { Address } from 'viem'
 import { appEvents, APP_EVENTS } from '../../utils/events'
@@ -92,8 +92,8 @@ export const useWithdrawVault = (): UseWithdrawVaultReturn => {
       setCurrentToastId(toastId)
 
       writeContract({
-        address: FUM_VAULT_CONFIG.address,
-        abi: FUM_VAULT_CONFIG.abi,
+        address: CIPHER_VAULT_CONFIG.address,
+        abi: CIPHER_VAULT_CONFIG.abi,
         functionName: 'withdrawVault',
         args: [BigInt(vaultId)],
       })
@@ -152,8 +152,8 @@ export const useWithdrawVault = (): UseWithdrawVaultReturn => {
       setCurrentToastId(toastId)
 
       writeContract({
-        address: FUM_VAULT_CONFIG.address,
-        abi: FUM_VAULT_CONFIG.abi,
+        address: CIPHER_VAULT_CONFIG.address,
+        abi: CIPHER_VAULT_CONFIG.abi,
         functionName: 'executeEmergencyWithdrawal',
         args: [BigInt(vaultId)],
       })

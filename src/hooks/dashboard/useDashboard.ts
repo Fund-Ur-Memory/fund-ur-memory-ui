@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { type DashboardData, type WalletAnalysisResponse, type AssetAllocation, type Transaction, type Vault } from '../../types/dashboard'
 import toast from 'react-hot-toast'
 import { useAccount, useBalance } from 'wagmi'
-import { fumAgentService } from '../../services/fumAgentService'
+import { cipherAgentService } from '../../services/cipherAgentService'
 import { useGetVaults, useVaultStats } from '../contracts/useGetVaults'
 import { useMultipleTokenPrices } from '../useTokenPrice'
 import { formatUnits } from 'viem'
@@ -62,7 +62,7 @@ export const useDashboard = (): UseDashboardReturn => {
         return cached.data
       }
 
-      const analysis = await fumAgentService.analyzeWallet(walletAddress)
+      const analysis = await cipherAgentService.analyzeWallet(walletAddress)
       
       // Cache the result
       if (analysis) {

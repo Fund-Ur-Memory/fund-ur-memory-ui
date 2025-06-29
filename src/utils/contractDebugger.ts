@@ -2,7 +2,7 @@
 // Debugging utilities for contract integration
 
 import { readContract } from 'wagmi/actions'
-import { FUM_VAULT_CONFIG } from '../contracts/FUMVault'
+import { CIPHER_VAULT_CONFIG } from '../contracts/CipherVault'
 import { config } from '../components/config/wagmi'
 import type { Address } from 'viem'
 
@@ -11,16 +11,16 @@ import type { Address } from 'viem'
  */
 export const debugContractCalls = async (userAddress: Address) => {
   console.log('🔍 Starting contract debugging...')
-  console.log('Contract Address:', FUM_VAULT_CONFIG.address)
+  console.log('Contract Address:', CIPHER_VAULT_CONFIG.address)
   console.log('User Address:', userAddress)
-  console.log('Chain ID:', FUM_VAULT_CONFIG.chainId)
+  console.log('Chain ID:', CIPHER_VAULT_CONFIG.chainId)
 
   try {
     // Test 1: Check if contract exists by calling a simple view function
     console.log('\n📋 Test 1: Getting contract stats...')
     const stats = await readContract(config, {
-      address: FUM_VAULT_CONFIG.address,
-      abi: FUM_VAULT_CONFIG.abi,
+      address: CIPHER_VAULT_CONFIG.address,
+      abi: CIPHER_VAULT_CONFIG.abi,
       functionName: 'getContractStats',
     })
     console.log('✅ Contract stats:', stats)
@@ -28,8 +28,8 @@ export const debugContractCalls = async (userAddress: Address) => {
     // Test 2: Get owner vaults
     console.log('\n📋 Test 2: Getting owner vaults...')
     const vaultIds = await readContract(config, {
-      address: FUM_VAULT_CONFIG.address,
-      abi: FUM_VAULT_CONFIG.abi,
+      address: CIPHER_VAULT_CONFIG.address,
+      abi: CIPHER_VAULT_CONFIG.abi,
       functionName: 'getOwnerVaults',
       args: [userAddress],
     })
@@ -40,8 +40,8 @@ export const debugContractCalls = async (userAddress: Address) => {
       console.log('\n📋 Test 3: Getting first vault data...')
       const firstVaultId = vaultIds[0]
       const vaultData = await readContract(config, {
-        address: FUM_VAULT_CONFIG.address,
-        abi: FUM_VAULT_CONFIG.abi,
+        address: CIPHER_VAULT_CONFIG.address,
+        abi: CIPHER_VAULT_CONFIG.abi,
         functionName: 'getVault',
         args: [firstVaultId],
       })
@@ -75,7 +75,7 @@ export const checkNetwork = () => {
     return window.ethereum.request({ method: 'eth_chainId' })
       .then((chainId: string) => {
         const currentChainId = parseInt(chainId, 16)
-        const expectedChainId = FUM_VAULT_CONFIG.chainId
+        const expectedChainId = CIPHER_VAULT_CONFIG.chainId
 
         console.log('🌐 Network check:', {
           currentChainId,
@@ -94,7 +94,7 @@ export const checkNetwork = () => {
 
   return Promise.resolve({
     currentChainId: null,
-    expectedChainId: FUM_VAULT_CONFIG.chainId,
+    expectedChainId: CIPHER_VAULT_CONFIG.chainId,
     isCorrect: false,
     networkName: 'No wallet detected'
   })
@@ -111,8 +111,8 @@ export const testContractFunction = async (
     console.log(`🧪 Testing ${functionName} with args:`, args)
 
     const result = await readContract(config, {
-      address: FUM_VAULT_CONFIG.address,
-      abi: FUM_VAULT_CONFIG.abi,
+      address: CIPHER_VAULT_CONFIG.address,
+      abi: CIPHER_VAULT_CONFIG.abi,
       functionName,
       args,
     })
@@ -188,6 +188,6 @@ if (typeof window !== 'undefined') {
     checkNetwork,
     testContractFunction,
     contractHealthCheck,
-    config: FUM_VAULT_CONFIG
+    config: CIPHER_VAULT_CONFIG
   }
 }

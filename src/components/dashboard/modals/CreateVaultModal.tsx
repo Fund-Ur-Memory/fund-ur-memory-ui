@@ -6,7 +6,7 @@ import { useVaultCreationWithConversion } from '../../../hooks/contracts/useCrea
 import '../../../styles/create-vault-modal.css'
 import { COMMITMENT_CONDITIONS, TIME_UNITS, SUPPORTED_TOKENS } from '../../../utils/constants'
 import { getMaxTimeValue, getDefaultTimeValue } from '../../../utils/helpers'
-import { fumAgentService } from '../../../services/fumAgentService'
+import { cipherAgentService } from '../../../services/cipherAgentService'
 
 interface CreateVaultModalProps {
   isOpen: boolean
@@ -172,7 +172,7 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
     console.log('🪙 Converted AVAX Amount:', avaxAmountFormatted)
 
     const commitmentText = generateCommitmentText()
-    const result = await fumAgentService.analyzeCommitment(commitmentText)
+    const result = await cipherAgentService.analyzeCommitment(commitmentText)
 
     if (result.success && result.data) {
       onAnalysisComplete(enhancedFormData, result.data)

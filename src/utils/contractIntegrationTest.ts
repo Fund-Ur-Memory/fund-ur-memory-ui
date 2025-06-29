@@ -4,7 +4,7 @@
 
 import type { VaultFormData } from '../types/contracts'
 import { validateVaultFormData, convertFormDataToContractData } from './contractHelpers'
-import { SUPPORTED_TOKENS, FUM_VAULT_CONFIG } from '../contracts/FUMVault'
+import { SUPPORTED_TOKENS, CIPHER_VAULT_CONFIG } from '../contracts/CipherVault'
 
 /**
  * Test form data validation
@@ -238,22 +238,22 @@ export const testNewContractIntegration = () => {
 
   // Test 1: Contract Configuration
   console.log('\n1. Testing Contract Configuration:')
-  console.log('✅ Contract Address:', FUM_VAULT_CONFIG.address)
-  console.log('✅ Chain ID:', FUM_VAULT_CONFIG.chainId)
+  console.log('✅ Contract Address:', CIPHER_VAULT_CONFIG.address)
+  console.log('✅ Chain ID:', CIPHER_VAULT_CONFIG.chainId)
 
   // Verify the new contract address
   const expectedAddress = '0x7Aa2608EeA7679FA66196DECd78989Bb13DACD38'
-  if (FUM_VAULT_CONFIG.address === expectedAddress) {
+  if (CIPHER_VAULT_CONFIG.address === expectedAddress) {
     console.log('✅ Contract address updated correctly!')
   } else {
     console.error('❌ Contract address mismatch!')
     console.error('Expected:', expectedAddress)
-    console.error('Actual:', FUM_VAULT_CONFIG.address)
+    console.error('Actual:', CIPHER_VAULT_CONFIG.address)
   }
 
   // Test 2: New ABI Functions
   console.log('\n2. Testing New ABI Functions:')
-  const abi = FUM_VAULT_CONFIG.abi as any[]
+  const abi = CIPHER_VAULT_CONFIG.abi as any[]
 
   // Check for new function signatures
   const createPriceVault = abi.find(item =>

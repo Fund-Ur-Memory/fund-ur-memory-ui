@@ -20,7 +20,7 @@ import {
   formatUnlockTime,
   parseUnlockTime,
   getConditionType
-} from '../contracts/FUMVault'
+} from '../contracts/CipherVault'
 
 /**
  * Convert raw vault data from contract to formatted vault for UI

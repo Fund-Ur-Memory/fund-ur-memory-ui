@@ -1,8 +1,8 @@
 // src/types/contracts.ts
 import type { Address } from 'viem'
-import type { FUMAnalysisResponse } from '../services/fumAgentService'
+import type { CipherAnalysisResponse } from '../services/cipherAgentService'
 
-// Enums from the contract (updated to match FUMVault.sol)
+// Enums from the contract (updated to match CipherVault.sol)
 export const ConditionType = {
   TIME_ONLY: 0,
   PRICE_UP_ONLY: 1,
@@ -183,7 +183,7 @@ export interface TransactionResult {
 
 // Hook return types
 export interface UseCreateVaultReturn {
-  createVault: (formData: VaultFormData, aiAnalysis?: FUMAnalysisResponse['data']) => Promise<TransactionResult>
+  createVault: (formData: VaultFormData, aiAnalysis?: CipherAnalysisResponse['data']) => Promise<TransactionResult>
   isLoading: boolean
   error: string | null
 }
@@ -195,7 +195,7 @@ export interface UseGetVaultsReturn {
   refetch: () => Promise<void>
 }
 
-export interface UseFUMVaultReturn {
+export interface UseCipherVaultReturn {
   // Vault operations
   createTimeVault: (token: Address, amount: bigint, unlockTime: bigint, title: string, message: string, autoWithdraw?: boolean) => Promise<TransactionResult>
   createPriceVault: (token: Address, amount: bigint, priceUp: bigint, priceDown: bigint, title: string, message: string, autoWithdraw?: boolean) => Promise<TransactionResult>

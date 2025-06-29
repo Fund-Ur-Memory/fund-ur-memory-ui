@@ -1,17 +1,17 @@
 import { useCallback } from 'react'
 import { useAccount } from 'wagmi'
-import { useFUMVault } from './useFUMVault'
+import { useCipherVault } from './useCipherVault'
 import type { VaultFormData, UseCreateVaultReturn, TransactionResult } from '../../types/contracts'
 import { convertFormDataToContractData, validateVaultFormData } from '../../utils/contractHelpers'
 import { indexerService } from '../../services/indexerService'
-import type { FUMAnalysisResponse } from '../../services/fumAgentService'
+import type { CipherAnalysisResponse } from '../../services/cipherAgentService'
 import { appEvents, APP_EVENTS } from '../../utils/events'
 
 export const useCreateVault = (): UseCreateVaultReturn => {
   const { address } = useAccount()
-  const fumVault = useFUMVault()
+  const cipherVault = useCipherVault()
 
-  const createVault = useCallback(async (formData: VaultFormData, aiAnalysis?: FUMAnalysisResponse['data']): Promise<TransactionResult> => {
+  const createVault = useCallback(async (formData: VaultFormData, aiAnalysis?: CipherAnalysisResponse['data']): Promise<TransactionResult> => {
     console.log('🚀 Starting vault creation process...')
     console.log('📋 Form data:', formData)
     console.log('💰 USD Amount:', formData.usdAmount)
@@ -69,7 +69,7 @@ export const useCreateVault = (): UseCreateVaultReturn => {
           console.log('🏷️ Title:', formData.title)
           console.log('💬 Message:', formData.message)
 
-          result = await fumVault.createTimeVault(
+          result = await cipherVault.createTimeVault(
             contractData.token,
             contractData.amount,
             contractData.unlockTime,
@@ -86,7 +86,7 @@ export const useCreateVault = (): UseCreateVaultReturn => {
           console.log('🏷️ Title:', formData.title)
           console.log('💬 Message:', formData.message)
 
-          result = await fumVault.createPriceVault(
+          result = await cipherVault.createPriceVault(
             contractData.token,
             contractData.amount,
             contractData.priceUp,
@@ -106,7 +106,7 @@ export const useCreateVault = (): UseCreateVaultReturn => {
           console.log('💬 Message:', formData.message)
           console.log('💡 Vault will unlock when EITHER condition is met')
 
-          result = await fumVault.createTimeOrPriceVault(
+          result = await cipherVault.createTimeOrPriceVault(
             contractData.token,
             contractData.amount,
             contractData.unlockTime,
@@ -217,12 +217,12 @@ export const useCreateVault = (): UseCreateVaultReturn => {
         error: errorMessage
       }
     }
-  }, [address, fumVault])
+  }, [address, cipherVault])
 
   return {
     createVault,
-    isLoading: fumVault.isLoading,
-    error: fumVault.error
+    isLoading: cipherVault.isLoading,
+    error: cipherVault.error
   }
 }
 

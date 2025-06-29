@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useAccount, useReadContract, useReadContracts } from 'wagmi'
 import type { Address } from 'viem'
-import { FUM_VAULT_CONFIG } from '../../contracts/FUMVault'
+import { CIPHER_VAULT_CONFIG } from '../../contracts/CipherVault'
 import type { UseGetVaultsReturn, FormattedVault, RawVault, ConditionType, VaultStatus } from '../../types/contracts'
 import { formatVaultData } from '../../utils/contractHelpers'
 import { appEvents, APP_EVENTS } from '../../utils/events'
@@ -23,8 +23,8 @@ export const useGetVaults = (owner?: Address): UseGetVaultsReturn => {
     error: idsError,
     refetch: refetchIds
   } = useReadContract({
-    address: FUM_VAULT_CONFIG.address,
-    abi: FUM_VAULT_CONFIG.abi,
+    address: CIPHER_VAULT_CONFIG.address,
+    abi: CIPHER_VAULT_CONFIG.abi,
     functionName: 'getOwnerVaults',
     args: targetOwner ? [targetOwner] : undefined,
     query: {
@@ -39,8 +39,8 @@ export const useGetVaults = (owner?: Address): UseGetVaultsReturn => {
       vaultIds,
       isLoadingIds,
       idsError: idsError?.message,
-      contractAddress: FUM_VAULT_CONFIG.address,
-      chainId: FUM_VAULT_CONFIG.chainId
+      contractAddress: CIPHER_VAULT_CONFIG.address,
+      chainId: CIPHER_VAULT_CONFIG.chainId
     })
   }, [targetOwner, vaultIds, isLoadingIds, idsError])
 
@@ -51,8 +51,8 @@ export const useGetVaults = (owner?: Address): UseGetVaultsReturn => {
     }
 
     return (vaultIds as number[]).map(vaultId => ({
-      address: FUM_VAULT_CONFIG.address,
-      abi: FUM_VAULT_CONFIG.abi,
+      address: CIPHER_VAULT_CONFIG.address,
+      abi: CIPHER_VAULT_CONFIG.abi,
       functionName: 'getVault',
       args: [vaultId],
     }))
@@ -178,8 +178,8 @@ export const useGetVault = (vaultId: number) => {
     error: vaultError,
     refetch
   } = useReadContract({
-    address: FUM_VAULT_CONFIG.address,
-    abi: FUM_VAULT_CONFIG.abi,
+    address: CIPHER_VAULT_CONFIG.address,
+    abi: CIPHER_VAULT_CONFIG.abi,
     functionName: 'getVault',
     args: [vaultId],
     query: {
@@ -271,8 +271,8 @@ export const useCheckVaultConditions = (vaultId: number) => {
     error,
     refetch
   } = useReadContract({
-    address: FUM_VAULT_CONFIG.address,
-    abi: FUM_VAULT_CONFIG.abi,
+    address: CIPHER_VAULT_CONFIG.address,
+    abi: CIPHER_VAULT_CONFIG.abi,
     functionName: 'checkConditions',
     args: [vaultId],
     query: {

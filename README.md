@@ -1,10 +1,10 @@
-# F.U.M - Fund Ur Memory/Money Frontend
+# Cipher - Commitment Protocol Frontend
 
-A sophisticated DeFi commitment contract platform frontend built with React, TypeScript, and modern Web3 technologies. F.U.M enables wealthy investors to create commitment vaults with time-based and price-based unlock conditions, leveraging Chainlink price feeds, automation, and CCIP for cross-chain functionality.
+A sophisticated DeFi commitment contract platform frontend built with React, TypeScript, and modern Web3 technologies. Cipher enables investors to create commitment vaults with time-based and price-based unlock conditions, leveraging Chainlink price feeds, automation, and CCIP for cross-chain functionality.
 
 ## Overview
 
-F.U.M (Fund Ur Memory/Money) is a DeFi platform that helps users commit their crypto assets for specific time periods or price targets, promoting better investment discipline and long-term holding strategies. The platform integrates with Chainlink's ecosystem for reliable price feeds, automated execution, and cross-chain operations.
+Cipher is a DeFi platform that helps users encode their commitment into secure vaults for specific time periods or price targets, promoting better investment discipline and long-term holding strategies. The platform integrates with Chainlink's ecosystem for reliable price feeds, automated execution, and cross-chain operations.
 
 ## Key Features
 
@@ -67,7 +67,7 @@ F.U.M (Fund Ur Memory/Money) is a DeFi platform that helps users commit their cr
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd fund-ur-memory-ui
+cd cipher-ui
 
 # Install dependencies
 pnpm install
@@ -104,7 +104,7 @@ pnpm lint
 ## Project Structure
 
 ```
-fund-ur-memory-ui/
+cipher-ui/
 ├── public/                 # Static assets
 │   ├── images/            # Image assets
 │   └── favicon.ico        # Site favicon
@@ -135,9 +135,9 @@ fund-ur-memory-ui/
 The frontend integrates with the FUMVault smart contract deployed on Avalanche Fuji testnet:
 
 ```typescript
-export const FUM_VAULT_CONFIG = {
+export const CIPHER_VAULT_CONFIG = {
   address: '0x7Aa2608EeA7679FA66196DECd78989Bb13DACD38',
-  abi: FUMVaultABI,
+  abi: CipherVaultABI,
   chainId: 43113, // Avalanche Fuji testnet
 }
 ```
@@ -318,7 +318,7 @@ pnpm preview
 ### Environment Configuration
 ```env
 # Production environment variables
-VITE_CONTRACT_ADDRESS=0x7Aa2608EeA7679FA66196DECd78989Bb13DACD38
+VITE_CIPHER_CONTRACT_ADDRESS=0x7Aa2608EeA7679FA66196DECd78989Bb13DACD38
 VITE_CHAIN_ID=43113
 VITE_COINGECKO_API_KEY=your_api_key
 ```
@@ -446,11 +446,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-- **Website**: [F.U.M Platform](https://your-domain.com)
-- **GitHub**: [Repository](https://github.com/your-org/fund-ur-memory-ui)
+- **Website**: [Cipher Platform](https://your-domain.com)
+- **GitHub**: [Repository](https://github.com/your-org/cipher-ui)
 - **Discord**: [Community](https://discord.gg/your-invite)
-- **Twitter**: [@FUMPlatform](https://twitter.com/fumplatform)
-- **Email**: support@fumplatform.com
+- **Twitter**: [@CipherProtocol](https://twitter.com/cipherprotocol)
+- **Email**: support@cipherprotocol.com
 
 ---
 
