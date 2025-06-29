@@ -37,7 +37,7 @@ const WhitepaperSection = () => {
                 }}
               >
                 <div className="image_block">
-                  <img src={wImg || "/placeholder.svg"} alt="F.U.M White Paper" />
+                  <img src={wImg || "/placeholder.svg"} alt="Cipher White Paper" />
                 </div>
               </div>
             </div>

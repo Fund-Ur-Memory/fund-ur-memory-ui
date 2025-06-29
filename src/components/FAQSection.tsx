@@ -17,16 +17,16 @@ const FAQSection = () => {
 
   // Array of FAQ questions
   const faqQuestions = [
-    "What is F.U.M Protocol?",
-    "How do Commitment Vaults work in F.U.M?",
-    "What are the benefits of using F.U.M Protocol?",
-    "How does F.U.M ensure cross-chain functionality?",
-    "What privacy features does F.U.M offer?",
+    "What is Cipher Protocol?",
+    "How do Commitment Vaults work in Cipher?",
+    "What are the benefits of using Cipher Protocol?",
+    "How does Cipher ensure cross-chain functionality?",
+    "What privacy features does Cipher offer?",
   ]
 
   // Array of Vault questions
   const vaultQuestions = [
-    "What are Commitment Vaults in F.U.M?",
+    "What are Commitment Vaults in Cipher?",
     "How do I create a Commitment Vault?",
     "What assets can be used in Commitment Vaults?",
     "What are the fees associated with Commitment Vaults?",
@@ -35,18 +35,18 @@ const FAQSection = () => {
 
   // Array of AI & Privacy questions
   const aiPrivacyQuestions = [
-    "How does F.U.M use AI analysis?",
+    "How does Cipher use AI analysis?",
     "What data is used for AI analysis?",
-    "How does F.U.M protect user privacy?",
+    "How does Cipher protect user privacy?",
     "Is my data shared with third parties?",
     "How can I control my privacy settings?",
   ]
 
   // Array of Platform Related questions
   const platformRelatedQuestions = [
-    "How can I contact F.U.M support?",
-    "What services does F.U.M provide?",
-    "How secure is the F.U.M platform?",
+    "How can I contact Cipher support?",
+    "What services does Cipher provide?",
+    "How secure is the Cipher platform?",
     "What is the dispute resolution process?",
     "Are there any platform usage guides?",
   ]
@@ -101,7 +101,7 @@ const FAQSection = () => {
         return (
           <>
             <p>
-              F.U.M Protocol is a decentralized framework designed to enhance digital interactions through
+              Cipher Protocol is a decentralized framework designed to enhance digital interactions through
               commitment vaults, AI-driven analysis, cross-chain functionality, and robust privacy
               features.
             </p>
@@ -145,14 +145,14 @@ const FAQSection = () => {
       case "collapse_token_sales":
         return (
           <p>
-            F.U.M utilizes AI analysis to enhance decision-making and provide insights. User privacy is
+            Cipher utilizes AI analysis to enhance decision-making and provide insights. User privacy is
             paramount, and data is anonymized and protected with advanced security measures.
           </p>
         )
       case "collapse_clients":
         return (
           <p>
-            F.U.M is dedicated to providing a seamless platform experience. Our support team is
+            Cipher is dedicated to providing a seamless platform experience. Our support team is
             available to assist with any questions, and we offer comprehensive platform usage guides.
           </p>
         )

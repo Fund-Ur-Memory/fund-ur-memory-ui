@@ -53,7 +53,7 @@ const SolutionSection = () => {
     <section className="problem_solution_section section_space pb-0">
       <div className="container">
         <div className="ico_heading_block text-center" data-aos="fade-up" data-aos-duration="600">
-          <h2 className="heading_text mb-0 text-white">F.U.M Protocol Problem & Solution</h2>
+          <h2 className="heading_text mb-0 text-white">Cipher Protocol Problem & Solution</h2>
         </div>
 
         <div className="ico_problem_solution_table" data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
@@ -64,7 +64,7 @@ const SolutionSection = () => {
                 <span className="icon">
                   <img src={sIcon1 || "/placeholder.svg"} alt="Icon Man With Question" />
                 </span>
-                <span className="text text-white">F.U.M Problem</span>
+                <span className="text text-white">Cipher Problem</span>
               </h3>
               <ul className="iconlist_block unordered_list_block">
                 {problemItems.map((item, index) => (
@@ -87,7 +87,7 @@ const SolutionSection = () => {
                 <span className="icon">
                   <img src={sIcon2 || "/placeholder.svg"} alt="Icon Bulb" />
                 </span>
-                <span className="text text-white">F.U.M Solution</span>
+                <span className="text text-white">Cipher Solution</span>
               </h3>
               <ul className="iconlist_block unordered_list_block">
                 {solutionItems.map((item, index) => (

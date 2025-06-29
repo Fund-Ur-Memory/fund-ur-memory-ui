@@ -82,8 +82,8 @@ const MobileMenu = () => {
                         offset={-100} 
                         className="nav-link scrollspy_btn"
                     >
-                        <span className="nav_link_label" data-text="About F.U.M">
-                            About F.U.M
+                        <span className="nav_link_label" data-text="About Cipher">
+                            About Cipher
                         </span>
                     </Link>
                 </ListItem>

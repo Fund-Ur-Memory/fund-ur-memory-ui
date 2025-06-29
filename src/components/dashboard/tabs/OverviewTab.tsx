@@ -279,7 +279,7 @@ const OverviewActivityCard: React.FC<{
           <div style={{ fontSize: '4rem', marginBottom: '1.5rem', opacity: '0.6' }}>📝</div>
           <h5 className="text-white mb-2">No Recent Activity</h5>
           <p className="text-gray" style={{ opacity: '0.7' }}>
-            Your transactions will appear here once you start using F.U.M
+            Your transactions will appear here once you start using Cipher
           </p>
         </div>
       )}

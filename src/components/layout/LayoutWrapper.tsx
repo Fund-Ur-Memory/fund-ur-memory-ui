@@ -66,7 +66,7 @@ export const LayoutWrapper: React.FC<LayoutWrapperProps> = ({
                       offset={-100}
                       className="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-700/50 transition-all cursor-pointer"
                     >
-                      ABOUT F.U.M
+                      ABOUT Cipher
                     </Link>
                     <Link
                       to="id_ico_service_section"
@@ -164,7 +164,7 @@ export const LayoutWrapper: React.FC<LayoutWrapperProps> = ({
               )}
             </div>
             <p className="text-gray-500 text-sm">
-              Copyright© 2025 F.U.M Protocol. All rights reserved.
+              Copyright© 2025 Cipher Protocol. All rights reserved.
             </p>
           </div>
         </div>

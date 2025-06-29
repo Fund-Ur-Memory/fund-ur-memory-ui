@@ -41,7 +41,7 @@ const roadmapData: RoadmapData[] = [
     badge: "Q1 - 2026",
     title: "Mainnet Launch",
     items: [
-      "Full deployment of the F.U.M protocol on the mainnet.",
+      "Full deployment of the Cipher protocol on the mainnet.",
       "Establishment of strategic partnerships with institutional investors.",
       "Ecosystem growth initiatives to foster adoption and community engagement.",
     ],

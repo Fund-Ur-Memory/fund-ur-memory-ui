@@ -23,7 +23,7 @@ const Footer = () => {
           </li>
         </ul>
         <div className="footer_bottom text-center">
-          <p className="copyright_text m-0 text-secondary">Copyright© 2025 F.U.M Protocol. All rights reserved.</p>
+          <p className="copyright_text m-0 text-secondary">Copyright© 2025 Cipher Protocol. All rights reserved.</p>
         </div>
       </div>
     </footer>

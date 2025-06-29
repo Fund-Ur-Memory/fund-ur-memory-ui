@@ -63,7 +63,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           {/* Logo and Brand */}
           <div className="flex items-center space-x-6">
             <div className="flex-shrink-0">
-              <h1 className="text-2xl font-bold text-white">F.U.M Dashboard</h1>
+              <h1 className="text-2xl font-bold text-white">Cipher Dashboard</h1>
             </div>
 
             {/* Last Updated Info */}

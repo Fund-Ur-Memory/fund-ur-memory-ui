@@ -41,7 +41,7 @@ const ChooseSection = () => {
 
       <div className="container">
         <div className="ico_heading_block text-center mt-lg-4" data-aos="fade-up" data-aos-duration="600">
-          <h2 className="heading_text mb-0 text-white">Why Choose F.U.M Protocol?</h2>
+          <h2 className="heading_text mb-0 text-white">Why Choose Cipher Protocol?</h2>
         </div>
 
         <div className="row m-lg-0 justify-content-center">

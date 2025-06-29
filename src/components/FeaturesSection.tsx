@@ -39,7 +39,7 @@ const FeaturesSection = () => {
           {/* Left Side - Features List */}
           <div className="col-lg-5">
             <div className="ico_heading_block" data-aos="fade-up" data-aos-duration="600">
-              <h2 className="heading_text mb-0 text-white">Why F.U.M is Revolutionary?</h2>
+              <h2 className="heading_text mb-0 text-white">Why Cipher is Revolutionary?</h2>
             </div>
             <ul className="ico_features_group unordered_list_block">
               {features.map((feature, index) => (

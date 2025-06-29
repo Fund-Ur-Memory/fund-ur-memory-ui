@@ -43,7 +43,7 @@ const Header = () => {
                     loading="lazy"
                     width={210}
                     src={Logo || "/placeholder.svg"}
-                    alt="F.U.M Site Logo"
+                    alt="Cipher Site Logo"
                   />
                 </a>
               </div>
@@ -81,9 +81,9 @@ const Header = () => {
                       >
                         <span
                           className="nav_link_label"
-                          data-text="About F.U.M"
+                          data-text="About Cipher"
                         >
-                          About F.U.M
+                          About Cipher
                         </span>
                       </Link>
                     </li>

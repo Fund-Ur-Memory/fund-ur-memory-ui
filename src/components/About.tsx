@@ -16,13 +16,13 @@ const About: React.FC<AboutProps> = ({ abClass = "" }) => {
         <div className="row justify-content-lg-between">
           <div className="col-lg-6">
             <div className="ico_heading_block" data-aos="fade-up" data-aos-duration="600">
-              <h2 className="heading_text mb-0 text-white">Introducing F.U.M Protocol</h2>
+              <h2 className="heading_text mb-0 text-white">Introducing Cipher Protocol</h2>
             </div>
             <ul className="about_ico_block unordered_list_block">
               <li data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
-                <h3 className="title_text text-white">What is F.U.M?</h3>
+                <h3 className="title_text text-white">What is Cipher?</h3>
                 <p className="info_description mb-0">
-                  F.U.M is a privacy-preserving, AI-powered cross-chain DeFi platform that enables wealthy investors to
+                  Cipher is a privacy-preserving, AI-powered cross-chain DeFi platform that enables wealthy investors to
                   create 'commitment contracts' - smart contracts that execute predetermined investment strategies while
                   preventing emotional trading decisions.
                 </p>
@@ -48,7 +48,7 @@ const About: React.FC<AboutProps> = ({ abClass = "" }) => {
               <li data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
                 <h3 className="title_text text-white">Market Opportunity</h3>
                 <p className="info_description mb-0">
-                  F.U.M's market opportunity lies in the underserved High-Net-Worth Individual (HNWI) DeFi market,
+                  Cipher's market opportunity lies in the underserved High-Net-Worth Individual (HNWI) DeFi market,
                   offering sophisticated investment tools and strategies tailored to their unique needs and risk
                   profiles.
                 </p>

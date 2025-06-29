@@ -43,7 +43,7 @@ const TokenomicsSection = () => {
     <section id="id_ico_tokenomics_section" className="ico_tokenomics_section section_space pb-0">
       <div className="container">
         <div className="ico_heading_block text-center" data-aos="fade-up" data-aos-duration="600">
-          <h2 className="heading_text mb-0 text-white">F.U.M Protocol Economics</h2>
+          <h2 className="heading_text mb-0 text-white">Cipher Protocol Economics</h2>
         </div>
 
         <div className="row align-items-center">
