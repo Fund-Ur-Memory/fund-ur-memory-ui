@@ -1,6 +1,6 @@
 // src/hooks/contracts/useGetVaults.ts
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { useAccount, useReadContract, useBlockNumber, useReadContracts } from 'wagmi'
+import { useAccount, useReadContract, useReadContracts } from 'wagmi'
 import type { Address } from 'viem'
 import { FUM_VAULT_CONFIG } from '../../contracts/FUMVault'
 import type { UseGetVaultsReturn, FormattedVault, RawVault, ConditionType, VaultStatus } from '../../types/contracts'

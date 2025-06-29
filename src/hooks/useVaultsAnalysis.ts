@@ -2,7 +2,7 @@
 // Hook for managing AI-powered vault analysis data
 
 import { useState, useEffect, useCallback } from 'react'
-import { fetchVaultsAnalysis, clearVaultsAnalysisCache, type VaultsAnalysisResponse, type VaultsAnalysisData } from '../services/vaultsAnalysisService'
+import { fetchVaultsAnalysis, clearVaultsAnalysisCache, type VaultsAnalysisData } from '../services/vaultsAnalysisService'
 
 interface UseVaultsAnalysisReturn {
   data: VaultsAnalysisData | null

@@ -2,7 +2,7 @@
 // Hook for fetching real vault data from the indexer API
 
 import { useState, useEffect, useCallback } from 'react'
-import { fetchOwnerVaults, getRecentVaultActivity, convertVaultToTransaction, type IndexerVault, type IndexerVaultsResponse } from '../services/indexerService'
+import { fetchOwnerVaults, getRecentVaultActivity, convertVaultToTransaction, type IndexerVault } from '../services/indexerService'
 import { type Transaction } from '../types/dashboard'
 
 interface UseIndexerVaultsReturn {

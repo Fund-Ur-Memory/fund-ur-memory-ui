@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Brain, TrendingUp, AlertTriangle, Target } from 'lucide-react'
+import { Brain } from 'lucide-react'
 import { type DashboardData, type WalletAnalysisResponse } from '../../../types/dashboard'
 import '../../../styles/header-compact.css'
 

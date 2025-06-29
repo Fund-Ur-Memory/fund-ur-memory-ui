@@ -98,9 +98,7 @@ export const useDashboard = (): UseDashboardReturn => {
     chainId: 43113, // Avalanche Fuji for AVAX
     query: { enabled: !!address }
   })
-  
-  // For testnet, we don't need ETH balance, focus on AVAX
-  const ethBalance = null
+
 
   // Get token prices - enable auto-refresh for real-time portfolio values
   const { prices: tokenPrices, isLoading: isPricesLoading } = useMultipleTokenPrices(['ETH', 'AVAX'], true) // Enable auto-refresh
