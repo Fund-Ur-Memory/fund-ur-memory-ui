@@ -19,7 +19,7 @@ export const useCipherVault = (): UseCipherVaultReturn => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Helper function to handle contract writes
+  // Helper function to handle contract writes with transaction receipt waiting
   const executeContractWrite = useCallback(async (
     functionName: string,
     args: unknown[],
@@ -52,17 +52,88 @@ export const useCipherVault = (): UseCipherVaultReturn => {
 
       console.log('✅ Transaction sent successfully!')
       console.log('🔗 Transaction hash:', hash)
-      return { hash, success: true }
+      
+      // Clear loading state immediately after transaction is sent successfully
+      // This allows UI to close modal and show transaction as "pending"
+      setIsLoading(false)
+      
+      // Start receipt checking in background (don't block UI)
+      console.log('⏳ Starting background receipt checking...')
+      const receiptCheckPromise = (async () => {
+        try {
+          const waitForReceipt = async (txHash: string): Promise<boolean> => {
+            return new Promise((resolve) => {
+              const checkReceipt = async () => {
+                try {
+                  // Use fetch to check transaction receipt
+                  const response = await fetch(`https://api.avax.network/ext/bc/C/ws`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      jsonrpc: '2.0',
+                      method: 'eth_getTransactionReceipt',
+                      params: [txHash],
+                      id: 1
+                    })
+                  })
+                  
+                  const data = await response.json()
+                  if (data.result && data.result.status) {
+                    console.log('✅ Transaction confirmed!')
+                    console.log('📊 Receipt:', data.result)
+                    resolve(true)
+                    return
+                  }
+                } catch (error) {
+                  console.log('⏳ Still waiting for receipt...')
+                }
+                
+                // Check again in 2 seconds
+                setTimeout(checkReceipt, 2000)
+              }
+              
+              checkReceipt()
+            })
+          }
+          
+          // Wait for receipt with timeout
+          const receiptPromise = waitForReceipt(hash)
+          const timeoutPromise = new Promise<boolean>((resolve) => 
+            setTimeout(() => resolve(false), 60000) // 60 second timeout
+          )
+          
+          const receiptReceived = await Promise.race([receiptPromise, timeoutPromise])
+          
+          if (receiptReceived) {
+            console.log('🎉 Transaction fully completed with receipt!')
+            return true
+          } else {
+            console.log('⚠️ Receipt timeout - transaction likely still pending')
+            return false
+          }
+        } catch (error) {
+          console.error('❌ Error checking receipt:', error)
+          return false
+        }
+      })()
+      
+      // Don't await the receipt check - return immediately with transaction success
+      // The receipt will be checked in background
+      receiptCheckPromise.then((receiptReceived) => {
+        console.log('📋 Final receipt status:', receiptReceived ? 'confirmed' : 'timeout/error')
+      })
+      
+      return { hash, success: true, receiptReceived: false } // Always return false initially since we don't wait
     } catch (err) {
       console.error('💥 Contract write failed:', err)
       const errorMessage = err instanceof Error ? err.message : 'Transaction failed'
       console.error('📄 Error message:', errorMessage)
       setError(errorMessage)
+      setIsLoading(false) // Clear loading on error
       return { hash: '', success: false, error: errorMessage }
-    } finally {
-      setIsLoading(false)
-      console.log('🏁 Contract write execution completed')
     }
+    
+    console.log('🏁 Contract write execution completed')
   }, [address, writeContractAsync])
 
   // Vault creation functions

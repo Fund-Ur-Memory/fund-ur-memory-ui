@@ -254,7 +254,7 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
                       disabled={isAnalyzing}
                       style={{ minWidth: '120px', width: 'auto', flex: '1' }}
                     />
-                    <div className="currency-code">{inputMode === 'usd' ? 'USD' : formData.token}</div>
+                    <div className="currency-code ml-auto">{inputMode === 'usd' ? 'USD' : formData.token}</div>
                     
                     {/* Swap Button */}
                     <button
@@ -264,8 +264,8 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
                       disabled={isAnalyzing || !avaxPrice}
                       title={`Switch to ${inputMode === 'usd' ? 'token' : 'USD'} input`}
                       style={{
-                        marginLeft: '8px',
                         padding: '8px',
+                        marginRight: '8px',
                         background: 'rgba(154, 68, 151, 0.2)',
                         border: '1px solid rgba(154, 68, 151, 0.3)',
                         borderRadius: '8px',
@@ -536,29 +536,33 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
                     <div className="price-target-container">
                       <ArrowUp className="price-arrow up" />
                       <span className="statement-text">reaches</span>
-                      <div className="inline-parameter-container">
-                        <span className="inline-parameter-unit">$</span>
-                        <input
-                          type="text"
-                          value={formData.priceUp?.toString() || ''}
-                          onChange={(e) => {
-                            const value = e.target.value
-                            // Allow empty string, numbers, and decimal points
-                            if (value === '' || /^\d*\.?\d*$/.test(value)) {
-                              // Prevent leading zeros except for decimals like 0.5
-                              if (value === '' || value === '0' || value === '0.' || !/^0\d/.test(value)) {
-                                setFormData(prev => ({
-                                  ...prev,
-                                  priceUp: value === '' ? undefined : parseFloat(value)
-                                }))
+                      <div className="amount-input-container">
+                        <div className={`amount-input-wrapper ${
+                          formData.priceUp && formData.priceUp > 0 ? 'has-value' : ''
+                        }`}>
+                          <div className="currency-symbol">$</div>
+                          <input
+                            type="text"
+                            value={formData.priceUp?.toString() || ''}
+                            onChange={(e) => {
+                              const value = e.target.value
+                              // Use same validation as USD amount input
+                              if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                                if (value === '' || value === '0' || value === '0.' || !/^0\d/.test(value)) {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    priceUp: value === '' ? undefined : parseFloat(value)
+                                  }))
+                                }
                               }
-                            }
-                          }}
-                          placeholder="0"
-                          className="inline-parameter-input price-input"
-                          disabled={isAnalyzing}
-                          style={{ minWidth: '80px', width: 'auto' }}
-                        />
+                            }}
+                            placeholder="0.00"
+                            className="amount-input-field"
+                            disabled={isAnalyzing}
+                            style={{ minWidth: '120px', width: 'auto', flex: '1' }}
+                          />
+                          <div className="currency-code ml-auto">USD</div>
+                        </div>
                       </div>
                     </div>
 
@@ -569,29 +573,33 @@ export const CreateVaultModal: React.FC<CreateVaultModalProps> = ({
                         <div className="price-target-container">
                           <ArrowDown className="price-arrow down" />
                           <span className="statement-text">drops to</span>
-                          <div className="inline-parameter-container">
-                            <span className="inline-parameter-unit">$</span>
-                            <input
-                              type="text"
-                              value={formData.priceDown?.toString() || ''}
-                              onChange={(e) => {
-                                const value = e.target.value
-                                // Allow empty string, numbers, and decimal points
-                                if (value === '' || /^\d*\.?\d*$/.test(value)) {
-                                  // Prevent leading zeros except for decimals like 0.5
-                                  if (value === '' || value === '0' || value === '0.' || !/^0\d/.test(value)) {
-                                    setFormData(prev => ({
-                                      ...prev,
-                                      priceDown: value === '' ? undefined : parseFloat(value)
-                                    }))
+                          <div className="amount-input-container">
+                            <div className={`amount-input-wrapper ${
+                              formData.priceDown && formData.priceDown > 0 ? 'has-value' : ''
+                            }`}>
+                              <div className="currency-symbol">$</div>
+                              <input
+                                type="text"
+                                value={formData.priceDown?.toString() || ''}
+                                onChange={(e) => {
+                                  const value = e.target.value
+                                  // Use same validation as USD amount input
+                                  if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                                    if (value === '' || value === '0' || value === '0.' || !/^0\d/.test(value)) {
+                                      setFormData(prev => ({
+                                        ...prev,
+                                        priceDown: value === '' ? undefined : parseFloat(value)
+                                      }))
+                                    }
                                   }
-                                }
-                              }}
-                              placeholder="0"
-                              className="inline-parameter-input price-input"
-                              disabled={isAnalyzing}
-                              style={{ minWidth: '80px', width: 'auto' }}
-                            />
+                                }}
+                                placeholder="0.00"
+                                className="amount-input-field"
+                                disabled={isAnalyzing}
+                                style={{ minWidth: '120px', width: 'auto', flex: '1' }}
+                              />
+                              <div className="currency-code ml-auto">USD</div>
+                            </div>
                           </div>
                         </div>
                       </>

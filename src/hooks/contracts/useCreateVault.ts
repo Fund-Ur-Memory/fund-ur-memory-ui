@@ -131,41 +131,82 @@ export const useCreateVault = (): UseCreateVaultReturn => {
       if (result.success && result.hash) {
         console.log('✅ Transaction successful!')
         console.log('🔗 Transaction hash:', result.hash)
-
-        if (aiAnalysis) {
-          console.log('📡 Indexing vault with AI analysis...')
-          try {
-            const indexData = {
-              vault_id: result.vaultId || 1,
-              vault_title: formData.title,
-              commitment_message: formData.message,
-              owner_address: address,
-              metadata: JSON.stringify(aiAnalysis),
-              tx_hash: result.hash
-            }
-
-            const indexResult = await indexerService.createVault(indexData)
-
-            if (indexResult.success) {
-              console.log('✅ Vault indexed successfully')
-            } else {
-              console.warn('⚠️ Failed to index vault:', indexResult.error)
-            }
-          } catch (indexError) {
-            console.warn('⚠️ Error during vault indexing:', indexError)
-          }
-        } else {
-          console.log('ℹ️ No AI analysis provided, skipping indexing')
-        }
-
-        // Emit vault creation event for dashboard auto-refresh
-        console.log('📡 Emitting vault creation event...')
+        
+        // Always emit immediate event for UI responsiveness
+        console.log('📡 Emitting immediate vault creation event...')
         appEvents.emit(APP_EVENTS.VAULT_CREATED, {
           vaultId: result.vaultId,
           hash: result.hash,
-          formData
+          formData,
+          receiptReceived: false // Always false initially since we don't wait for receipt
         })
+        
+        // Start background process to wait for receipt and then index
+        console.log('🔄 Starting background receipt monitoring and indexing...')
+        setTimeout(async () => {
+          try {
+            // Wait a bit for receipt to be available
+            await new Promise(resolve => setTimeout(resolve, 3000))
+            
+            // Check if receipt is available now
+            let receiptReceived = false
+            try {
+              const response = await fetch(`https://api.avax.network/ext/bc/C/ws`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  jsonrpc: '2.0',
+                  method: 'eth_getTransactionReceipt',
+                  params: [result.hash],
+                  id: 1
+                })
+              })
+              
+              const data = await response.json()
+              receiptReceived = !!(data.result && data.result.status)
+            } catch (error) {
+              console.log('⚠️ Could not check receipt status, proceeding with indexing anyway')
+            }
+            
+            // Proceed with indexing regardless of receipt status
+            if (aiAnalysis) {
+              console.log('📡 Background indexing vault with AI analysis...')
+              try {
+                const indexData = {
+                  vault_id: result.vaultId || 1,
+                  vault_title: formData.title,
+                  commitment_message: formData.message,
+                  owner_address: address,
+                  metadata: JSON.stringify(aiAnalysis),
+                  tx_hash: result.hash
+                }
 
+                const indexResult = await indexerService.createVault(indexData)
+
+                if (indexResult.success) {
+                  console.log('✅ Vault indexed successfully in background')
+                } else {
+                  console.warn('⚠️ Failed to index vault in background:', indexResult.error)
+                }
+              } catch (indexError) {
+                console.warn('⚠️ Error during background vault indexing:', indexError)
+              }
+            }
+            
+            // Emit final event with updated status
+            console.log('📡 Emitting final vault creation event with receipt status...')
+            appEvents.emit(APP_EVENTS.VAULT_CREATED, {
+              vaultId: result.vaultId,
+              hash: result.hash,
+              formData,
+              receiptReceived
+            })
+            
+          } catch (error) {
+            console.error('❌ Error in background processing:', error)
+          }
+        }, 100) // Start background process after 100ms
+        
         return result
       } else {
         console.error('❌ Transaction failed')

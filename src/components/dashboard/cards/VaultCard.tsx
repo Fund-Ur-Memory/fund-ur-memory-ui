@@ -5,6 +5,7 @@ import { useWithdrawVault } from '../../../hooks/contracts/useWithdrawVault'
 import { useVaultTokenPrice } from '../../../hooks/useTokenPrice'
 import { useVaultProgress } from '../../../hooks/useVaultProgress'
 import { VaultOperationLoader } from '../common/VaultOperationLoader'
+import { EmergencyWithdrawalModal } from '../modals/EmergencyWithdrawalModal'
 import type { FormattedVault } from '../../../types/contracts'
 import '../../../styles/vault-cards.css'
 import '../../../styles/enhanced-loading.css'
@@ -30,6 +31,7 @@ export const VaultCard: React.FC<VaultCardProps> = ({
 }) => {
   const [isWithdrawing, setIsWithdrawing] = useState(false)
   const [isEmergencyWithdrawing, setIsEmergencyWithdrawing] = useState(false)
+  const [isEmergencyModalOpen, setIsEmergencyModalOpen] = useState(false)
   const { withdrawVault, emergencyWithdraw, isLoading, operationStatus, txHash: hookTxHash } = useWithdrawVault()
 
   // Get real-time token price
@@ -79,7 +81,12 @@ export const VaultCard: React.FC<VaultCardProps> = ({
     }
   }
 
-  const handleEmergencyWithdraw = async () => {
+  const handleEmergencyWithdrawClick = () => {
+    if (!vault.canEmergencyWithdraw) return
+    setIsEmergencyModalOpen(true)
+  }
+
+  const handleEmergencyWithdrawConfirm = async () => {
     if (!vault.canEmergencyWithdraw) return
 
     setIsEmergencyWithdrawing(true)
@@ -89,6 +96,7 @@ export const VaultCard: React.FC<VaultCardProps> = ({
 
       await emergencyWithdraw(vault.id, amountFormatted, tokenSymbol)
       onEmergencyWithdraw?.(vault.id)
+      setIsEmergencyModalOpen(false)
     } catch (err) {
       console.error('Emergency withdraw failed:', err)
     } finally {
@@ -108,6 +116,13 @@ export const VaultCard: React.FC<VaultCardProps> = ({
   const createdAtFormatted = vault.createdAt?.formatted || 'Unknown'
   const targetPriceUsd = vault.targetPrice?.usd
   const unlockTimeFormatted = vault.unlockTime?.formatted
+
+  // Check if vault is claimed/completed (funds already withdrawn)
+  const isVaultClaimed = vault.status?.name === 'WITHDRAWN' || vault.status?.name === 'EMERGENCY'
+  
+  // For claimed vaults, progress and unlock time are no longer relevant
+  const shouldShowProgress = !isVaultClaimed
+  const shouldShowUnlockTime = !isVaultClaimed
 
   const getAssetIcon = (asset: string) => {
     const icons: Record<string, string> = {
@@ -248,7 +263,7 @@ export const VaultCard: React.FC<VaultCardProps> = ({
               <button
                 onClick={(e) => {
                   e.stopPropagation()
-                  handleEmergencyWithdraw()
+                  handleEmergencyWithdrawClick()
                 }}
                 disabled={isWithdrawing || isLoading}
                 className="vault-action-button vault-emergency-button"
@@ -460,17 +475,20 @@ export const VaultCard: React.FC<VaultCardProps> = ({
             </div>
 
             <div>
-              <p style={{
-                color: 'rgba(255, 255, 255, 0.5)',
-                fontSize: '12px',
-                margin: '0 0 5px 0',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
-                {vault.conditionType?.name?.includes('PRICE') ? 'Price Targets' : 'Unlock Time'}
-              </p>
+              {/* Only show condition details for unclaimed vaults */}
+              {shouldShowUnlockTime && (
+                <p style={{
+                  color: 'rgba(255, 255, 255, 0.5)',
+                  fontSize: '12px',
+                  margin: '0 0 5px 0',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  {vault.conditionType?.name?.includes('PRICE') ? 'Price Targets' : 'Unlock Time'}
+                </p>
+              )}
 
-              {vault.conditionType?.name?.includes('PRICE') ? (
+              {shouldShowUnlockTime && vault.conditionType?.name?.includes('PRICE') ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   {/* Price Up Target */}
                   {vault.priceUp && Number(vault.priceUp.formatted) > 0 && (
@@ -523,7 +541,7 @@ export const VaultCard: React.FC<VaultCardProps> = ({
                     </span>
                   )}
                 </div>
-              ) : (
+              ) : shouldShowUnlockTime ? (
                 <div>
                   <p className="text-white" style={{
                     fontSize: '16px',
@@ -541,6 +559,26 @@ export const VaultCard: React.FC<VaultCardProps> = ({
                       {unlockTimeFormatted}
                     </p>
                   )}
+                </div>
+              ) : (
+                <div>
+                  {/* For claimed vaults, show completion status instead of unlock time */}
+                  <p className="text-white" style={{
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    margin: 0
+                  }}>
+                    {vault.status?.name === 'WITHDRAWN' ? '✅ Completed' : 
+                     vault.status?.name === 'EMERGENCY' ? '🚨 Emergency Exit' : 
+                     '🔓 Claimed'}
+                  </p>
+                  <p style={{
+                    color: 'rgba(255, 255, 255, 0.5)',
+                    fontSize: '12px',
+                    margin: '2px 0 0 0'
+                  }}>
+                    Funds withdrawn
+                  </p>
                 </div>
               )}
             </div>
@@ -565,54 +603,56 @@ export const VaultCard: React.FC<VaultCardProps> = ({
             </div>
           </div>
 
-          {/* Progress Section */}
-          <div style={{ marginBottom: '10px' }}>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '8px'
-            }}>
-              <p style={{
-                color: 'rgba(255, 255, 255, 0.5)',
-                fontSize: '12px',
-                margin: 0,
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
+          {/* Progress Section - Only show for active/unclaimed vaults */}
+          {shouldShowProgress && (
+            <div style={{ marginBottom: '10px' }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '8px'
               }}>
-                Progress
-              </p>
-              <p className="text-white" style={{
-                fontSize: '14px',
-                fontWeight: '600',
-                margin: 0
-              }}>
-                {realTimeProgress}%
-              </p>
-            </div>
-            <div
-              className="vault-progress-bar"
-              style={{
-                width: '100%',
-                height: '6px',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                borderRadius: '3px',
-                overflow: 'hidden'
-              }}
-            >
+                <p style={{
+                  color: 'rgba(255, 255, 255, 0.5)',
+                  fontSize: '12px',
+                  margin: 0,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Progress
+                </p>
+                <p className="text-white" style={{
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  margin: 0
+                }}>
+                  {realTimeProgress}%
+                </p>
+              </div>
               <div
+                className="vault-progress-bar"
                 style={{
-                  width: `${realTimeProgress}%`,
-                  height: '100%',
-                  background: isUnlocked 
-                    ? 'linear-gradient(90deg, #10b981, #059669)' 
-                    : 'linear-gradient(90deg, var(--bs-primary), var(--bs-secondary))',
+                  width: '100%',
+                  height: '6px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
                   borderRadius: '3px',
-                  transition: 'width 1s ease-out'
+                  overflow: 'hidden'
                 }}
-              />
+              >
+                <div
+                  style={{
+                    width: `${realTimeProgress}%`,
+                    height: '100%',
+                    background: isUnlocked 
+                      ? 'linear-gradient(90deg, #10b981, #059669)' 
+                      : 'linear-gradient(90deg, var(--bs-primary), var(--bs-secondary))',
+                    borderRadius: '3px',
+                    transition: 'width 1s ease-out'
+                  }}
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Status and Condition */}
           <div style={{
@@ -705,6 +745,15 @@ export const VaultCard: React.FC<VaultCardProps> = ({
           setIsEmergencyWithdrawing(false)
         }}
         estimatedTime={isEmergencyWithdrawing ? 45 : 30}
+      />
+
+      {/* Emergency Withdrawal Modal */}
+      <EmergencyWithdrawalModal
+        isOpen={isEmergencyModalOpen}
+        onClose={() => setIsEmergencyModalOpen(false)}
+        onConfirm={handleEmergencyWithdrawConfirm}
+        vault={vault}
+        isLoading={isEmergencyWithdrawing || isLoading}
       />
     </motion.div>
   )

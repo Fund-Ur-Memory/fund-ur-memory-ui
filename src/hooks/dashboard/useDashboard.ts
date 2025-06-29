@@ -460,9 +460,6 @@ export const useDashboard = (): UseDashboardReturn => {
       setLastUpdated(new Date())
       setDataInitialized(true)
 
-      if (isRefetch) {
-        toast.success('Dashboard data updated successfully')
-      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load dashboard data'
       setError(errorMessage)

@@ -9,7 +9,7 @@ interface UseCreateVaultReturn {
   isCreating: boolean
   openModal: () => void
   closeModal: () => void
-  createVault: (vaultData: VaultFormData, aiAnalysis?: CipherAnalysisResponse['data']) => Promise<void>
+  createVault: (vaultData: VaultFormData, aiAnalysis?: CipherAnalysisResponse['data']) => Promise<{ receiptReceived?: boolean; hash?: string } | undefined>
 }
 
 export const useCreateVault = (): UseCreateVaultReturn => {
@@ -50,16 +50,24 @@ export const useCreateVault = (): UseCreateVaultReturn => {
 
         // Close modal on success
         setIsModalOpen(false)
+        
+        // Return the result for caller to handle
+        return {
+          receiptReceived: result.receiptReceived,
+          hash: result.hash
+        }
       } else {
         // Show specific error message from contract
         toast.error(result.error || 'Failed to create vault. Please try again.', {
           duration: 6000
         })
+        return undefined
       }
 
     } catch (error) {
       console.error('Failed to create vault:', error)
       toast.error('An unexpected error occurred. Please try again.')
+      return undefined
     }
   }, [contractCreateVault])
 

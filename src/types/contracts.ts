@@ -179,6 +179,7 @@ export interface TransactionResult {
   success: boolean
   vaultId?: number
   error?: string
+  receiptReceived?: boolean
 }
 
 // Hook return types

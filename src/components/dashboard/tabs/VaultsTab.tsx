@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Shield, DollarSign, CheckCircle, Clock } from 'lucide-react'
 import { VaultCard } from '../cards/VaultCard'
@@ -13,6 +13,7 @@ import { useIndexerVaults } from '../../../hooks/useIndexerVaults'
 import { useAccount } from 'wagmi'
 import type { VaultFormData } from '../../../types/contracts'
 import type { CipherAnalysisResponse } from '../../../services/cipherAgentService'
+import { appEvents, APP_EVENTS } from '../../../utils/events'
 import '../../../styles/header-compact.css'
 import '../../../styles/vault-cards.css'
 import '../../../styles/enhanced-loading.css'
@@ -104,13 +105,34 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
     console.log('💰 VaultsTab: USD Amount:', formData.usdAmount)
     console.log('🪙 VaultsTab: Converted Token Amount:', formData._convertedTokenAmount)
 
-    if (pendingAiAnalysis) {
-      await createVault(formData, pendingAiAnalysis.data)
-    } else {
-      await createVault(formData)
+    try {
+      let result
+      if (pendingAiAnalysis) {
+        result = await createVault(formData, pendingAiAnalysis.data)
+      } else {
+        result = await createVault(formData)
+      }
+      
+      // Close modal immediately after successful transaction send
+      if (result?.hash) {
+        console.log('✅ Transaction sent successfully, closing modal')
+        handleCommitmentModalClose()
+        
+        // Do an immediate refresh to show the new transaction state
+        console.log('🔄 Immediate refresh after transaction send...')
+        setTimeout(() => {
+          handleRefresh()
+        }, 1000) // Small delay to ensure events are processed
+      } else {
+        // If no transaction hash, something went wrong
+        console.error('❌ No transaction hash received')
+        handleCommitmentModalClose()
+      }
+      
+    } catch (error) {
+      console.error('❌ Error creating vault:', error)
+      handleCommitmentModalClose()
     }
-    handleCommitmentModalClose()
-    await handleRefresh()
   }
 
   const handleRefresh = async () => {
@@ -127,6 +149,52 @@ export const VaultsTab: React.FC<VaultsTabProps> = ({
     console.log(`🚨 Vault ${vaultId} emergency withdrawn successfully`)
     handleRefresh()
   }
+
+  // Listen for vault creation events to refresh data automatically
+  useEffect(() => {
+    const handleVaultCreated = async (eventData: any) => {
+      console.log('📡 VaultsTab: Received vault creation event:', eventData)
+      
+      if (eventData.receiptReceived) {
+        console.log('🔄 Receipt confirmed - immediately refreshing data')
+        await handleRefresh()
+      } else {
+        console.log('⏳ Receipt pending - will refresh after delay')
+        // Set up a polling mechanism for receipt confirmation
+        const pollForReceipt = async () => {
+          let attempts = 0
+          const maxAttempts = 30 // 30 attempts = 1 minute with 2s intervals
+          
+          const poll = async () => {
+            attempts++
+            console.log(`🔍 Polling attempt ${attempts} for receipt confirmation...`)
+            
+            // Refresh data to check if vault appears
+            await handleRefresh()
+            
+            if (attempts < maxAttempts) {
+              setTimeout(poll, 2000) // Poll every 2 seconds
+            } else {
+              console.log('⏰ Polling timeout reached - final refresh')
+              await handleRefresh()
+            }
+          }
+          
+          poll()
+        }
+        
+        pollForReceipt()
+      }
+    }
+
+    // Subscribe to vault creation events
+    appEvents.on(APP_EVENTS.VAULT_CREATED, handleVaultCreated)
+
+    // Cleanup subscription on unmount
+    return () => {
+      appEvents.off(APP_EVENTS.VAULT_CREATED, handleVaultCreated)
+    }
+  }, [handleRefresh])
 
   return (
     <div>
