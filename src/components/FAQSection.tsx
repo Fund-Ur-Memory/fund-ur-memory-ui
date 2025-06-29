@@ -42,15 +42,6 @@ const FAQSection = () => {
     "How can I control my privacy settings?",
   ]
 
-  // Array of Platform Related questions
-  const platformRelatedQuestions = [
-    "How can I contact Cipher support?",
-    "What services does Cipher provide?",
-    "How secure is the Cipher platform?",
-    "What is the dispute resolution process?",
-    "Are there any platform usage guides?",
-  ]
-
   // Arrow SVG component for reusability
   const ArrowIcon = () => (
     <svg viewBox="0 0 23 27" xmlns="http://www.w3.org/2000/svg">
@@ -201,16 +192,6 @@ const FAQSection = () => {
                   AI & Privacy
                 </button>
               </li>
-              <li className="nav-item" role="presentation">
-                <button
-                  className={`nav-link ${activeTab === "tab_clients_releted" ? "active" : ""}`}
-                  type="button"
-                  role="tab"
-                  onClick={() => toggleTab("tab_clients_releted")}
-                >
-                  Platform Related
-                </button>
-              </li>
             </ul>
           </div>
 
@@ -245,17 +226,6 @@ const FAQSection = () => {
             >
               <div className="ico_accordion" id="accordion_3">
                 {renderAccordionItems(aiPrivacyQuestions, "collapse_token_sales", "accordion_3")}
-              </div>
-            </div>
-
-            {/* Platform Related Tab */}
-            <div
-              className={`tab-pane fade ${activeTab === "tab_clients_releted" ? "show active" : ""}`}
-              role="tabpanel"
-              id="tab_clients_releted"
-            >
-              <div className="ico_accordion" id="accordion_4">
-                {renderAccordionItems(platformRelatedQuestions, "collapse_clients", "accordion_4")}
               </div>
             </div>
           </div>

@@ -132,7 +132,7 @@ cipher-ui/
 ## Smart Contract Integration
 
 ### Contract Configuration
-The frontend integrates with the FUMVault smart contract deployed on Avalanche Fuji testnet:
+The frontend integrates with the CipherVault smart contract deployed on Avalanche Fuji testnet:
 
 ```typescript
 export const CIPHER_VAULT_CONFIG = {

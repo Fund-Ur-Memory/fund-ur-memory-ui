@@ -23,7 +23,7 @@ const services = [
   },
   {
     icon: "/images/services/icon_pinpoint.png",
-    title: "Privacy Layer",
+    title: "Privacy Layer ( Coming Soon )",
     description: "ZK-proof implementation for transaction privacy and stealth addresses",
     delay: 500,
   },

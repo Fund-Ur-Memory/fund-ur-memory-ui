@@ -33,7 +33,7 @@ export const isPriceBasedAnalysis = (analysis: Analysis): analysis is PriceBased
 export const cipherAgentService = {
   async analyzeCommitment(text: string): Promise<CipherAnalysisResponse> {
     try {
-      const response = await fetch('https://fund-ur-memory-agents-production.up.railway.app/api/message', {
+      const response = await fetch('https://cipher-agents.up.railway.app/api/message', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -48,7 +48,7 @@ export const cipherAgentService = {
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error('Error calling FUM agent:', error);
+      console.error('Error calling Cipher agent:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to analyze commitment'
@@ -58,7 +58,7 @@ export const cipherAgentService = {
 
   async analyzeWallet(walletAddress: string): Promise<WalletAnalysisResponse> {
     try {
-      const response = await fetch('https://fund-ur-memory-agents-production.up.railway.app/api/wallet-analysis', {
+      const response = await fetch('https://cipher-agents.up.railway.app/api/wallet-analysis', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

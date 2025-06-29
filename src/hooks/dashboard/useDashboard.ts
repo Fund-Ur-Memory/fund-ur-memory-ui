@@ -38,14 +38,14 @@ export const useDashboard = (): UseDashboardReturn => {
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState('overview')
   const [isPrivacyMode, setIsPrivacyMode] = useState(() => {
-    const saved = localStorage.getItem('fum-privacy-mode')
+    const saved = localStorage.getItem('cipher-privacy-mode')
     return saved ? JSON.parse(saved) : false
   })
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [dataInitialized, setDataInitialized] = useState(false)
 
   useEffect(() => {
-    localStorage.setItem('fum-privacy-mode', JSON.stringify(isPrivacyMode))
+    localStorage.setItem('cipher-privacy-mode', JSON.stringify(isPrivacyMode))
   }, [isPrivacyMode])
 
 

@@ -15,11 +15,37 @@ const Hero = () => {
     >
       <div className="container">
         <h1 className="hero_title text-white" data-aos="fade-up" data-aos-duration="800">
-          Set It, Forget It, Let AI Remember It
+          Encode Your Discipline
         </h1>
         <p className="hero_subtitle" data-aos="fade-up" data-aos-duration="800" data-aos-delay="100">
-          Your Cross-Chain Autonomous Wealth Vault
+          AI-Powered Cross-Chain DeFi Commitment Protocol<br/>
+          <span className="text-primary">Chainlink CCIP • ElizaOS Agents • Avalanche Network</span>
         </p>
+        
+        <div className="hero_stats" data-aos="fade-up" data-aos-duration="800" data-aos-delay="200">
+          <div className="row justify-content-center">
+            <div className="col-lg-8">
+              <div className="stats_wrapper">
+                <div className="stat_item">
+                  <span className="stat_number text-primary"> 5 </span>
+                  <span className="stat_label">Chainlink Services</span>
+                </div>
+                <div className="stat_item">
+                  <span className="stat_number text-primary"> 90%+ </span>
+                  <span className="stat_label">Success Rate</span>
+                </div>
+                <div className="stat_item">
+                  <span className="stat_number text-primary"> $2.3B </span>
+                  <span className="stat_label">Losses Prevented</span>
+                </div>
+                <div className="stat_item">
+                  <span className="stat_number text-primary"> Multi-Chain </span>
+                  <span className="stat_label"> CCIP Integration </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <ul
           className="btns_group unordered_list justify-content-center p-0"
@@ -42,7 +68,7 @@ const Hero = () => {
                     <path d="M1.44252 9.28834L9.48641 1.16784C9.59281 1.06043 9.73772 1 9.88891 1H13.0081C13.5116 1 13.7649 1.60758 13.4106 1.96525L5.36672 10.0858C5.26033 10.1932 5.11541 10.2536 4.96422 10.2536H1.84502C1.34158 10.2536 1.08822 9.64601 1.44252 9.28834Z" />
                   </svg>
                 </span>
-                <span className="btn_label">Create Commitment Vault</span>
+                <span className="btn_label">Launch DeFi Vault</span>
                 <span className="btn_icon_right">
                   <small className="dot_top"></small>
                   <small className="dot_bottom"></small>
@@ -92,23 +118,23 @@ const Hero = () => {
             </div>
             <div className="ico_progress">
               <ul className="progress_range_step unordered_list justify-content-between">
-                <li>Active Vaults: $1.75m</li>
-                <li>Total Locked: $4.75m</li>
-                <li>Bonus</li>
+                <li>Active Vaults: 0 <small className="text-success">(Target: 1.75k)</small></li>
+                <li>Total Locked: $40 <small className="text-success">(Target: $4.75M)</small></li>
+                <li>Success Rate: 80%</li>
               </ul>
               <div className="progress">
                 <div
                   className="progress-bar"
                   role="progressbar"
-                  style={{ width: "80%" }}
-                  aria-valuenow={80}
+                  style={{ width: "8%" }}
+                  aria-valuenow={8}
                   aria-valuemin={0}
                   aria-valuemax={100}
                 ></div>
               </div>
               <ul className="progress_value unordered_list justify-content-between">
-                <li>Minimum Commitment: $200</li>
-                <li>Assets Under Management: $1,830,985</li>
+                <li>Minimum Commitment: $0.025 <small className="text-success">(Mainnet: $100)</small></li>
+                <li>Assets Under Management: $40 <small className="text-success">(Projected: $1.8M)</small></li>
               </ul>
             </div>
           </div>

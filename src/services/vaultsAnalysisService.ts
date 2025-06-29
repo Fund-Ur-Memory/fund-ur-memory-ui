@@ -74,7 +74,7 @@ export const fetchVaultsAnalysis = async (text = "Analyze community vault patter
 
     console.log('🔍 Fetching fresh vaults analysis from API...')
 
-    const response = await fetch('https://fund-ur-memory-agents-production.up.railway.app/api/vaults-analysis', {
+    const response = await fetch('https://cipher-agents.up.railway.app/api/vaults-analysis', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

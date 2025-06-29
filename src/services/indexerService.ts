@@ -127,7 +127,7 @@ export const fetchOwnerVaults = async (
 
     console.log('🔍 Fetching vault data from indexer for:', owner)
 
-    const url = `https://fund-ur-memory-indexer-production.up.railway.app/vaults?owner=${owner}&limit=${limit}&offset=${offset}`
+    const url = `https://cipher-indexer.up.railway.app/vaults?owner=${owner}&limit=${limit}&offset=${offset}`
     
     const response = await fetch(url, {
       method: 'GET',

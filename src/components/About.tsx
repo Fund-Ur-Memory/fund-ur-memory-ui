@@ -16,29 +16,31 @@ const About: React.FC<AboutProps> = ({ abClass = "" }) => {
         <div className="row justify-content-lg-between">
           <div className="col-lg-6">
             <div className="ico_heading_block" data-aos="fade-up" data-aos-duration="600">
-              <h2 className="heading_text mb-0 text-white">Introducing Cipher Protocol</h2>
+              <h2 className="heading_text mb-0 text-white">Building the Future, Onchain</h2>
             </div>
             <ul className="about_ico_block unordered_list_block">
               <li data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
-                <h3 className="title_text text-white">What is Cipher?</h3>
+                <h3 className="title_text text-white">Cross-Chain Innovation</h3>
                 <p className="info_description mb-0">
-                  Cipher is a privacy-preserving, AI-powered cross-chain DeFi platform that enables wealthy investors to
-                  create 'commitment contracts' - smart contracts that execute predetermined investment strategies while
-                  preventing emotional trading decisions.
+                  Cipher leverages <strong>Chainlink CCIP</strong> for seamless cross-chain interoperability, enabling 
+                  DeFi commitment vaults across multiple blockchains with unified liquidity and automated price feeds 
+                  for optimal capital efficiency.
                 </p>
               </li>
               <li data-aos="fade-up" data-aos-duration="600" data-aos-delay="200">
-                <h3 className="title_text text-white">Why Commitment Contracts?</h3>
+                <h3 className="title_text text-white">ElizaOS AI Framework</h3>
                 <p className="info_description mb-0">
-                  Commitment contracts prevent emotional trading and decision fatigue for wealthy investors by
-                  automating investment strategies based on pre-defined rules and market conditions.
+                  Powered by <strong>ElizaOS multi-agent systems</strong>, our AI framework analyzes market psychology, 
+                  behavioral patterns, and commitment optimization in real-time, providing sophisticated investment 
+                  intelligence for DeFi protocols.
                 </p>
               </li>
               <li data-aos="fade-up" data-aos-duration="600" data-aos-delay="300">
-                <h3 className="title_text text-white">Why AI-Powered?</h3>
+                <h3 className="title_text text-white">Avalanche Deployment</h3>
                 <p className="info_description mb-0">
-                  AI analysis and multi-agent systems enhance investment decisions by providing data-driven insights,
-                  identifying market trends, and optimizing portfolio allocation for better risk-adjusted returns.
+                  Built on <strong>Avalanche's high-performance network</strong> with sub-second finality and low fees, 
+                  our smart contract vaults utilize Chainlink Automation and Data Feeds for trustless, gasless execution 
+                  of commitment strategies.
                 </p>
               </li>
             </ul>
@@ -46,11 +48,11 @@ const About: React.FC<AboutProps> = ({ abClass = "" }) => {
           <div className="col-lg-5 d-lg-flex flex-lg-column-reverse">
             <ul className="about_ico_block unordered_list_block">
               <li data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
-                <h3 className="title_text text-white">Market Opportunity</h3>
+                <h3 className="title_text text-white">Technical Excellence</h3>
                 <p className="info_description mb-0">
-                  Cipher's market opportunity lies in the underserved High-Net-Worth Individual (HNWI) DeFi market,
-                  offering sophisticated investment tools and strategies tailored to their unique needs and risk
-                  profiles.
+                  Cipher demonstrates cutting-edge integration of <strong>5 Chainlink services</strong> including CCIP, 
+                  Data Feeds, Automation, Functions, and VRF, combined with ElizaOS AI agents and Avalanche's 
+                  high-performance infrastructure for next-generation DeFi innovation.
                 </p>
               </li>
             </ul>

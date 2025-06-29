@@ -16,18 +16,18 @@ interface Feature {
 const features: Feature[] = [
   {
     icon: icon1,
-    title: "Prevents Emotional Trading",
-    description: "Commitment contracts eliminate FOMO and panic selling",
+    title: "ElizaOS AI Agents",
+    description: "Multi-agent behavioral analysis using advanced LLMs for real-time market psychology and commitment optimization",
   },
   {
     icon: icon2,
-    title: "AI-Powered Decisions",
-    description: "Multi-agent analysis provides optimal entry/exit strategies",
+    title: "Chainlink CCIP Integration",
+    description: "Cross-chain interoperability with automated price feeds, data streams, and smart contract automation",
   },
   {
     icon: icon3,
-    title: "Cross-Chain Flexibility",
-    description: "Manage assets across 10+ blockchains seamlessly",
+    title: "Smart Commitment Contracts",
+    description: "Avalanche-deployed vaults with cryptographic commitment mechanisms and emergency withdrawal protocols",
   },
 ]
 
@@ -39,7 +39,7 @@ const FeaturesSection = () => {
           {/* Left Side - Features List */}
           <div className="col-lg-5">
             <div className="ico_heading_block" data-aos="fade-up" data-aos-duration="600">
-              <h2 className="heading_text mb-0 text-white">Why Cipher is Revolutionary?</h2>
+              <h2 className="heading_text mb-0 text-white">Hackathon-Grade Innovation</h2>
             </div>
             <ul className="ico_features_group unordered_list_block">
               {features.map((feature, index) => (
@@ -68,19 +68,19 @@ const FeaturesSection = () => {
               <li>
                 <h4 className="heading_text text-white">Total Value Locked</h4>
                 <div className="investment_value">
-                  <span className="odometer" data-count="60000">
-                    <CountUp end={1200000} enableScrollSpy scrollSpyOnce />
+                  <span className="odometer" data-count="40">
+                    <CountUp end={40} enableScrollSpy scrollSpyOnce />
                   </span>
-                  <span>$</span>
+                  <span>$ <small className="text-success">(Target: $4.75M)</small></span>
                 </div>
               </li>
               <li>
-                <h4 className="heading_text text-white">Average APY</h4>
+                <h4 className="heading_text text-white">Success Rate</h4>
                 <div className="investment_value">
-                  <span className="odometer" data-count="60000">
-                    <CountUp end={15} enableScrollSpy scrollSpyOnce />
+                  <span className="odometer" data-count="80">
+                    <CountUp end={80} enableScrollSpy scrollSpyOnce />
                   </span>
-                  <span>%</span>
+                  <span>% <small className="text-success">(8/10 Vaults)</small></span>
                 </div>
               </li>
             </ul>
@@ -88,29 +88,29 @@ const FeaturesSection = () => {
             {/* Coin Purchase Price */}
             <div className="ico_coin_purchase_price" data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
               <p className="purchase_price_rate mb-0 text-secondary">
-                Average Commitment Duration <strong>90 Days</strong>
+                Average Commitment Duration <strong>30 Days</strong> <small className="text-success">(Real Data)</small>
               </p>
               <div className="chart_image">
                 <img src={shape1 || "/placeholder.svg"} alt="Shape Chart" />
               </div>
               <div className="live_values">
-                <span>100$</span>
-                <span>100.000$</span>
+                <span>$0.025</span>
+                <span>$6.50 <small className="text-success">Avg</small></span>
               </div>
             </div>
 
             {/* Calculation Range */}
             <div className="ico_calculation_range" data-aos="fade-up" data-aos-duration="600" data-aos-delay="200">
               <div className="live_values">
-                <span>AI Analysis Updated</span>
-                <span>Continuously</span>
+                <span>Total Vaults Created</span>
+                <span>10 <small className="text-success">Real</small></span>
               </div>
               <div className="range_image">
                 <img src={shape2 || "/placeholder.svg"} alt="Shape Range" />
               </div>
               <div className="live_values">
-                <span>100$</span>
-                <span>100.000$</span>
+                <span>Min: $0.025</span>
+                <span>Max: $13 <small className="text-success">Testnet</small></span>
               </div>
             </div>
           </div>
